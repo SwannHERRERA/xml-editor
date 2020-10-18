@@ -1,55 +1,8 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE CATALOG [
-
-<!ENTITY AUTHOR "John Doe">
-<!ENTITY COMPANY "JD Power Tools, Inc.">
-<!ENTITY EMAIL "jd@jd-tools.com">
-
-<!ELEMENT CATALOG (PRODUCT+)>
-
-<!ELEMENT PRODUCT
-(SPECIFICATIONS+,OPTIONS?,PRICE+,NOTES?)>
-<!ATTLIST PRODUCT
-NAME CDATA #IMPLIED
-CATEGORY (HandTool|Table|Shop-Professional) "HandTool"
-PARTNUM CDATA #IMPLIED
-PLANT (Pittsburgh|Milwaukee|Chicago) "Chicago"
-INVENTORY (InStock|Backordered|Discontinued) "InStock">
-
-<!ELEMENT SPECIFICATIONS (#PCDATA)>
-<!ATTLIST SPECIFICATIONS
-WEIGHT CDATA #IMPLIED
-POWER CDATA #IMPLIED>
-
-<!ELEMENT OPTIONS (#PCDATA)>
-<!ATTLIST OPTIONS
-FINISH (Metal|Polished|Matte) "Matte"
-ADAPTER (Included|Optional|NotApplicable) "Included"
-CASE (HardShell|Soft|NotApplicable) "HardShell">
-
-<!ELEMENT PRICE (#PCDATA)>
-<!ATTLIST PRICE
-MSRP CDATA #IMPLIED
-WHOLESALE CDATA #IMPLIED
-STREET CDATA #IMPLIED
-SHIPPING CDATA #IMPLIED>
-
-<!ELEMENT NOTES (#PCDATA)>
-
-]>
-<catalog>
-  <product name="key">
-    <specifications>text</specifications>
-    <specifications power="12" weight="10">text with power and weight</specifications>
-  </product>
-  <product name="key2">
-    <options>option</options>
-    <options finish="Polished" case="Soft">option with attr</options>
-  </product>
-  <product>
-    <specifications power="12" weight="10">text with power and weight</specifications>
-    <options finish="Polished" case="Soft">option with attr</options>
-    <price street="gzeg">12</price>
-    <note>Note</note>
-  </product>
-</catalog>
+<?xml version="1.0"?>
+<!DOCTYPE ESGI [<!ELEMENT classrooms (classroom+)><!ELEMENT classroom (#PCDATA)>]>
+<classrooms>
+  <classroom>AL</classroom>
+  <classroom>IABD</classroom>
+  <classroom>MOC</classroom>
+  <classroom>IBC</classroom>
+</classrooms>
