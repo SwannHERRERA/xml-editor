@@ -193,6 +193,7 @@ long get_size_of_file(FILE *file)
   return size;
 }
 
+// TODO utiliser la fonction realloc()
 void add_element(XMLElement *parent, XMLElement *child)
 {
   if (parent->childsCount == parent->childsCapacity)
