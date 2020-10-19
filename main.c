@@ -2,6 +2,15 @@
 #include <stdlib.h>
 #include <string.h>
 
+
+typedef struct XMLElement XMLElement;
+typedef struct Doctype Doctype;
+char *find_doctype(FILE *file);
+long get_size_of_file(FILE *file);
+char *file_get_content(FILE *file);
+void add_element(XMLElement *parent, XMLElement *child);
+XMLElement *create_element(XMLElement *parent, int deepness);
+
 struct Doctype
 {
   char *name;
@@ -17,14 +26,6 @@ struct XMLElement
   int childsCount;
   int childsCapacity;
 };
-
-typedef struct XMLElement XMLElement;
-typedef struct Doctype Doctype;
-char *find_doctype(FILE *file);
-long get_size_of_file(FILE *file);
-char *file_get_content(FILE *file);
-void add_element(XMLElement *parent, XMLElement *child);
-XMLElement *create_element(XMLElement *parent, int deepness);
 
 /**
  * I use ARGV to give relative path to xml
@@ -106,7 +107,7 @@ XMLElement *create_element(XMLElement *parent, int deepness)
   element->parent = parent;
   element->deepness = deepness;
   element->childsCount = 0;
-  element->childsCapacity = 1;
+  element->childsCapacity = 20;
   element->childs = malloc(sizeof(XMLElement));
   return element;
 }
