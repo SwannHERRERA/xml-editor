@@ -2,21 +2,28 @@
 #include <stdlib.h>
 #include <string.h>
 
-typedef struct XMLElement XMLElement;
-int find_doctype(FILE *file);
-long get_size_of_file(FILE *file);
-char *file_get_content(FILE *file);
-void add_element(XMLElement* parent, XMLElement* child);
-XMLElement* create_element(XMLElement* parent, int deepness);
+struct Doctype
+{
+  char *name;
+  XMLElement *elements;
+};
 
-struct XMLElement{
-  XMLElement* parent;
-  XMLElement** childs;
+struct XMLElement
+{
+  XMLElement *parent;
+  XMLElement **childs;
   int deepness;
   int childsCount;
   int childsCapacity;
 };
 
+typedef struct XMLElement XMLElement;
+typedef struct Doctype Doctype;
+char *find_doctype(FILE *file);
+long get_size_of_file(FILE *file);
+char *file_get_content(FILE *file);
+void add_element(XMLElement *parent, XMLElement *child);
+XMLElement *create_element(XMLElement *parent, int deepness);
 
 /**
  * I use ARGV to give relative path to xml
@@ -35,26 +42,25 @@ int main(int argc, char **argv)
     fprintf(stderr, "Error opening file %s\n", argv[1]);
     return EXIT_FAILURE;
   }
-  printf("%d\n", find_doctype(file));
+  printf("%s\n", find_doctype(file));
   fclose(file);
 }
 
-// A terme j'aimerais bien que ça retourn
-// <!DOCTYPE ESGI [<!ELEMENT classrooms (classroom+)><!ELEMENT classroom (#PCDATA)>]>
-int find_doctype(FILE *file)
+// C'est ici qu'on derterminera si la DTD est dans un fichier externe ou pas attention http
+char *find_doctype(FILE *file)
 {
   char *buffer = file_get_content(file);
-  if (strstr(buffer, "<!DOCTYPE") != NULL)
-  {
-    return 1;
-  }
-  return 0;
+  char *start = strstr(buffer, "<!DOCTYPE");
+  char *end = strstr(buffer, "]>");
+  char *res = (char *)malloc(sizeof(char) * (end - start));
+  strncpy(res, start, end - start);
+  return res;
 }
 
 char *file_get_content(FILE *file)
 {
   long size = get_size_of_file(file);
-  char *buffer = malloc(sizeof(char) * size);
+  char *buffer = (char *)malloc(sizeof(char) * size);
   if (buffer)
   {
     fread(buffer, sizeof(char), size, file);
@@ -73,11 +79,14 @@ long get_size_of_file(FILE *file)
   return size;
 }
 
-void add_element(XMLElement* parent, XMLElement* child){
-  if(parent->childsCount == parent->childsCapacity){
+void add_element(XMLElement *parent, XMLElement *child)
+{
+  if (parent->childsCount == parent->childsCapacity)
+  {
     parent->childsCapacity *= 2;
-    XMLElement** tab = malloc(sizeof(XMLElement)*parent->childsCapacity);
-    for(int i = 0; i < parent->childsCount;i++){
+    XMLElement **tab = malloc(sizeof(XMLElement) * parent->childsCapacity);
+    for (int i = 0; i < parent->childsCount; i++)
+    {
       tab[i] = parent->childs[i];
     }
     parent->childs = tab;
@@ -86,9 +95,11 @@ void add_element(XMLElement* parent, XMLElement* child){
   parent->childs[parent->childsCount] = child;
 }
 
-XMLElement* create_element(XMLElement* parent, int deepness){
-  XMLElement* element = malloc(sizeof(XMLElement));
-  if(parent != NULL){
+XMLElement *create_element(XMLElement *parent, int deepness)
+{
+  XMLElement *element = malloc(sizeof(XMLElement));
+  if (parent != NULL)
+  {
     add_element(parent, element);
   }
   element->parent = parent;
@@ -98,4 +109,3 @@ XMLElement* create_element(XMLElement* parent, int deepness){
   element->childs = malloc(sizeof(XMLElement));
   return element;
 }
-
