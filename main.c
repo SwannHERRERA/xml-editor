@@ -96,5 +96,6 @@ XMLElement* create_element(XMLElement* parent, int deepness){
   element->childsCount = 0;
   element->childsCapacity = 1;
   element->childs = malloc(sizeof(XMLElement));
+  return element;
 }
 
