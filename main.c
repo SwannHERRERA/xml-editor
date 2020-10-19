@@ -12,6 +12,10 @@ char *file_get_content(FILE *file);
 void add_element(XMLElement *parent, XMLElement *child);
 XMLElement *create_element(XMLElement *parent);
 XMLElement *parse_dtd(char *dtd);
+long get_size_of_doctype(char *start);
+int is_internal_doctype(char *doctype);
+char *get_content_of_external_DTD(char *doctype);
+char *get_DTD_filename(char *doctype);
 
 struct Doctype
 {
@@ -54,12 +58,112 @@ int main(int argc, char **argv)
 // C'est ici qu'on derterminera si la DTD est dans un fichier externe ou pas attention http
 char *find_doctype(FILE *file)
 {
+
   char *buffer = file_get_content(file);
   char *start = strstr(buffer, "<!DOCTYPE");
-  char *end = strstr(buffer, "]>");
-  char *res = (char *)malloc(sizeof(char) * (end - start));
-  strncpy(res, start, end - start);
+  char size_of_doctype = get_size_of_doctype(start);
+  char *doctype = (char *)malloc(sizeof(char) * size_of_doctype);
+  strncpy(doctype, start, size_of_doctype);
+
+  if (is_internal_doctype(doctype))
+  {
+    return doctype;
+  }
+  else
+  {
+    return get_content_of_external_DTD(doctype);
+  }
+}
+
+char *get_content_of_external_DTD(char *doctype)
+{
+  char *external_DTD_filename = NULL;
+  FILE *external_DTD_file = NULL;
+
+  external_DTD_filename = get_DTD_filename(doctype);
+  external_DTD_file = fopen(external_DTD_filename, "r");
+
+  if (external_DTD_file == NULL)
+  {
+    fprintf(stderr, "Failed to open file: %s\n", external_DTD_filename);
+    fclose(external_DTD_file);
+    exit(EXIT_FAILURE);
+  }
+
+  free(external_DTD_filename);
+  return file_get_content(external_DTD_file);
+}
+
+char *get_DTD_filename(char *doctype)
+{
+  char *res;
+  long size_of_doctype = strlen(doctype);
+  int n = 0;
+  int start = 0;
+  int end = 0;
+  while (n < size_of_doctype)
+  {
+    if (doctype[n] == '"')
+    {
+      if (start == 0)
+      {
+        start = n + 1;
+      }
+      else
+      {
+        end = n;
+        break;
+      }
+    }
+    n += 1;
+  }
+  res = (char *)malloc(sizeof(char) * (end - start));
+  if (res == NULL)
+  {
+    fprintf(stderr, "Memory allocation failed [get_DTD_filename]");
+    exit(EXIT_FAILURE);
+  }
+  strncpy(res, doctype + start, end - start);
   return res;
+}
+
+long get_size_of_doctype(char *start)
+{
+  long size_of_buffer = strlen(start);
+  long n = 1;
+  int nb_open_tags = 0;
+  int exit_loop = 0;
+
+  while (n < size_of_buffer && exit_loop == 0)
+  {
+    if (start[n] == '<')
+    {
+      nb_open_tags += 1;
+    }
+    else if (start[n] == '>')
+    {
+      if (nb_open_tags == 0)
+      {
+        exit_loop = 1;
+      }
+      else
+      {
+        nb_open_tags -= 1;
+      }
+    }
+    n += 1;
+  }
+  return n;
+}
+
+// TODO mettre en BOOL
+int is_internal_doctype(char *doctype)
+{
+  if (strstr(doctype, "SYSTEM") == NULL)
+  {
+    return 1;
+  }
+  return 0;
 }
 
 char *file_get_content(FILE *file)
@@ -69,6 +173,11 @@ char *file_get_content(FILE *file)
   if (buffer)
   {
     fread(buffer, sizeof(char), size, file);
+  }
+  else
+  {
+    fprintf(stderr, "Failed to allocate memory [file_get_content]\n");
+    exit(EXIT_FAILURE);
   }
   return buffer;
 }

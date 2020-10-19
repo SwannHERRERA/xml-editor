@@ -1,0 +1,5 @@
+<?xml version="1.0"?>
+<!ELEMENT Stockmarket (sname,branch,contact)>
+<!ELEMENT sname (#PCDATA)>
+<!ELEMENT branch (#PCDATA)>
+<!ELEMENT contact (#PCDATA)>
