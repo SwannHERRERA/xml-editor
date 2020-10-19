@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <stdbool.h>
 
 
 typedef struct XMLElement XMLElement;
@@ -9,7 +10,8 @@ char *find_doctype(FILE *file);
 long get_size_of_file(FILE *file);
 char *file_get_content(FILE *file);
 void add_element(XMLElement *parent, XMLElement *child);
-XMLElement *create_element(XMLElement *parent, int deepness);
+XMLElement *create_element(XMLElement *parent);
+XMLElement *parse_dtd(char *dtd);
 
 struct Doctype
 {
@@ -46,6 +48,7 @@ int main(int argc, char **argv)
   }
   printf("%s\n", find_doctype(file));
   fclose(file);
+  parse_dtd("<!ELEMENT classrooms (classroom+)><!ELEMENT classroom (#PCDATA)>");
 }
 
 // C'est ici qu'on derterminera si la DTD est dans un fichier externe ou pas attention http
@@ -97,17 +100,33 @@ void add_element(XMLElement *parent, XMLElement *child)
   parent->childs[parent->childsCount] = child;
 }
 
-XMLElement *create_element(XMLElement *parent, int deepness)
+XMLElement *create_element(XMLElement *parent)
 {
   XMLElement *element = malloc(sizeof(XMLElement));
+  element->deepness = 0;
   if (parent != NULL)
   {
     add_element(parent, element);
+    element->deepness = parent->deepness + 1;
   }
   element->parent = parent;
-  element->deepness = deepness;
   element->childsCount = 0;
   element->childsCapacity = 20;
   element->childs = malloc(sizeof(XMLElement));
   return element;
+}
+
+XMLElement *parse_dtd(char *dtd)
+{
+  XMLElement *parent = NULL;
+  char **buff = malloc(sizeof(char*)*20);
+  int i = 0;
+  buff[i]= strtok(dtd, ">");
+  while(buff[i] != NULL){
+    buff[++i] = strtok(NULL, ">");
+  }
+  for(int i = 0; i < 20;i++){
+    printf("%s", buff[i]);
+  }
+  return parent;
 }
