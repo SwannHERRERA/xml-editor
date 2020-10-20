@@ -51,7 +51,7 @@ int main(int argc, char **argv)
   }
   printf("%s\n", find_doctype(file));
   fclose(file);
-  parse_dtd("<!ELEMENT classrooms (classroom+)><!ELEMENT classroom (#PCDATA)>");
+  parse_dtd("<!ELEMENT classrooms (classroom+)>\n<!ELEMENT classroom (#PCDATA)>");
   return EXIT_SUCCESS;
 }
 
@@ -249,10 +249,10 @@ XMLElement *parse_dtd(char *dtd)
   strcpy(tmp, dtd);
   XMLElement *parent = NULL;
   int i = 0;
-  buff[i] = strtok(tmp, "<>");
+  buff[i] = strtok(tmp, ">");
   while (buff[i] != NULL)
   {
-    buff[++i] = strtok(NULL, "<>");
+    buff[++i] = strtok(NULL, ">");
   }
   for (int i = 0; i < buff_size; i++)
   {
