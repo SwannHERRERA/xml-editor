@@ -2,6 +2,7 @@ BUILD_DIR = build/
 CC = gcc
 EXTRAFLAG = -std=c18 -Wall -Wextra -Werror
 RMDIR = rm -rf
+SRC = src/
 
 create_dir:
 	mkdir -p $(BUILD_DIR)
@@ -14,6 +15,6 @@ all: dev
 dev: build start
 
 build: create_dir
-	$(CC) $(EXTRAFLAG) -o $(BUILD_DIR)executable.out main.c 
+	$(CC) $(EXTRAFLAG) -o $(BUILD_DIR)executable.out $(SRC)file_helper.c $(SRC)xml_element.c $(SRC)parse_dtd.c $(SRC)main.c 
 start:
 	$(BUILD_DIR)executable.out $(inputFile)
