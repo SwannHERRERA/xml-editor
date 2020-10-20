@@ -27,6 +27,8 @@ struct XMLElement
   XMLElement *parent;
   XMLElement **childs;
   char *name;
+  char *data;
+  bool pcdata;
   int deepness;
   int childsCount;
   int childsCapacity;
@@ -228,6 +230,7 @@ XMLElement *create_element(XMLElement *parent)
   return element;
 }
 
+//TODO ajouter un prototype
 int char_count(char *str, char character)
 {
   int counter = 0;
@@ -241,23 +244,49 @@ int char_count(char *str, char character)
   return counter;
 }
 
-XMLElement *parse_dtd(char *dtd)
+//TODO ajouter un prototype
+char **split_string(char *dtd, int *size)
 {
-  printf("Starting to parse dtd\n");
-  int buff_size = char_count(dtd, '>');
-  char **buff = malloc(sizeof(char *) * buff_size);
+  *size = char_count(dtd, '>');
+  char **buffer = malloc(sizeof(char *) * (*size));
   char tmp[strlen(dtd)];
   strcpy(tmp, dtd);
-  XMLElement *parent = NULL;
   int i = 0;
-  buff[i] = strtok(tmp, ">");
-  while (buff[i] != NULL)
+  buffer[i] = strtok(tmp, ">");
+  while (buffer[i] != NULL)
   {
-    buff[++i] = strtok(NULL, ">");
+    buffer[++i] = strtok(NULL, ">");
   }
-  for (int i = 0; i < buff_size; i++)
+  return buffer;
+}
+
+XMLElement *create_elements_tree(char **buffer, int buffer_size)
+{
+  for (int i = 0; i < buffer_size; i++)
   {
-    printf("%s\n", buff[i]);
+    if(strstr(buffer[i], "<!ELEMENT ") != NULL)
+    {
+      int j = strlen("<!ELEMENT ");
+      char name[255];
+      bool found=false;
+      while(buffer[i][j] != ' ' && !found){
+        if(buffer[i][j] != ' '){
+          found=true;
+          strncat(name, buffer[i]+j, 1);
+        }
+        j++;
+        i++;
+      }
+      printf("%s", name);
+    }
   }
+  return NULL;
+}
+
+XMLElement *parse_dtd(char *dtd)
+{
+  int buffer_size = 0;
+  char **buffer = split_string(dtd, &buffer_size);
+  XMLElement *parent = create_elements_tree(buffer, buffer_size);
   return parent;
 }
