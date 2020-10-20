@@ -4,7 +4,6 @@
 #include <stdbool.h>
 
 typedef struct XMLElement XMLElement;
-typedef struct Doctype Doctype;
 char *find_doctype(FILE *file);
 long get_size_of_file(FILE *file);
 char *file_get_content(FILE *file);
@@ -12,15 +11,9 @@ void add_element(XMLElement *parent, XMLElement *child);
 XMLElement *create_element(XMLElement *parent);
 XMLElement *parse_dtd(char *dtd);
 long get_size_of_doctype(char *start);
-int is_internal_doctype(char *doctype);
+bool is_internal_doctype(char *doctype);
 char *get_content_of_external_DTD(char *doctype);
 char *get_DTD_filename(char *doctype);
-
-struct Doctype
-{
-  char *name;
-  XMLElement *elements;
-};
 
 struct XMLElement
 {
@@ -166,14 +159,13 @@ long get_size_of_doctype(char *start)
   return n;
 }
 
-// TODO mettre en BOOL
-int is_internal_doctype(char *doctype)
+bool is_internal_doctype(char *doctype)
 {
   if (strstr(doctype, "SYSTEM") == NULL)
   {
-    return 1;
+    return true;
   }
-  return 0;
+  return false;
 }
 
 char *file_get_content(FILE *file)
