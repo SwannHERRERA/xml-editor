@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!DOCTYPE Stockmarket SYSTEM "exemple.dtd">
-<!DOCTYPE ESGI [<!ELEMENT classrooms (classroom+)><!ELEMENT classroom (#PCDATA)>]>
 <classrooms>
+  <!-- <!DOCTYPE ESGI [<!ELEMENT classrooms (classroom+)><!ELEMENT classroom (#PCDATA)>]> -->
   <classroom>AL</classroom>
   <classroom>IABD</classroom>
   <classroom>MOC</classroom>

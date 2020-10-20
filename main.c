@@ -49,9 +49,10 @@ int main(int argc, char **argv)
     fprintf(stderr, "Error opening file %s\n", argv[1]);
     return EXIT_FAILURE;
   }
-  printf("%s\n", find_doctype(file));
+  char *dtd = find_doctype(file);
   fclose(file);
-  parse_dtd("<!ELEMENT classrooms (classroom+)>\n<!ELEMENT classroom (#PCDATA)>");
+  parse_dtd(dtd);
+  free(dtd);
   return EXIT_SUCCESS;
 }
 
