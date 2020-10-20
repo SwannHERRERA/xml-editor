@@ -3,7 +3,6 @@
 #include <string.h>
 #include <stdbool.h>
 
-
 typedef struct XMLElement XMLElement;
 typedef struct Doctype Doctype;
 char *find_doctype(FILE *file);
@@ -27,7 +26,7 @@ struct XMLElement
 {
   XMLElement *parent;
   XMLElement **childs;
-  char* name;
+  char *name;
   int deepness;
   int childsCount;
   int childsCapacity;
@@ -53,7 +52,7 @@ int main(int argc, char **argv)
   printf("%s\n", find_doctype(file));
   fclose(file);
   parse_dtd("<!ELEMENT classrooms (classroom+)><!ELEMENT classroom (#PCDATA)>");
-  return 0;
+  return EXIT_SUCCESS;
 }
 
 // C'est ici qu'on derterminera si la DTD est dans un fichier externe ou pas attention http
@@ -228,10 +227,13 @@ XMLElement *create_element(XMLElement *parent)
   return element;
 }
 
-int char_count(char *str, char character){
-  int counter=0;
-  for(size_t i = 0;i<strlen(str);i++){
-    if(str[i]==character){
+int char_count(char *str, char character)
+{
+  int counter = 0;
+  for (size_t i = 0; i < strlen(str); i++)
+  {
+    if (str[i] == character)
+    {
       counter++;
     }
   }
@@ -242,16 +244,18 @@ XMLElement *parse_dtd(char *dtd)
 {
   printf("Starting to parse dtd\n");
   int buff_size = char_count(dtd, '>');
-  char **buff = malloc(sizeof(char*)*buff_size);
+  char **buff = malloc(sizeof(char *) * buff_size);
   char tmp[strlen(dtd)];
   strcpy(tmp, dtd);
   XMLElement *parent = NULL;
   int i = 0;
-  buff[i]= strtok(tmp, "<>");
-  while(buff[i] != NULL){
+  buff[i] = strtok(tmp, "<>");
+  while (buff[i] != NULL)
+  {
     buff[++i] = strtok(NULL, "<>");
   }
-  for(int i = 0; i < buff_size;i++){
+  for (int i = 0; i < buff_size; i++)
+  {
     printf("%s\n", buff[i]);
   }
   return parent;
