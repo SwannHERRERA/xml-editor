@@ -64,8 +64,13 @@ char *find_doctype(FILE *file)
   char *start = strstr(buffer, "<!DOCTYPE");
   char size_of_doctype = get_size_of_doctype(start);
   char *doctype = (char *)malloc(sizeof(char) * size_of_doctype);
+  if (!doctype)
+  {
+    fprintf(stderr, "Failed to allocate memory for {doctype} [find_doctype]");
+    exit(EXIT_FAILURE);
+  }
   strncpy(doctype, start, size_of_doctype);
-
+  free(buffer);
   if (is_internal_doctype(doctype))
   {
     return doctype;
@@ -78,6 +83,7 @@ char *find_doctype(FILE *file)
 
 char *get_content_of_external_DTD(char *doctype)
 {
+  char *res = NULL;
   char *external_DTD_filename = NULL;
   FILE *external_DTD_file = NULL;
 
@@ -91,8 +97,11 @@ char *get_content_of_external_DTD(char *doctype)
     exit(EXIT_FAILURE);
   }
 
+  res = file_get_content(external_DTD_file);
   free(external_DTD_filename);
-  return file_get_content(external_DTD_file);
+  free(doctype);
+  fclose(external_DTD_file);
+  return res;
 }
 
 char *get_DTD_filename(char *doctype)
@@ -201,6 +210,11 @@ void add_element(XMLElement *parent, XMLElement *child)
   {
     parent->childsCapacity *= 2;
     XMLElement **tab = malloc(sizeof(XMLElement) * parent->childsCapacity);
+    if (tab == NULL)
+    {
+      fprintf(stderr, "Failed to allocate memory [add_element]\n");
+      exit(EXIT_FAILURE);
+    }
     for (int i = 0; i < parent->childsCount; i++)
     {
       tab[i] = parent->childs[i];
@@ -215,6 +229,11 @@ void add_element(XMLElement *parent, XMLElement *child)
 XMLElement *create_element(XMLElement *parent)
 {
   XMLElement *element = malloc(sizeof(XMLElement));
+  if (element == NULL)
+  {
+    fprintf(stderr, "Failed to allocate memory [create_element]\n");
+    exit(EXIT_FAILURE);
+  }
   element->deepness = 0;
   if (parent != NULL)
   {
@@ -225,6 +244,11 @@ XMLElement *create_element(XMLElement *parent)
   element->childsCount = 0;
   element->childsCapacity = 20;
   element->childs = malloc(sizeof(XMLElement));
+  if (!element->childs)
+  {
+    fprintf(stderr, "Failed to allocate memory for {element->childs} [create_element]\n");
+    exit(EXIT_FAILURE);
+  }
   return element;
 }
 
@@ -246,6 +270,11 @@ XMLElement *parse_dtd(char *dtd)
   printf("Starting to parse dtd\n");
   int buff_size = char_count(dtd, '>');
   char **buff = malloc(sizeof(char *) * buff_size);
+  if (buff == NULL)
+  {
+    fprintf(stderr, "Failed to allocate memory [parse_dtd]\n");
+    exit(EXIT_FAILURE);
+  }
   char tmp[strlen(dtd)];
   strcpy(tmp, dtd);
   XMLElement *parent = NULL;
@@ -259,5 +288,6 @@ XMLElement *parse_dtd(char *dtd)
   {
     printf("%s\n", buff[i]);
   }
+  free(buff);
   return parent;
 }
