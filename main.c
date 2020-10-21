@@ -287,20 +287,30 @@ XMLElement *create_elements_tree(char **buffer, int buffer_size)
 {
   for (int i = 0; i < buffer_size; i++)
   {
-    if(strstr(buffer[i], "<!ELEMENT ") != NULL)
+    char *ptr_str = strstr(buffer[i], "<!ELEMENT ");
+    if(ptr_str != NULL)
     {
       int j = strlen("<!ELEMENT ");
       char name[255];
-      bool found=false;
-      while(buffer[i][j] != ' ' && !found){
-        if(buffer[i][j] != ' '){
+      bool found = false;
+      char* name_start = NULL;
+      int name_length = 0;
+      while(ptr_str[j] != ' ' || !found)
+      {
+        if(ptr_str[j] != ' ' && !found)
+        {
           found=true;
-          strncat(name, buffer[i]+j, 1);
+          name_start = buffer[i]+j;
+        }
+        if(ptr_str[j] != ' ')
+        {
+          name_length++;
         }
         j++;
-        i++;
       }
-      printf("%s", name);
+      strncpy(name, name_start, name_length);
+      name[name_length] = 0;
+      printf("%s\n", name);
     }
   }
   return NULL;
