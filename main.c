@@ -246,6 +246,7 @@ XMLElement *create_element(XMLElement *parent)
   return element;
 }
 
+
 //TODO ajouter un prototype
 int char_count(char *str, char character)
 {
@@ -264,8 +265,8 @@ int char_count(char *str, char character)
 char **split_string(char *dtd, int *size)
 {
   printf("Starting to parse dtd\n");
-  int buffer_size = char_count(dtd, '>');
-  char **buffer = malloc(sizeof(char *) * buffer_size);
+  *size = char_count(dtd, '>');
+  char **buffer = malloc(sizeof(char *) * (*size));
   if (buffer == NULL)
   {
     fprintf(stderr, "Failed to allocate memory [parse_dtd]\n");
