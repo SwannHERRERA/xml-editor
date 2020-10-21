@@ -1,57 +1,6 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <stdbool.h>
+#include "parse_dtd.h"
 
-typedef struct XMLElement XMLElement;
-char *find_doctype(FILE *file);
-long get_size_of_file(FILE *file);
-char *file_get_content(FILE *file);
-void add_element(XMLElement *parent, XMLElement *child);
-XMLElement *create_element(XMLElement *parent);
-XMLElement *parse_dtd(char *dtd);
-long get_size_of_doctype(char *start);
-bool is_internal_doctype(char *doctype);
-char *get_content_of_external_DTD(char *doctype);
-char *get_DTD_filename(char *doctype);
-
-struct XMLElement
-{
-  XMLElement *parent;
-  XMLElement **childs;
-  char *name;
-  char *data;
-  bool pcdata;
-  int deepness;
-  int childsCount;
-  int childsCapacity;
-};
-
-/**
- * I use ARGV to give relative path to xml
- */
-int main(int argc, char **argv)
-{
-  if (argc < 2)
-  {
-    fprintf(stderr, "Error attending xml file in parameters\n");
-    return EXIT_FAILURE;
-  }
-  FILE *file = fopen(argv[1], "r");
-  if (file == NULL)
-  {
-    fclose(file);
-    fprintf(stderr, "Error opening file %s\n", argv[1]);
-    return EXIT_FAILURE;
-  }
-  char *dtd = find_doctype(file);
-  fclose(file);
-  parse_dtd(dtd);
-  free(dtd);
-  return EXIT_SUCCESS;
-}
-
-// C'est ici qu'on derterminera si la DTD est dans un fichier externe ou pas attention http
+// TODO attention http
 char *find_doctype(FILE *file)
 {
 
@@ -170,84 +119,6 @@ bool is_internal_doctype(char *doctype)
   return false;
 }
 
-char *file_get_content(FILE *file)
-{
-  long size = get_size_of_file(file);
-  char *buffer = (char *)malloc(sizeof(char) * size);
-  if (buffer)
-  {
-    fread(buffer, sizeof(char), size, file);
-  }
-  else
-  {
-    fprintf(stderr, "Failed to allocate memory [file_get_content]\n");
-    exit(EXIT_FAILURE);
-  }
-  return buffer;
-}
-
-long get_size_of_file(FILE *file)
-{
-  long size;
-  long current_size = ftell(file);
-  fseek(file, 0L, SEEK_END);
-  size = ftell(file);
-  fseek(file, 0L, SEEK_SET);
-  fseek(file, current_size, SEEK_CUR);
-  return size;
-}
-
-// TODO utiliser la fonction realloc()
-void add_element(XMLElement *parent, XMLElement *child)
-{
-  if (parent->childsCount == parent->childsCapacity)
-  {
-    parent->childsCapacity *= 2;
-    XMLElement **tab = malloc(sizeof(XMLElement) * parent->childsCapacity);
-    if (tab == NULL)
-    {
-      fprintf(stderr, "Failed to allocate memory [add_element]\n");
-      exit(EXIT_FAILURE);
-    }
-    for (int i = 0; i < parent->childsCount; i++)
-    {
-      tab[i] = parent->childs[i];
-    }
-    free(parent->childs);
-    parent->childs = tab;
-  }
-  parent->childsCount += 1;
-  parent->childs[parent->childsCount] = child;
-}
-
-XMLElement *create_element(XMLElement *parent)
-{
-  XMLElement *element = malloc(sizeof(XMLElement));
-  if (element == NULL)
-  {
-    fprintf(stderr, "Failed to allocate memory [create_element]\n");
-    exit(EXIT_FAILURE);
-  }
-  element->deepness = 0;
-  if (parent != NULL)
-  {
-    add_element(parent, element);
-    element->deepness = parent->deepness + 1;
-  }
-  element->parent = parent;
-  element->childsCount = 0;
-  element->childsCapacity = 20;
-  element->childs = malloc(sizeof(XMLElement));
-  if (!element->childs)
-  {
-    fprintf(stderr, "Failed to allocate memory for {element->childs} [create_element]\n");
-    exit(EXIT_FAILURE);
-  }
-  return element;
-}
-
-
-//TODO ajouter un prototype
 int char_count(char *str, char character)
 {
   int counter = 0;
@@ -261,7 +132,6 @@ int char_count(char *str, char character)
   return counter;
 }
 
-//TODO ajouter un prototype
 char **split_string(char *dtd, int *size)
 {
   printf("Starting to parse dtd\n");
@@ -288,21 +158,21 @@ XMLElement *create_elements_tree(char **buffer, int buffer_size)
   for (int i = 0; i < buffer_size; i++)
   {
     char *ptr_str = strstr(buffer[i], "<!ELEMENT ");
-    if(ptr_str != NULL)
+    if (ptr_str != NULL)
     {
       int j = strlen("<!ELEMENT ");
       char name[255];
       bool found = false;
-      char* name_start = NULL;
+      char *name_start = NULL;
       int name_length = 0;
-      while(ptr_str[j] != ' ' || !found)
+      while (ptr_str[j] != ' ' || !found)
       {
-        if(ptr_str[j] != ' ' && !found)
+        if (ptr_str[j] != ' ' && !found)
         {
-          found=true;
-          name_start = buffer[i]+j;
+          found = true;
+          name_start = buffer[i] + j;
         }
-        if(ptr_str[j] != ' ')
+        if (ptr_str[j] != ' ')
         {
           name_length++;
         }
