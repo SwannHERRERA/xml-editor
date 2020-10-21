@@ -30,6 +30,21 @@ int main(int argc, char **argv)
   return EXIT_SUCCESS;
 }
 
+bool isWhiteSpaceCharacter(char c)
+{
+  unsigned int size = 8;
+  unsigned int i;
+  char whiteSpaceCharacter[] = {32, 9, 10, 11, 12, 13, 133, 160};
+  for (i = 0; i < size; i += 1)
+  {
+    if (whiteSpaceCharacter[i] == c)
+    {
+      return true;
+    }
+  }
+  return false;
+}
+
 bool isCorrectXML(FILE *xml)
 {
   // Check 1 chevron ouvrant = 1 chevron fermant ⚠️ commentaire
