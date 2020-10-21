@@ -132,29 +132,65 @@ int char_count(char *str, char character)
   return counter;
 }
 
-XMLElement *parse_dtd(char *dtd)
+char **split_string(char *dtd, int *size)
 {
   printf("Starting to parse dtd\n");
-  int buff_size = char_count(dtd, '>');
-  char **buff = malloc(sizeof(char *) * buff_size);
-  if (buff == NULL)
+  *size = char_count(dtd, '>');
+  char **buffer = malloc(sizeof(char *) * (*size));
+  if (buffer == NULL)
   {
     fprintf(stderr, "Failed to allocate memory [parse_dtd]\n");
     exit(EXIT_FAILURE);
   }
   char tmp[strlen(dtd)];
   strcpy(tmp, dtd);
-  XMLElement *parent = NULL;
   int i = 0;
-  buff[i] = strtok(tmp, ">");
-  while (buff[i] != NULL)
+  buffer[i] = strtok(tmp, ">");
+  while (buffer[i] != NULL)
   {
-    buff[++i] = strtok(NULL, ">");
+    buffer[++i] = strtok(NULL, ">");
   }
-  for (int i = 0; i < buff_size; i++)
+  return buffer;
+}
+
+XMLElement *create_elements_tree(char **buffer, int buffer_size)
+{
+  for (int i = 0; i < buffer_size; i++)
   {
-    printf("%s\n", buff[i]);
+    char *ptr_str = strstr(buffer[i], "<!ELEMENT ");
+    if (ptr_str != NULL)
+    {
+      int j = strlen("<!ELEMENT ");
+      char name[255];
+      bool found = false;
+      char *name_start = NULL;
+      int name_length = 0;
+      while (ptr_str[j] != ' ' || !found)
+      {
+        if (ptr_str[j] != ' ' && !found)
+        {
+          found = true;
+          name_start = buffer[i] + j;
+        }
+        if (ptr_str[j] != ' ')
+        {
+          name_length++;
+        }
+        j++;
+      }
+      strncpy(name, name_start, name_length);
+      name[name_length] = 0;
+      printf("%s\n", name);
+    }
   }
-  free(buff);
+  return NULL;
+}
+
+XMLElement *parse_dtd(char *dtd)
+{
+  int buffer_size = 0;
+  char **buffer = split_string(dtd, &buffer_size);
+  XMLElement *parent = create_elements_tree(buffer, buffer_size);
+  free(buffer);
   return parent;
 }
