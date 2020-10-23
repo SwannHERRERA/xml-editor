@@ -160,19 +160,19 @@ XMLElement *create_elements_tree(char **buffer, int buffer_size)
     char *ptr_str = strstr(buffer[i], "<!ELEMENT ");
     if (ptr_str != NULL)
     {
-      int j = strlen("<!ELEMENT ");
+      int j = (ptr_str - buffer[i]) + strlen("<!ELEMENT ");
       char name[255];
       bool found = false;
       char *name_start = NULL;
       int name_length = 0;
-      while (ptr_str[j] != ' ' || !found)
+      while (buffer[i][j] != ' ' || !found)
       {
-        if (ptr_str[j] != ' ' && !found)
+        if (buffer[i][j] != ' ' && !found)
         {
           found = true;
           name_start = buffer[i] + j;
         }
-        if (ptr_str[j] != ' ')
+        if (buffer[i][j] != ' ')
         {
           name_length++;
         }
