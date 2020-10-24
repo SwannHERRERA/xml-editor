@@ -122,10 +122,21 @@ bool is_internal_doctype(char *doctype)
 char *get_root_name(char* buffer)
 {
   char *start = strstr(buffer, "<!DOCTYPE ") + strlen("<!DOCTYPE ");
-  int char_count = 0;
-  while(*(start+char_count) != ' ')
+  int char_count = 0, j = 0;
+  bool found = false;
+  while (*(start + j) != ' ' || !found)
   {
-    char_count++;
+    if (*(start + j)!= ' ' && !found)
+    {
+      found = true;
+      start = start + j;
+      j=0;
+    }
+    if (*(start + j) != ' ')
+    {
+      char_count++;
+    }
+    j++;
   }
   char *root_name = (char*) malloc(sizeof(char) * char_count);
     if (root_name == NULL)
