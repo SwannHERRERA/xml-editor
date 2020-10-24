@@ -6,7 +6,7 @@ char *find_doctype(FILE *file, char **root_name)
   char *buffer = file_get_content(file);
   char *start = strstr(buffer, "<!DOCTYPE ");
   char size_of_doctype = get_size_of_doctype(start);
-  char *doctype = (char *)malloc(sizeof(char) * size_of_doctype);
+  char *doctype = (char *)malloc(sizeof(char) * size_of_doctype+1);
   if (!doctype)
   {
     fprintf(stderr, "Failed to allocate memory for {doctype} [find_doctype]");
@@ -14,6 +14,7 @@ char *find_doctype(FILE *file, char **root_name)
   }
   strncpy(doctype, start, size_of_doctype);
   *root_name = get_root_name(doctype);
+  doctype[(int)size_of_doctype] = 0;
   free(buffer);
   if (is_internal_doctype(doctype))
   {
@@ -138,7 +139,7 @@ char *get_root_name(char* buffer)
     }
     j++;
   }
-  char *root_name = (char*) malloc(sizeof(char) * char_count);
+  char *root_name = (char*) malloc(sizeof(char) * char_count+1);
     if (root_name == NULL)
   {
     fprintf(stderr, "Memory allocation failed [get_root_name]");
@@ -167,7 +168,7 @@ char **split_string(char *dtd, int *size)
 {
   printf("Starting to parse dtd\n");
   *size = char_count(dtd, '>');
-  char **buffer = malloc(sizeof(char *) * (*size));
+  char **buffer = malloc(sizeof(char *) * (*size)+1);
   if (buffer == NULL)
   {
     fprintf(stderr, "Failed to allocate memory [parse_dtd]\n");
@@ -179,39 +180,53 @@ char **split_string(char *dtd, int *size)
   buffer[i] = strtok(tmp, ">");
   while (buffer[i] != NULL)
   {
-    buffer[++i] = strtok(NULL, ">");
+    i+=1;
+    buffer[i] = strtok(NULL, ">");
   }
   return buffer;
 }
 
-XMLElement *create_elements_tree(char **buffer, int buffer_size)
+char *get_node_name(char *buffer)
 {
+  char *ptr_str = strstr(buffer, "<!ELEMENT ");
+  int j = (ptr_str - buffer) + strlen("<!ELEMENT ");
+  bool found = false;
+  char *name_start = NULL;
+  int name_length = 0;
+  while (buffer[j] != ' ' || !found)
+  {
+    if (buffer[j] != ' ' && !found)
+    {
+      found = true;
+      name_start = buffer + j;
+    }
+    if (buffer[j] != ' ')
+    {
+      name_length++;
+    }
+    j++;
+  }
+  char *name = malloc(sizeof(char) * name_length);
+  strncpy(name, name_start, name_length);
+  name[name_length] = 0;
+  return name;
+}
+
+XMLElement *parse_element(char *node_name, char **buffer, int buffer_size)
+{
+  for(int x = 0; x<buffer_size;x++){
+    printf("%s\n",buffer[x]);
+  }
+  
+  printf("%s\n",node_name);
   for (int i = 0; i < buffer_size; i++)
   {
     char *ptr_str = strstr(buffer[i], "<!ELEMENT ");
+    printf("%p\n",ptr_str);
     if (ptr_str != NULL)
     {
-      int j = (ptr_str - buffer[i]) + strlen("<!ELEMENT ");
-      char name[255];
-      bool found = false;
-      char *name_start = NULL;
-      int name_length = 0;
-      while (buffer[i][j] != ' ' || !found)
-      {
-        if (buffer[i][j] != ' ' && !found)
-        {
-          found = true;
-          name_start = buffer[i] + j;
-        }
-        if (buffer[i][j] != ' ')
-        {
-          name_length++;
-        }
-        j++;
-      }
-      strncpy(name, name_start, name_length);
-      name[name_length] = 0;
-      printf("%s\n", name);
+     char *name = get_node_name(buffer[i]);
+     printf("aaaa%s\n", name);
     }
   }
   return NULL;
@@ -219,10 +234,12 @@ XMLElement *create_elements_tree(char **buffer, int buffer_size)
 
 XMLElement *parse_dtd(char *dtd, char *root_name)
 {
-  printf("%s\n", root_name);
+  printf("DTD : %s\tRoot name : %s\n", dtd, root_name);
   int buffer_size = 0;
   char **buffer = split_string(dtd, &buffer_size);
-  XMLElement *parent = create_elements_tree(buffer, buffer_size);
+
+
+  XMLElement *parent = parse_element(root_name, buffer, buffer_size);
   free(buffer);
   return parent;
 }
