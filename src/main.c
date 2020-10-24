@@ -17,10 +17,12 @@ int main(int argc, char **argv)
     fprintf(stderr, "Error opening file %s\n", argv[1]);
     return EXIT_FAILURE;
   }
-  char *dtd = find_doctype(file);
+  char *root_name;
+  char *dtd = find_doctype(file, &root_name);
   fclose(file);
-  parse_dtd(dtd);
+  parse_dtd(dtd, root_name);
   free(dtd);
+  free(root_name);
   return EXIT_SUCCESS;
 }
 

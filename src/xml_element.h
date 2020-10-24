@@ -13,4 +13,5 @@ struct XMLElement
   int deepness;
   int childsCount;
   int childsCapacity;
+  unsigned char occurenceFlag;
 };

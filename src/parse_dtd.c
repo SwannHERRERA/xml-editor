@@ -1,11 +1,10 @@
 #include "parse_dtd.h"
 
 // TODO attention http
-char *find_doctype(FILE *file)
+char *find_doctype(FILE *file, char **root_name)
 {
-
   char *buffer = file_get_content(file);
-  char *start = strstr(buffer, "<!DOCTYPE");
+  char *start = strstr(buffer, "<!DOCTYPE ");
   char size_of_doctype = get_size_of_doctype(start);
   char *doctype = (char *)malloc(sizeof(char) * size_of_doctype);
   if (!doctype)
@@ -14,6 +13,7 @@ char *find_doctype(FILE *file)
     exit(EXIT_FAILURE);
   }
   strncpy(doctype, start, size_of_doctype);
+  *root_name = get_root_name(doctype);
   free(buffer);
   if (is_internal_doctype(doctype))
   {
@@ -119,6 +119,26 @@ bool is_internal_doctype(char *doctype)
   return false;
 }
 
+char *get_root_name(char* buffer)
+{
+  char *start = strstr(buffer, "<!DOCTYPE ") + strlen("<!DOCTYPE ");
+  int char_count = 0;
+  while(*(start+char_count) != ' ')
+  {
+    char_count++;
+  }
+  char *root_name = (char*) malloc(sizeof(char) * char_count);
+    if (root_name == NULL)
+  {
+    fprintf(stderr, "Memory allocation failed [get_root_name]");
+    exit(EXIT_FAILURE);
+  }
+  strncpy(root_name, start, char_count);
+  root_name[char_count] = 0;
+  printf("root_name : %s\n", root_name);
+  return root_name;
+}
+
 int char_count(char *str, char character)
 {
   int counter = 0;
@@ -186,8 +206,9 @@ XMLElement *create_elements_tree(char **buffer, int buffer_size)
   return NULL;
 }
 
-XMLElement *parse_dtd(char *dtd)
+XMLElement *parse_dtd(char *dtd, char *root_name)
 {
+  printf("%s\n", root_name);
   int buffer_size = 0;
   char **buffer = split_string(dtd, &buffer_size);
   XMLElement *parent = create_elements_tree(buffer, buffer_size);
