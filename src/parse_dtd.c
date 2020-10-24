@@ -174,15 +174,17 @@ char **split_string(char *dtd, int *size)
     fprintf(stderr, "Failed to allocate memory [parse_dtd]\n");
     exit(EXIT_FAILURE);
   }
-  char tmp[strlen(dtd)];
-  strcpy(tmp, dtd);
   int i = 0;
-  buffer[i] = strtok(tmp, ">");
+  buffer[i] = strtok(dtd, ">");
   while (buffer[i] != NULL)
   {
     i+=1;
     buffer[i] = strtok(NULL, ">");
   }
+  for(int x = 0; x<*size;x++){
+    printf("%s\n",buffer[x]);
+  }
+  
   return buffer;
 }
 
@@ -214,19 +216,14 @@ char *get_node_name(char *buffer)
 
 XMLElement *parse_element(char *node_name, char **buffer, int buffer_size)
 {
-  for(int x = 0; x<buffer_size;x++){
-    printf("%s\n",buffer[x]);
-  }
-  
   printf("%s\n",node_name);
   for (int i = 0; i < buffer_size; i++)
   {
     char *ptr_str = strstr(buffer[i], "<!ELEMENT ");
-    printf("%p\n",ptr_str);
     if (ptr_str != NULL)
     {
      char *name = get_node_name(buffer[i]);
-     printf("aaaa%s\n", name);
+     printf("%s\n", name);
     }
   }
   return NULL;
@@ -237,8 +234,6 @@ XMLElement *parse_dtd(char *dtd, char *root_name)
   printf("DTD : %s\tRoot name : %s\n", dtd, root_name);
   int buffer_size = 0;
   char **buffer = split_string(dtd, &buffer_size);
-
-
   XMLElement *parent = parse_element(root_name, buffer, buffer_size);
   free(buffer);
   return parent;
