@@ -20,7 +20,7 @@
 
 
 typedef struct XMLElement XMLElement;
-XMLElement *create_element(XMLElement *parent);
+XMLElement *create_element(char *name);
 void add_element(XMLElement *parent, XMLElement *child);
 
 struct XMLElement

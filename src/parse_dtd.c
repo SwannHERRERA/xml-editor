@@ -120,20 +120,45 @@ bool is_internal_doctype(char *doctype)
   return false;
 }
 
+/*TODO check why start is equal to nil
+ * Gets every char between two tokens 
+ * tokens[0] is where the new string will begin
+ * tokens[1] is the token where the new string will stop
+ */ 
+char *get_between_tokens(char *buffer, char *tokens)
+{
+  char *start = NULL;
+  char *end = NULL;
+  char *buff = NULL;
+  start = strstr(buffer, tokens);
+  end = strstr(buffer, tokens+1);
+  if(start == NULL || end == NULL || end-start < 1){
+    fprintf(stderr, "Invalid DTD, it maybe empty %p %p\n", start, end);
+    exit(EXIT_FAILURE);
+  }
+  strncpy(buff, start, end-start);
+  return buff;
+}
+
+bool is_xml_valid_char(char c)
+{
+  return ((c >= 'a' && c <= 'z') || (c >='A' && c <= 'Z') || (c >= '0' && c <= '9')) ? true : false;
+}
+
 char *get_root_name(char* buffer)
 {
   char *start = strstr(buffer, "<!DOCTYPE ") + strlen("<!DOCTYPE ");
   int char_count = 0, j = 0;
   bool found = false;
-  while (*(start + j) != ' ' || !found)
+  while (is_xml_valid_char(*(start + j)) || !found)
   {
-    if (*(start + j)!= ' ' && !found)
+    if (is_xml_valid_char(*(start + j)) && !found)
     {
       found = true;
       start = start + j;
       j=0;
     }
-    if (*(start + j) != ' ')
+    if (is_xml_valid_char(*(start + j)))
     {
       char_count++;
     }
@@ -147,7 +172,6 @@ char *get_root_name(char* buffer)
   }
   strncpy(root_name, start, char_count);
   root_name[char_count] = 0;
-  printf("root_name : %s\n", root_name);
   return root_name;
 }
 
@@ -181,10 +205,6 @@ char **split_string(char *dtd, int *size)
     i+=1;
     buffer[i] = strtok(NULL, ">");
   }
-  for(int x = 0; x<*size;x++){
-    printf("%s\n",buffer[x]);
-  }
-  
   return buffer;
 }
 
@@ -195,14 +215,14 @@ char *get_node_name(char *buffer)
   bool found = false;
   char *name_start = NULL;
   int name_length = 0;
-  while (buffer[j] != ' ' || !found)
+  while (is_xml_valid_char(buffer[j]) || !found)
   {
-    if (buffer[j] != ' ' && !found)
+    if (is_xml_valid_char(buffer[j]) && !found)
     {
       found = true;
       name_start = buffer + j;
     }
-    if (buffer[j] != ' ')
+    if (is_xml_valid_char(buffer[j]))
     {
       name_length++;
     }
@@ -214,9 +234,10 @@ char *get_node_name(char *buffer)
   return name;
 }
 
+
 XMLElement *parse_element(char *node_name, char **buffer, int buffer_size)
 {
-  printf("%s\n",node_name);
+  XMLElement *xml_element = NULL;
   for (int i = 0; i < buffer_size; i++)
   {
     char *ptr_str = strstr(buffer[i], "<!ELEMENT ");
@@ -224,14 +245,34 @@ XMLElement *parse_element(char *node_name, char **buffer, int buffer_size)
     {
      char *name = get_node_name(buffer[i]);
      printf("%s\n", name);
+     if(strcmp(node_name, name) == 0)
+     {
+      ptr_str = strstr(buffer[i], name) + strlen(name);
+      xml_element = create_element(name);
+      /*bool found_any = false;
+      bool found_empty = false;
+      if(strstr(ptr_str, "ANY") != NULL)
+      {
+        found_any = true;
+      }
+      if(strstr(ptr_str, "EMPTY") != NULL)
+      {
+        found_empty = true;
+      }
+      if(!(found_any ^ found_empty))
+      {
+        fprintf(stderr, "Error at : %s>\n",buffer[i]);
+        exit(EXIT_FAILURE);
+      }*/
+     }
     }
   }
-  return NULL;
+  return xml_element;
 }
 
 XMLElement *parse_dtd(char *dtd, char *root_name)
 {
-  printf("DTD : %s\tRoot name : %s\n", dtd, root_name);
+  printf("DTD : %s\nRoot name : %s\n", dtd, root_name);
   int buffer_size = 0;
   char **buffer = split_string(dtd, &buffer_size);
   XMLElement *parent = parse_element(root_name, buffer, buffer_size);
