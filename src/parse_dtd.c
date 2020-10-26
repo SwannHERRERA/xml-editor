@@ -18,7 +18,8 @@ char *find_doctype(FILE *file, char **root_name)
   free(buffer);
   if (is_internal_doctype(doctype))
   {
-    return doctype;
+    char * str = get_between_tokens(doctype, "[]");
+    return str;
   }
   else
   {
@@ -127,16 +128,21 @@ bool is_internal_doctype(char *doctype)
  */ 
 char *get_between_tokens(char *buffer, char *tokens)
 {
+  int size = 0;
   char *start = NULL;
   char *end = NULL;
   char *buff = NULL;
-  start = strstr(buffer, tokens);
-  end = strstr(buffer, tokens+1);
-  if(start == NULL || end == NULL || end-start < 1){
-    fprintf(stderr, "Invalid DTD, it maybe empty %p %p\n", start, end);
-    exit(EXIT_FAILURE);
+  start = strchr(buffer, tokens[0])+1;
+  end = strchr(buffer, tokens[1])-1;
+  size = end - start + 2;
+  if(start == NULL || end == NULL || end-start < 1)
+  {
+    fprintf(stderr, "Invalid DTD, it maybe empty %s %p %p\n",tokens, start, end);
+    return NULL;
   }
-  strncpy(buff, start, end-start);
+  buff = malloc(sizeof(char) * size);
+  strncpy(buff, start, size);
+  buff[size-1] = 0;
   return buff;
 }
 
@@ -249,8 +255,9 @@ XMLElement *parse_element(char *node_name, char **buffer, int buffer_size)
      {
       ptr_str = strstr(buffer[i], name) + strlen(name);
       xml_element = create_element(name);
-      /*bool found_any = false;
+      bool found_any = false;
       bool found_empty = false;
+      char *elements = NULL;
       if(strstr(ptr_str, "ANY") != NULL)
       {
         found_any = true;
@@ -259,11 +266,14 @@ XMLElement *parse_element(char *node_name, char **buffer, int buffer_size)
       {
         found_empty = true;
       }
-      if(!(found_any ^ found_empty))
+      elements = get_between_tokens(ptr_str,"()");
+      printf("elements : %s\n", elements);
+      if((found_any && found_empty && (elements != NULL)))
       {
         fprintf(stderr, "Error at : %s>\n",buffer[i]);
         exit(EXIT_FAILURE);
-      }*/
+      }
+      break;
      }
     }
   }
