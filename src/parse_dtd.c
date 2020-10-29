@@ -194,22 +194,31 @@ int char_count(char *str, char character)
   return counter;
 }
 
-char **split_string(char *dtd, int *size)
+char **split_string(char *dtd, int *size, char delim)
 {
-  printf("Starting to parse dtd\n");
-  *size = char_count(dtd, '>');
+  bool no_delim = (strchr(dtd, delim) == NULL ? true : false);
+  *size = char_count(dtd, delim);
+  if(no_delim)
+  {
+    *size = 1;
+  }
   char **buffer = malloc(sizeof(char *) * (*size)+1);
   if (buffer == NULL)
   {
     fprintf(stderr, "Failed to allocate memory [parse_dtd]\n");
     exit(EXIT_FAILURE);
   }
+  if(no_delim)
+  {
+    buffer[0] = dtd;
+    return buffer;
+  }
   int i = 0;
-  buffer[i] = strtok(dtd, ">");
+  buffer[i] = strtok(dtd, &delim);
   while (buffer[i] != NULL)
   {
     i+=1;
-    buffer[i] = strtok(NULL, ">");
+    buffer[i] = strtok(NULL, &delim);
   }
   return buffer;
 }
@@ -250,7 +259,6 @@ XMLElement *parse_element(char *node_name, char **buffer, int buffer_size)
     if (ptr_str != NULL)
     {
      char *name = get_node_name(buffer[i]);
-     printf("%s\n", name);
      if(strcmp(node_name, name) == 0)
      {
       ptr_str = strstr(buffer[i], name) + strlen(name);
@@ -258,6 +266,9 @@ XMLElement *parse_element(char *node_name, char **buffer, int buffer_size)
       bool found_any = false;
       bool found_empty = false;
       char *elements = NULL;
+      int elements_size = 1;
+      char **elements_buffer = NULL;
+
       if(strstr(ptr_str, "ANY") != NULL)
       {
         found_any = true;
@@ -266,13 +277,50 @@ XMLElement *parse_element(char *node_name, char **buffer, int buffer_size)
       {
         found_empty = true;
       }
-      elements = get_between_tokens(ptr_str,"()");
-      printf("elements : %s\n", elements);
-      if((found_any && found_empty && (elements != NULL)))
+      elements = get_between_tokens(ptr_str, "()");
+      if((found_any && found_empty) || (found_any && elements != NULL) || (found_empty && elements != NULL))
       {
-        fprintf(stderr, "Error at : %s>\n",buffer[i]);
+        fprintf(stderr, "Error at : %s>\n", buffer[i]);
         exit(EXIT_FAILURE);
       }
+      elements_buffer = split_string(elements, &elements_size, ',');
+      for(int j = 0; j < elements_size; j += 1)
+      {
+        if(strstr(elements_buffer[j], "#PCDATA") != NULL)
+        {
+          continue;
+        }
+        int k = 0;
+        int name_length = 0;
+        bool found =false;
+        char *name_start = NULL;
+        char *element_name = NULL;
+        while(is_xml_valid_char(*(elements_buffer[j] + k)) || !found)
+        {
+          if (is_xml_valid_char(*(elements_buffer[j] + k)) && !found)
+          {
+            found = true;
+            name_start = elements_buffer[j] + k;
+          }
+          if (is_xml_valid_char(*(elements_buffer[j] + k)))
+          {
+            name_length++;
+          }
+          k++;
+        }
+        if(name_length > 0){
+          element_name = malloc(sizeof(char) * name_length + 1);
+          if (buffer == NULL)
+          {
+            fprintf(stderr, "Failed to allocate memory [name] {parse_element}\n");
+            exit(EXIT_FAILURE);
+          }
+          strncpy(element_name, name_start, name_length);
+          element_name[name_length] = 0;
+          add_element(xml_element, parse_element(element_name, buffer, buffer_size));
+        }
+      }
+      free(elements);
       break;
      }
     }
@@ -282,10 +330,12 @@ XMLElement *parse_element(char *node_name, char **buffer, int buffer_size)
 
 XMLElement *parse_dtd(char *dtd, char *root_name)
 {
+  printf("Starting to parse dtd\n");
   printf("DTD : %s\nRoot name : %s\n", dtd, root_name);
   int buffer_size = 0;
-  char **buffer = split_string(dtd, &buffer_size);
+  char **buffer = split_string(dtd, &buffer_size, '>');
   XMLElement *parent = parse_element(root_name, buffer, buffer_size);
+  printf("child = %s\n", parent->childs[0]->name);
   free(buffer);
   return parent;
 }

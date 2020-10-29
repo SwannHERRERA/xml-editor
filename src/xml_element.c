@@ -33,6 +33,6 @@ void add_element(XMLElement *parent, XMLElement *child)
       exit(EXIT_FAILURE);
     }
   }
-  parent->childsCount += 1;
   parent->childs[parent->childsCount] = child;
+  parent->childsCount += 1;
 }
