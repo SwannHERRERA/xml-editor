@@ -1,5 +1,6 @@
 #include "parse_dtd.h"
 
+// Faire une liste chainé
 typedef struct xml_attribute
 {
   char *name;
@@ -66,17 +67,13 @@ bool isWhiteSpaceCharacter(char c)
   return false;
 }
 
-xml_element *get_root_balise(char *xml, char *root_name)
+void make_attributes(char *tag, char *subject, xml_element *element)
 {
-  xml_element *res = malloc(sizeof(xml_element));
-  res->name = root_name;
-  // char *start_attr;
-  // char *end_attr;
   char *start;
   char *tag;
-  char *tmp = (char *)calloc(strlen(root_name) + 1, sizeof(char));
+  char *tmp = (char *)calloc(strlen(tag) + 1, sizeof(char));
   strcpy(tmp, "<");
-  start = strstr(xml, strcat(tmp, root_name));
+  start = strstr(subject, strcat(tmp, tag));
   tmp = start;
   size_t i = 0;
   size_t j = 0;
@@ -115,10 +112,19 @@ xml_element *get_root_balise(char *xml, char *root_name)
     }
     i += 1;
   }
-  tag = malloc(sizeof(char) * (i + 2));
-  strncpy(tag, start, (i + 1) * sizeof(char));
-  printf("%s\n", tag);
-  return res;
+  element->attributes;
+}
+
+xml_element *get_root_balise(char *xml, char *root_name)
+{
+  xml_element *root_tag = malloc(sizeof(xml_element));
+  root_tag->name = root_name;
+  make_attributes(root_name, xml, root_tag);
+
+  // tag = malloc(sizeof(char) * (i + 2));
+  // strncpy(tag, start, (i + 1) * sizeof(char));
+  // printf("%s\n", tag);
+  return root_tag;
   // GET XML STRING
   // <root_name ... >
   // stack qui ouvre et qui ferme
