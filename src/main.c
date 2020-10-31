@@ -5,7 +5,7 @@ typedef struct xml_attribute
 {
   char *name;
   char *value;
-
+  xml_attribute *next;
 } xml_attribute;
 typedef struct xml_element
 {
@@ -70,7 +70,6 @@ bool isWhiteSpaceCharacter(char c)
 void make_attributes(char *tag, char *subject, xml_element *element)
 {
   char *start;
-  char *tag;
   char *tmp = (char *)calloc(strlen(tag) + 1, sizeof(char));
   strcpy(tmp, "<");
   start = strstr(subject, strcat(tmp, tag));
@@ -78,12 +77,13 @@ void make_attributes(char *tag, char *subject, xml_element *element)
   size_t i = 0;
   size_t j = 0;
   size_t counter;
+  xml_attribute *attr = element->attributes;
   // Care about <b attr=">">
   while (tmp[i] != '>')
   {
     if (tmp[i] == '=')
     {
-      xml_attribute *new_attrbute = malloc(sizeof(xml_attribute));
+      // xml_attribute *new_attrbute = malloc(sizeof(xml_attribute));
       j = i;
       counter = 0;
       while (tmp[j] != ' ')
@@ -91,18 +91,18 @@ void make_attributes(char *tag, char *subject, xml_element *element)
         j -= 1;
         counter += 1;
       }
-      new_attrbute->name = calloc(counter, sizeof(char));
-      strncpy(new_attrbute->name, tmp + i - counter, counter);
-      printf("attr_name: %s\n", new_attrbute->name);
+      attr->name = calloc(counter, sizeof(char));
+      strncpy(attr->name, tmp + i - counter, counter);
+      printf("attr_name: %s\n", attr->name);
       i += 2; // skip first "
       j = i;
       while (tmp[j] != '"' && tmp[j] != '\'' && j < strlen(tmp))
       {
         j += 1;
       }
-      new_attrbute->value = calloc(j - i, sizeof(char));
-      strncpy(new_attrbute->value, tmp + i, j - i);
-      printf("attr_value: %s\n", new_attrbute->value);
+      attr->value = calloc(j - i, sizeof(char));
+      strncpy(attr->value, tmp + i, j - i);
+      printf("attr_value: %s\n", attr->value);
     }
 
     if (i > strlen(start))
@@ -115,10 +115,19 @@ void make_attributes(char *tag, char *subject, xml_element *element)
   element->attributes;
 }
 
+void create_empty_attributes(xml_element *element)
+{
+  element->attributes = malloc(sizeof(xml_attribute));
+  element->attributes->name = NULL;
+  element->attributes->value = NULL;
+  element->attributes->next = NULL;
+}
+
 xml_element *get_root_balise(char *xml, char *root_name)
 {
   xml_element *root_tag = malloc(sizeof(xml_element));
   root_tag->name = root_name;
+  create_empty_attributes(root_tag);
   make_attributes(root_name, xml, root_tag);
 
   // tag = malloc(sizeof(char) * (i + 2));
