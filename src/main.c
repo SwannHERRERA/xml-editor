@@ -5,12 +5,20 @@ typedef struct xml_attribute
 {
   char *name;
   char *value;
-  xml_attribute *next;
 } xml_attribute;
+
+typedef struct xml_attribute_linkedlist xml_attribute_linkedlist;
+
+struct xml_attribute_linkedlist
+{
+  xml_attribute *value;
+  xml_attribute_linkedlist *next;
+};
+
 typedef struct xml_element
 {
   char *name;
-  xml_attribute *attributes;
+  xml_attribute_linkedlist *attributes;
   char *content;
 } xml_element;
 
@@ -37,7 +45,7 @@ int main(int argc, char **argv)
   char *dtd = find_doctype(file, &root_name);
   fclose(file);
 
-  char *xml = "<classrooms attr='fefe' b='ef' c='' derrerzer='qs'>"
+  char *xml = "<classrooms attr='fefe' b='ef' c='>' derrerzer='qs'>"
               "< classroom > AL</ classroom>"
               "<classroom> IABD</ classroom>"
               "<classroom> MOC</ classroom>"
@@ -67,23 +75,31 @@ bool isWhiteSpaceCharacter(char c)
   return false;
 }
 
+xml_attribute_linkedlist *create_next_element(xml_attribute_linkedlist *head)
+{
+  head->next = malloc(sizeof(xml_attribute_linkedlist));
+  head->next->next = NULL;
+  head->next->value = NULL;
+  return head->next;
+}
+
 void make_attributes(char *tag, char *subject, xml_element *element)
 {
   char *start;
+  size_t i = 0, j = 0, counter;
   char *tmp = (char *)calloc(strlen(tag) + 1, sizeof(char));
   strcpy(tmp, "<");
   start = strstr(subject, strcat(tmp, tag));
   tmp = start;
-  size_t i = 0;
-  size_t j = 0;
-  size_t counter;
-  xml_attribute *attr = element->attributes;
+
+  xml_attribute_linkedlist *head = element->attributes;
+
   // Care about <b attr=">">
   while (tmp[i] != '>')
   {
     if (tmp[i] == '=')
     {
-      // xml_attribute *new_attrbute = malloc(sizeof(xml_attribute));
+      xml_attribute *attr = malloc(sizeof(xml_attribute));
       j = i;
       counter = 0;
       while (tmp[j] != ' ')
@@ -93,8 +109,8 @@ void make_attributes(char *tag, char *subject, xml_element *element)
       }
       attr->name = calloc(counter, sizeof(char));
       strncpy(attr->name, tmp + i - counter, counter);
-      printf("attr_name: %s\n", attr->name);
-      i += 2; // skip first "
+
+      i += 2; // skip ="
       j = i;
       while (tmp[j] != '"' && tmp[j] != '\'' && j < strlen(tmp))
       {
@@ -102,7 +118,9 @@ void make_attributes(char *tag, char *subject, xml_element *element)
       }
       attr->value = calloc(j - i, sizeof(char));
       strncpy(attr->value, tmp + i, j - i);
-      printf("attr_value: %s\n", attr->value);
+
+      element->attributes->value = attr;
+      element->attributes = create_next_element(element->attributes);
     }
 
     if (i > strlen(start))
@@ -112,31 +130,34 @@ void make_attributes(char *tag, char *subject, xml_element *element)
     }
     i += 1;
   }
-  element->attributes;
+  element->attributes = head;
 }
 
-void create_empty_attributes(xml_element *element)
+void create_empty_xml_attribute_linkedlist(xml_element *element)
 {
-  element->attributes = malloc(sizeof(xml_attribute));
-  element->attributes->name = NULL;
+  element->attributes = malloc(sizeof(xml_attribute_linkedlist));
   element->attributes->value = NULL;
   element->attributes->next = NULL;
+}
+
+void print_attribute(xml_element *element)
+{
+  xml_attribute_linkedlist *head = element->attributes;
+  while (head != NULL)
+  {
+    printf("%s=\"%s\"\n", head->value->name, head->value->value);
+    printf("next: %p\n", head->next);
+    head = head->next;
+  }
 }
 
 xml_element *get_root_balise(char *xml, char *root_name)
 {
   xml_element *root_tag = malloc(sizeof(xml_element));
   root_tag->name = root_name;
-  create_empty_attributes(root_tag);
+  create_empty_xml_attribute_linkedlist(root_tag);
   make_attributes(root_name, xml, root_tag);
+  print_attribute(root_tag);
 
-  // tag = malloc(sizeof(char) * (i + 2));
-  // strncpy(tag, start, (i + 1) * sizeof(char));
-  // printf("%s\n", tag);
   return root_tag;
-  // GET XML STRING
-  // <root_name ... >
-  // stack qui ouvre et qui ferme
-  // <root_name ... >
-  // ELEMENT name;
 }
