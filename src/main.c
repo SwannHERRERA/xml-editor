@@ -18,6 +18,7 @@ struct xml_attribute_linkedlist
 typedef struct xml_element
 {
   char *name;
+  unsigned int number_of_attribute;
   xml_attribute_linkedlist *attributes;
   char *content;
 } xml_element;
@@ -50,7 +51,7 @@ int main(int argc, char **argv)
               "<classroom> IABD</ classroom>"
               "<classroom> MOC</ classroom>"
               "<classroom> IBC</ classroom>"
-              "</ classrooms> ";
+              "</classrooms> ";
 
   get_root_balise(xml, root_name);
 
@@ -77,10 +78,11 @@ bool isWhiteSpaceCharacter(char c)
 
 xml_attribute_linkedlist *create_next_element(xml_attribute_linkedlist *head)
 {
-  head->next = malloc(sizeof(xml_attribute_linkedlist));
-  head->next->next = NULL;
-  head->next->value = NULL;
-  return head->next;
+  xml_attribute_linkedlist *new_attribute = malloc(sizeof(xml_attribute_linkedlist));
+  new_attribute->next = NULL;
+  new_attribute->value = NULL;
+  head->next = new_attribute;
+  return new_attribute;
 }
 
 void make_attributes(char *tag, char *subject, xml_element *element)
@@ -99,6 +101,7 @@ void make_attributes(char *tag, char *subject, xml_element *element)
   {
     if (tmp[i] == '=')
     {
+      element->number_of_attribute += 1;
       xml_attribute *attr = malloc(sizeof(xml_attribute));
       j = i;
       counter = 0;
@@ -142,11 +145,13 @@ void create_empty_xml_attribute_linkedlist(xml_element *element)
 
 void print_attribute(xml_element *element)
 {
+  unsigned int i = 0;
   xml_attribute_linkedlist *head = element->attributes;
-  while (head != NULL)
+  printf("number of attributes: %d\n", element->number_of_attribute);
+  for (i = 0; i < element->number_of_attribute; i += 1)
   {
     printf("%s=\"%s\"\n", head->value->name, head->value->value);
-    printf("next: %p\n", head->next);
+
     head = head->next;
   }
 }
@@ -155,6 +160,7 @@ xml_element *get_root_balise(char *xml, char *root_name)
 {
   xml_element *root_tag = malloc(sizeof(xml_element));
   root_tag->name = root_name;
+  root_tag->number_of_attribute = 0;
   create_empty_xml_attribute_linkedlist(root_tag);
   make_attributes(root_name, xml, root_tag);
   print_attribute(root_tag);
