@@ -249,6 +249,69 @@ char *get_node_name(char *buffer)
   return name;
 }
 
+void parse_element_childs(XMLElement *parent, int elements_size, char **elements_buffer, char **buffer, int buffer_size)
+{
+  for(int j = 0; j < elements_size; j += 1)
+  {
+    if(strstr(elements_buffer[j], "#PCDATA") != NULL)
+    {
+      continue;
+    }
+    int k = 0;
+    int name_length = 0;
+    bool found =false;
+    char *name_start = NULL;
+    char *element_name = NULL;
+    while(is_xml_valid_char(*(elements_buffer[j] + k)) || !found)
+    {
+      if (is_xml_valid_char(*(elements_buffer[j] + k)) && !found)
+      {
+        found = true;
+        name_start = elements_buffer[j] + k;
+      }
+      if (is_xml_valid_char(*(elements_buffer[j] + k)))
+      {
+        name_length++;
+      }
+      k++;
+    }
+    if(name_length > 0){
+      element_name = malloc(sizeof(char) * name_length + 1);
+      if (buffer == NULL)
+      {
+        fprintf(stderr, "Failed to allocate memory [name] {parse_element}\n");
+        exit(EXIT_FAILURE);
+      }
+      strncpy(element_name, name_start, name_length);
+      element_name[name_length] = 0;
+      add_element(parent, parse_element(element_name, buffer, buffer_size));
+    }
+  }
+}
+
+char *get_node_childs(char *buffer, char *name)
+{
+  char *ptr_str = strstr(buffer, name) + strlen(name);
+  bool found_any = false;
+  bool found_empty = false;
+  char *elements = NULL;
+
+  if(strstr(ptr_str, "ANY") != NULL)
+  {
+    found_any = true;
+  }
+  if(strstr(ptr_str, "EMPTY") != NULL)
+  {
+    found_empty = true;
+  }
+  elements = get_between_tokens(ptr_str, "()");
+  if((found_any && found_empty) || (found_any && elements != NULL) || (found_empty && elements != NULL))
+  {
+    fprintf(stderr, "Error at : %s>\n", buffer);
+    exit(EXIT_FAILURE);
+  }
+  return elements;
+}
 
 XMLElement *parse_element(char *node_name, char **buffer, int buffer_size)
 {
@@ -258,71 +321,17 @@ XMLElement *parse_element(char *node_name, char **buffer, int buffer_size)
     char *ptr_str = strstr(buffer[i], "<!ELEMENT ");
     if (ptr_str != NULL)
     {
-     char *name = get_node_name(buffer[i]);
-     if(strcmp(node_name, name) == 0)
-     {
-      ptr_str = strstr(buffer[i], name) + strlen(name);
-      xml_element = create_element(name);
-      bool found_any = false;
-      bool found_empty = false;
-      char *elements = NULL;
-      int elements_size = 1;
-      char **elements_buffer = NULL;
-
-      if(strstr(ptr_str, "ANY") != NULL)
+      char *name = get_node_name(buffer[i]);
+      if(strcmp(node_name, name) == 0)
       {
-        found_any = true;
+        xml_element = create_element(name);
+        char *elements = get_node_childs(buffer[i], name);
+        int elements_size = 1;
+        char **elements_buffer = split_string(elements, &elements_size, ',');
+        parse_element_childs(xml_element, elements_size, elements_buffer, buffer, buffer_size);
+        free(elements);
+        break;
       }
-      if(strstr(ptr_str, "EMPTY") != NULL)
-      {
-        found_empty = true;
-      }
-      elements = get_between_tokens(ptr_str, "()");
-      if((found_any && found_empty) || (found_any && elements != NULL) || (found_empty && elements != NULL))
-      {
-        fprintf(stderr, "Error at : %s>\n", buffer[i]);
-        exit(EXIT_FAILURE);
-      }
-      elements_buffer = split_string(elements, &elements_size, ',');
-      for(int j = 0; j < elements_size; j += 1)
-      {
-        if(strstr(elements_buffer[j], "#PCDATA") != NULL)
-        {
-          continue;
-        }
-        int k = 0;
-        int name_length = 0;
-        bool found =false;
-        char *name_start = NULL;
-        char *element_name = NULL;
-        while(is_xml_valid_char(*(elements_buffer[j] + k)) || !found)
-        {
-          if (is_xml_valid_char(*(elements_buffer[j] + k)) && !found)
-          {
-            found = true;
-            name_start = elements_buffer[j] + k;
-          }
-          if (is_xml_valid_char(*(elements_buffer[j] + k)))
-          {
-            name_length++;
-          }
-          k++;
-        }
-        if(name_length > 0){
-          element_name = malloc(sizeof(char) * name_length + 1);
-          if (buffer == NULL)
-          {
-            fprintf(stderr, "Failed to allocate memory [name] {parse_element}\n");
-            exit(EXIT_FAILURE);
-          }
-          strncpy(element_name, name_start, name_length);
-          element_name[name_length] = 0;
-          add_element(xml_element, parse_element(element_name, buffer, buffer_size));
-        }
-      }
-      free(elements);
-      break;
-     }
     }
   }
   return xml_element;
