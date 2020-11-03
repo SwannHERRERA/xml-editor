@@ -15,6 +15,6 @@ all: dev
 dev: build start
 
 build: create_dir
-	$(CC) $(EXTRAFLAG) -o $(BUILD_DIR)executable.out $(SRC)file_helper.c $(SRC)xml_element.c $(SRC)parse_dtd.c $(SRC)main.c 
+	$(CC) $(EXTRAFLAG) -o $(BUILD_DIR)executable.out $(SRC)file_helper.c $(SRC)xml_element.c $(SRC)parse_dtd.c $(SRC)parse_xml.c $(SRC)main.c 
 start:
 	$(BUILD_DIR)executable.out $(inputFile)
