@@ -4,15 +4,15 @@
 /*
  * At least one to many corresponds to +
  */
-#define OCCURENCE_1_N 0b1
+#define OCCURENCE_1_N 0b10
 /*
  * 0 to N corresponds to *
  */
-#define OCCURENCE_0_N 0b10
+#define OCCURENCE_0_N 0b11
 /*
  * 0 or 1 corresponds to ?
  */
-#define OCCURENCE_0_1 0b100
+#define OCCURENCE_0_1 0b1
 /*
  * OR with the next element corresponds to |
  */
@@ -20,7 +20,7 @@
 
 
 typedef struct XMLElement XMLElement;
-XMLElement *create_element(XMLElement *parent);
+XMLElement *create_element(char *name);
 void add_element(XMLElement *parent, XMLElement *child);
 
 struct XMLElement
