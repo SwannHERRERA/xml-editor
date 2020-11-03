@@ -117,17 +117,17 @@ void free_element(xml_element *element)
   free(element);
 }
 
-xml_element *get_element(char *xml, char *root_name)
+xml_element *get_element(char *xml, char *tag_name)
 {
   int index_of_opening_tag;
-  xml_element *root_tag = malloc(sizeof(xml_element));
-  root_tag->name = root_name;
-  root_tag->number_of_attribute = 0;
-  create_empty_xml_attribute_linkedlist(root_tag);
-  index_of_opening_tag = make_attributes(root_name, xml, root_tag);
+  xml_element *tag = malloc(sizeof(xml_element));
+  tag->name = tag_name;
+  tag->number_of_attribute = 0;
+  create_empty_xml_attribute_linkedlist(tag);
+  index_of_opening_tag = make_attributes(tag_name, xml, tag);
   char *start = xml + sizeof(char) * index_of_opening_tag;
-  get_content(start, root_tag);
-  print_element(root_tag);
-  free_element(root_tag);
-  return root_tag;
+  get_content(start, tag);
+  print_element(tag);
+  free_element(tag);
+  return tag;
 }

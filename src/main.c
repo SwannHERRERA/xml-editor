@@ -20,7 +20,7 @@ int main(int argc, char **argv)
   }
   char *root_name;
   char *dtd = find_doctype(file, &root_name);
-
+  // TODO faire un get XML
   char *xml = "<classrooms attr='fefe' b='ef' c='>' derrerzer='qs'>"
               "< classroom > AL</ classroom>"
               "<classroom> IABD</ classroom>"
