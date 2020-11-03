@@ -1,4 +1,5 @@
 #include "parse_dtd.h"
+#include "parse_xml.h"
 
 /**
  * I use ARGV to give relative path to xml
@@ -19,13 +20,25 @@ int main(int argc, char **argv)
   }
   char *root_name;
   char *dtd = find_doctype(file, &root_name);
-  fclose(file);
+  // TODO faire un get XML
+  char *xml = "<classrooms attr='fefe' b='ef' c='>' derrerzer='qs'>"
+              "< classroom > AL</ classroom>"
+              "<classroom> IABD</ classroom>"
+              "<classroom> MOC</ classroom>"
+              "<classroom> IBC</ classroom>"
+              "</classrooms> ";
+
   parse_dtd(dtd, root_name);
+  get_element(xml, root_name);
+
+  fclose(file);
   free(dtd);
   free(root_name);
   return EXIT_SUCCESS;
 }
-
+/**
+ * NOT used 
+ */
 bool isWhiteSpaceCharacter(char c)
 {
   unsigned int size = 8;
