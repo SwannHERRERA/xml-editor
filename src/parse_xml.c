@@ -86,6 +86,7 @@ void get_content(char *subject, xml_element *element)
 {
   char *content = (char *)malloc(sizeof(char) * strlen(subject));
   strcpy(content, subject);
+  // TODO make this generic
   char *end = strstr(content, "</classrooms>");
   end[0] = '\0';
   element->content = content;
@@ -112,7 +113,8 @@ void free_element(xml_element *element)
     element->attributes = element->attributes->next;
     free(tmp);
   }
-  free(element->name);
+  // TODO is equal to parametre care duble free / create copy
+  // free(element->name);
   free(element->content);
   free(element);
 }
@@ -120,14 +122,14 @@ void free_element(xml_element *element)
 xml_element *get_element(char *xml, char *tag_name)
 {
   int index_of_opening_tag;
-  xml_element *tag = malloc(sizeof(xml_element));
-  tag->name = tag_name;
-  tag->number_of_attribute = 0;
-  create_empty_xml_attribute_linkedlist(tag);
-  index_of_opening_tag = make_attributes(tag_name, xml, tag);
+  xml_element *element = malloc(sizeof(xml_element));
+  element->name = tag_name;
+  element->number_of_attribute = 0;
+  create_empty_xml_attribute_linkedlist(element);
+  index_of_opening_tag = make_attributes(tag_name, xml, element);
   char *start = xml + sizeof(char) * index_of_opening_tag;
-  get_content(start, tag);
-  print_element(tag);
-  free_element(tag);
-  return tag;
+  get_content(start, element);
+  print_element(element);
+  free_element(element);
+  return element;
 }

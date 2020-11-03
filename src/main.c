@@ -28,15 +28,17 @@ int main(int argc, char **argv)
               "<classroom> IBC</ classroom>"
               "</classrooms> ";
 
+  parse_dtd(dtd, root_name);
   get_element(xml, root_name);
 
-  parse_dtd(dtd, root_name);
   fclose(file);
   free(dtd);
   free(root_name);
   return EXIT_SUCCESS;
 }
-
+/**
+ * NOT used 
+ */
 bool isWhiteSpaceCharacter(char c)
 {
   unsigned int size = 8;
