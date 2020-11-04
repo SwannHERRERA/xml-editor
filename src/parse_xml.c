@@ -119,6 +119,15 @@ void free_element(xml_element *element)
   free(element);
 }
 
+char *found_start(char *xml, xml_element *element)
+{
+  int length_of_opening_tag = strlen(element->name) + (1 * sizeof(char));
+  char tmp[length_of_opening_tag];
+  strcpy(tmp, "<");
+  strcat(tmp, element->name);
+  return strstr(xml, tmp);
+}
+
 xml_element *get_element(char *xml, char *tag_name)
 {
   int index_of_opening_tag;
@@ -126,6 +135,7 @@ xml_element *get_element(char *xml, char *tag_name)
   element->name = tag_name;
   element->number_of_attribute = 0;
   create_empty_xml_attribute_linkedlist(element);
+  xml = found_start(xml, element);
   index_of_opening_tag = make_attributes(tag_name, xml, element);
   char *start = xml + sizeof(char) * index_of_opening_tag;
   get_content(start, element);
