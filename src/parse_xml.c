@@ -87,7 +87,11 @@ void get_content(char *subject, xml_element *element)
   char *content = (char *)malloc(sizeof(char) * strlen(subject));
   strcpy(content, subject);
   // TODO make this generic
-  char *end = strstr(content, "</classrooms>");
+  char *closing_tag = malloc((strlen(element->name) + 3) * sizeof(char));
+  strcpy(closing_tag, "</");
+  strcat(closing_tag, element->name);
+  strcat(closing_tag, ">");
+  char *end = strstr(content, closing_tag);
   end[0] = '\0';
   element->content = content;
 }
@@ -113,26 +117,32 @@ void free_element(xml_element *element)
     element->attributes = element->attributes->next;
     free(tmp);
   }
-  // TODO is equal to parametre care duble free / create copy
-  // free(element->name);
+
+  free(element->name);
   free(element->content);
   free(element);
 }
 
 char *found_start(char *xml, xml_element *element)
 {
-  int length_of_opening_tag = strlen(element->name) + (1 * sizeof(char));
+  int length_of_opening_tag = strlen(element->name) + (2 * sizeof(char));
   char tmp[length_of_opening_tag];
   strcpy(tmp, "<");
   strcat(tmp, element->name);
-  return strstr(xml, tmp);
+  char *str = strstr(xml, tmp);
+  while (str[strlen(element->name) + 1] != '>' && str[strlen(element->name) + 1] != ' ')
+  {
+    str = strstr(str + sizeof(char), tmp);
+  }
+  return str;
 }
 
 xml_element *get_element(char *xml, char *tag_name)
 {
   int index_of_opening_tag;
   xml_element *element = malloc(sizeof(xml_element));
-  element->name = tag_name;
+  element->name = malloc(sizeof(char) * strlen(tag_name));
+  strcpy(element->name, tag_name);
   element->number_of_attribute = 0;
   create_empty_xml_attribute_linkedlist(element);
   xml = found_start(xml, element);

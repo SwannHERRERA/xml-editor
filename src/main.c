@@ -24,7 +24,6 @@ int main(int argc, char **argv)
 
   fseek(file, 0L, SEEK_SET);
   char *xml = file_get_content(file);
-  // TODO ATTENTION <classroom match aussi <classrooms faire attention que le caractère suivant soit pas une lettre puis relancer
   get_element(xml, root_name);
 
   free(xml);
