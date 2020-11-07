@@ -18,10 +18,12 @@
  */
 #define OCCURENCE_OR 0b1000
 
-
 typedef struct XMLElement XMLElement;
 XMLElement *create_element(char *name);
 void add_element(XMLElement *parent, XMLElement *child);
+void print_XMLElement(XMLElement *element);
+void free_XMLElement(XMLElement *element);
+void free_DTD(XMLElement *root);
 
 struct XMLElement
 {
