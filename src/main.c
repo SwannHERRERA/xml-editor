@@ -42,17 +42,20 @@ int main(int argc, char **argv)
  */
 xml_element *get_next_element(char *xml)
 {
+  printf("get_next_element\n");
   int i = 1;
   int start, end;
   char *name;
-  while (xml != NULL && !isspace(xml[i]))
+  long max_size = strlen(xml);
+  printf("max_size: %ld\n", max_size);
+  while (!isspace(xml[i]) && xml[i] != '>' && i < max_size)
   {
     i += 1;
   }
   start = 1;
   end = i;
-  name = malloc(sizeof(char) * end);
-  strncpy(name, xml + start, end);
+  name = malloc(sizeof(char) * (end - start));
+  strncpy(name, xml + start, end - start);
   printf("name: %s\n", name);
   xml_element *element = get_element(xml, name);
   free(name);
@@ -85,9 +88,9 @@ bool check_is_doctype(char *s)
 {
   if (strstr(s, "<!DOCTYPE ") == NULL)
   {
-    return true;
+    return false;
   }
-  return false;
+  return true;
 }
 
 bool check_is_balise(char **xml)
@@ -106,11 +109,37 @@ bool check_is_balise(char **xml)
   }
   if (check_is_doctype(*xml) == true)
   {
+    printf("it's doctype\n");
     size_of_dtd = get_size_of_doctype(*xml);
     *xml = *xml + sizeof(char) * size_of_dtd;
     return false;
   }
   return true;
+}
+
+bool is_closing_tag(char *s, xml_element *element)
+{
+  if (element == NULL)
+  {
+    fprintf(stderr, "Error element is NULL\n");
+    exit(EXIT_FAILURE);
+  }
+  char closing_tag[strlen(element->name) + 3];
+  char closing_tag_find[strlen(element->name) + 3];
+
+  strcpy(closing_tag, "</");
+  strcat(closing_tag, element->name);
+  strcat(closing_tag, ">");
+
+  if (s[1] == '/')
+  {
+    strncpy(closing_tag_find, s, strlen(element->name) + 3);
+    if (strcmp(closing_tag, closing_tag_find) == 0)
+    {
+      return true;
+    }
+  }
+  return false;
 }
 
 xml_element *parse_xml(char *xml)
@@ -119,17 +148,21 @@ xml_element *parse_xml(char *xml)
 
   while ((xml = strchr(xml, '<')) != NULL)
   {
-    printf("%s\n\n", xml);
     if (!check_is_balise(&xml))
     {
       continue;
     }
-    if (is_closing_tag(&xml))
+    printf("%s\n\n", xml);
+    current_element = get_next_element(xml);
+
+    if (is_closing_tag(xml, current_element))
     {
       current_element = current_element->parent;
     }
-    // TODO when see parent
-    current_element = get_next_element(xml);
+    else
+    {
+      // current_element = get_next_element(xml);
+    }
   }
   return current_element;
 }

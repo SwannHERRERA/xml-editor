@@ -141,6 +141,7 @@ xml_element *get_element(char *xml, char *tag_name)
 {
   int index_of_opening_tag;
   xml_element *element = malloc(sizeof(xml_element));
+  element->parent = NULL;
   element->name = malloc(sizeof(char) * strlen(tag_name));
   strcpy(element->name, tag_name);
   element->number_of_attribute = 0;
