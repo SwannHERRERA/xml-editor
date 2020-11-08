@@ -40,9 +40,8 @@ int main(int argc, char **argv)
  * @param prev element
  * 
  */
-xml_element *get_next_element(char *xml)
+xml_element *get_next_element(char *xml, xml_element *parent)
 {
-  printf("get_next_element\n");
   int i = 1;
   int start, end;
   char *name;
@@ -56,6 +55,7 @@ xml_element *get_next_element(char *xml)
   name = malloc(sizeof(char) * (end - start));
   strncpy(name, xml + start, end - start);
   xml_element *element = get_element(xml, name);
+  element->parent = parent;
   free(name);
   return element;
 }
@@ -68,6 +68,7 @@ bool check_is_comment(char *s)
 {
   if (s[1] == '!')
   {
+
     return true;
   }
   return false;
@@ -84,17 +85,23 @@ bool check_is_version(char *s)
 
 bool check_is_doctype(char *s)
 {
-  if (strstr(s, "<!DOCTYPE ") == NULL)
+  if (strncmp(s, "<!DOCTYPE ", 10) == 0)
   {
-    return false;
+    return true;
   }
-  return true;
+  return false;
 }
 
 bool check_is_balise(char **xml)
 {
   int size_of_dtd;
 
+  if (check_is_doctype(*xml) == true)
+  {
+    size_of_dtd = get_size_of_doctype(*xml);
+    *xml = *xml + sizeof(char) * size_of_dtd;
+    return false;
+  }
   if (check_is_comment(*xml) == true)
   {
     *xml = strstr(*xml, "-->");
@@ -103,13 +110,6 @@ bool check_is_balise(char **xml)
   if (check_is_version(*xml) == true)
   {
     *xml = strstr(*xml, "?>");
-    return false;
-  }
-  if (check_is_doctype(*xml) == true)
-  {
-    printf("it's doctype\n");
-    size_of_dtd = get_size_of_doctype(*xml);
-    *xml = *xml + sizeof(char) * size_of_dtd;
     return false;
   }
   return true;
@@ -134,16 +134,18 @@ xml_element *parse_xml(char *xml)
     {
       continue;
     }
-    // printf("%s\n\n", xml);
-    // current_element = get_next_element(xml);
 
     if (is_closing_tag(xml))
     {
+      if (current_element == NULL)
+      {
+        print_element(current_element);
+      }
       current_element = current_element->parent;
     }
     else
     {
-      current_element = get_next_element(xml);
+      current_element = get_next_element(xml, current_element);
     }
     xml = xml + sizeof(char) * 1;
   }
