@@ -2,8 +2,12 @@
 <!DOCTYPE classrooms[<!ELEMENT classrooms (classroom+)><!ELEMENT classroom (#PCDATA)>]>
 <classrooms attribute1="TOTO">
   <!-- <!DOCTYPE Stockmarket SYSTEM "exemple.dtd"> -->
-  <classroom>AL</classroom>
+  <classroom rank="1" other_name="les bests">AL</classroom>
   <classroom>IABD</classroom>
   <classroom>MOC</classroom>
   <classroom>IBC</classroom>
+  <students>
+    <student>Pierre</student>
+    <student>Swann</student>
+  </students>
 </classrooms>

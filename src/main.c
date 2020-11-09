@@ -30,7 +30,8 @@ int main(int argc, char **argv)
 
   fseek(file, 0L, SEEK_SET);
   char *xml = file_get_content(file);
-  parse_xml(xml);
+  xml_element *root = parse_xml(xml);
+  print_element(root);
   free_DTD(dtd);
   free(xml);
   fclose(file);
@@ -121,7 +122,6 @@ xml_element *get_next_element(char *xml, xml_element *parent, int deepness)
     parent->childs[parent->childs_count] = element;
     parent->childs_count += 1;
   }
-  print_element();
   free(name);
   return element;
 }
@@ -224,6 +224,5 @@ xml_element *parse_xml(char *xml)
     }
     xml = xml + sizeof(char) * 1;
   }
-  print_element(current_element);
   return root;
 }

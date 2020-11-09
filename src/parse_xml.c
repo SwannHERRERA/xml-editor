@@ -100,7 +100,25 @@ void print_element(xml_element *element)
 {
   printf("%s\n", element->name);
   print_attribute(element);
+  printf("number of childs: %d\n", element->childs_count);
+  printf("capacity of childs: %d\n", element->childs_capacity);
+  printf("deepness: %d\n", element->deepness);
+
+  if (element->parent != NULL)
+  {
+    printf("parent: %s\n", element->parent->name);
+  }
+  else
+  {
+    printf("parent: NULL\n");
+  }
+
+  for (int i = 0; i < element->childs_count; i += 1)
+  {
+    print_element(element->childs[i]);
+  }
   printf("%s\n", element->content);
+  printf("\n");
 }
 
 void free_element(xml_element *element)
@@ -151,6 +169,6 @@ xml_element *get_element(char *xml, char *tag_name)
   char *start = xml + sizeof(char) * index_of_opening_tag;
   get_content(start, element);
   // print_element(element);
-  free_element(element);
+  // free_element(element);
   return element;
 }
