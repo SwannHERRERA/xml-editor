@@ -71,7 +71,7 @@ void create_empty_xml_attribute_linkedlist(xml_element *element)
 
 void print_attribute(xml_element *element)
 {
-  unsigned int i = 0;
+  int i = 0;
   xml_attribute_linkedlist *head = element->attributes;
   printf("number of attributes: %d\n", element->number_of_attribute);
   for (i = 0; i < element->number_of_attribute; i += 1)
@@ -106,7 +106,7 @@ void print_element(xml_element *element)
 void free_element(xml_element *element)
 {
   xml_attribute_linkedlist *tmp = NULL;
-  unsigned int i;
+  int i;
 
   for (i = 0; i < element->number_of_attribute; i += 1)
   {
@@ -150,7 +150,7 @@ xml_element *get_element(char *xml, char *tag_name)
   index_of_opening_tag = make_attributes(tag_name, xml, element);
   char *start = xml + sizeof(char) * index_of_opening_tag;
   get_content(start, element);
-  print_element(element);
+  // print_element(element);
   free_element(element);
   return element;
 }

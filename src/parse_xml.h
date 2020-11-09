@@ -19,10 +19,14 @@ struct xml_attribute_linkedlist
 typedef struct xml_element
 {
   char *name;
-  unsigned int number_of_attribute;
+  int number_of_attribute;
   xml_attribute_linkedlist *attributes;
   char *content;
   struct xml_element *parent;
+  struct xml_element **childs;
+  int childs_count;
+  int childs_capacity;
+  int deepness;
 } xml_element;
 
 void create_empty_xml_attribute_linkedlist(xml_element *element);

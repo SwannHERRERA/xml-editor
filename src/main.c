@@ -3,6 +3,7 @@
 #include "parse_xml.h"
 
 xml_element *parse_xml(char *xml);
+void print_element_tree(xml_element *root);
 
 /**
  * I use ARGV to give relative path to xml
@@ -25,6 +26,8 @@ int main(int argc, char **argv)
   char *dtd_string = find_doctype(file, &root_name);
   XMLElement *dtd = parse_dtd(dtd_string, root_name);
 
+  printf("\n\n   PARSE XML  \n\n");
+
   fseek(file, 0L, SEEK_SET);
   char *xml = file_get_content(file);
   parse_xml(xml);
@@ -36,11 +39,60 @@ int main(int argc, char **argv)
   return EXIT_SUCCESS;
 }
 
+void print_element_tree(xml_element *root)
+{
+  if (root == NULL)
+  {
+    return;
+  }
+}
+
+void print_element_tree_recursive(xml_element *element)
+{
+  int i = 0, j = 0;
+  xml_attribute_linkedlist *current_attr = element->attributes;
+  for (i = 0; i < element->deepness; i += 1)
+  {
+    printf("  ");
+  }
+  printf("- %s\n", element->name);
+  for (i = 0; i < element->deepness; i += 1)
+  {
+    printf("  ");
+  }
+  printf("  Attributes: %d\n", element->number_of_attribute);
+  for (i = 0; i < element->number_of_attribute; i += 1)
+  {
+    for (j = 0; j < element->deepness; j += 1)
+    {
+      printf("  ");
+    }
+    printf("%s=\"%s\"\n", current_attr->value->name, current_attr->value->value);
+    current_attr = current_attr->next;
+  }
+  for (i = 0; i < element->childs_count; i += 1)
+  {
+    print_element_tree_recursive(element->childs[i]);
+  }
+}
+
+void realloc_childs(xml_element *element)
+{
+  xml_element **new_array = malloc(sizeof(xml_element *) * (element->childs_capacity * 2));
+  element->childs_capacity *= 2;
+  for (int i = 0; i < element->childs_count; i += 1)
+  {
+    new_array[i] = element->childs[i];
+  }
+  free(element->childs);
+  element->childs = new_array;
+}
+
 /**
- * @param prev element
+ * @param parent xml_element*
  * 
  */
-xml_element *get_next_element(char *xml, xml_element *parent)
+xml_element *get_next_element(char *xml, xml_element *parent, int deepness)
 {
   int i = 1;
   int start, end;
@@ -55,7 +107,21 @@ xml_element *get_next_element(char *xml, xml_element *parent)
   name = malloc(sizeof(char) * (end - start));
   strncpy(name, xml + start, end - start);
   xml_element *element = get_element(xml, name);
+  element->childs = malloc(sizeof(xml_element *) * 5);
+  element->childs_count = 0;
+  element->childs_capacity = 5;
   element->parent = parent;
+  element->deepness = deepness;
+  if (parent != NULL)
+  {
+    if (parent->childs_count == parent->childs_capacity)
+    {
+      realloc_childs(parent);
+    }
+    parent->childs[parent->childs_count] = element;
+    parent->childs_count += 1;
+  }
+  print_element();
   free(name);
   return element;
 }
@@ -126,7 +192,9 @@ bool is_closing_tag(char *s)
 
 xml_element *parse_xml(char *xml)
 {
+  xml_element *root;
   xml_element *current_element = NULL;
+  int deepness = 0;
 
   while ((xml = strchr(xml, '<')) != NULL)
   {
@@ -139,15 +207,23 @@ xml_element *parse_xml(char *xml)
     {
       if (current_element == NULL)
       {
-        print_element(current_element);
+        fprintf(stderr, "Error closing tag when no one was open.\n");
+        exit(EXIT_FAILURE);
       }
+      deepness -= 1;
       current_element = current_element->parent;
     }
     else
     {
-      current_element = get_next_element(xml, current_element);
+      current_element = get_next_element(xml, current_element, deepness);
+      if (current_element->parent == NULL)
+      {
+        root = current_element;
+      }
+      deepness += 1;
     }
     xml = xml + sizeof(char) * 1;
   }
-  return current_element;
+  print_element(current_element);
+  return root;
 }
