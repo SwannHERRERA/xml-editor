@@ -172,3 +172,145 @@ xml_element *get_element(char *xml, char *tag_name)
   // free_element(element);
   return element;
 }
+
+void realloc_childs(xml_element *element)
+{
+  xml_element **new_array = malloc(sizeof(xml_element *) * (element->childs_capacity * 2));
+  element->childs_capacity *= 2;
+  for (int i = 0; i < element->childs_count; i += 1)
+  {
+    new_array[i] = element->childs[i];
+  }
+  free(element->childs);
+  element->childs = new_array;
+}
+
+xml_element *get_next_element(char *xml, xml_element *parent, int deepness)
+{
+  int i = 1;
+  int start, end;
+  char *name;
+  long max_size = strlen(xml);
+  while (!isspace(xml[i]) && xml[i] != '>' && i < max_size)
+  {
+    i += 1;
+  }
+  start = 1;
+  end = i;
+  name = malloc(sizeof(char) * (end - start));
+  strncpy(name, xml + start, end - start);
+  xml_element *element = get_element(xml, name);
+  element->childs = malloc(sizeof(xml_element *) * 5);
+  element->childs_count = 0;
+  element->childs_capacity = 5;
+  element->parent = parent;
+  element->deepness = deepness;
+  if (parent != NULL)
+  {
+    if (parent->childs_count == parent->childs_capacity)
+    {
+      realloc_childs(parent);
+    }
+    parent->childs[parent->childs_count] = element;
+    parent->childs_count += 1;
+  }
+  free(name);
+  return element;
+}
+
+bool check_is_comment(char *s)
+{
+  if (s[1] == '!')
+  {
+
+    return true;
+  }
+  return false;
+}
+
+bool check_is_version(char *s)
+{
+  if (s[1] == '?')
+  {
+    return true;
+  }
+  return false;
+}
+
+bool check_is_doctype(char *s)
+{
+  if (strncmp(s, "<!DOCTYPE ", 10) == 0)
+  {
+    return true;
+  }
+  return false;
+}
+
+bool check_is_balise(char **xml)
+{
+  int size_of_dtd;
+
+  if (check_is_doctype(*xml) == true)
+  {
+    size_of_dtd = get_size_of_doctype(*xml);
+    *xml = *xml + sizeof(char) * size_of_dtd;
+    return false;
+  }
+  if (check_is_comment(*xml) == true)
+  {
+    *xml = strstr(*xml, "-->");
+    return false;
+  }
+  if (check_is_version(*xml) == true)
+  {
+    *xml = strstr(*xml, "?>");
+    return false;
+  }
+  return true;
+}
+
+bool is_closing_tag(char *s)
+{
+  if (s[1] == '/')
+  {
+    return true;
+  }
+  return false;
+}
+
+xml_element *parse_xml(char *xml)
+{
+  xml_element *root;
+  xml_element *current_element = NULL;
+  int deepness = 0;
+
+  while ((xml = strchr(xml, '<')) != NULL)
+  {
+    if (!check_is_balise(&xml))
+    {
+      continue;
+    }
+
+    if (is_closing_tag(xml))
+    {
+      if (current_element == NULL)
+      {
+        fprintf(stderr, "Error closing tag when no one was open.\n");
+        exit(EXIT_FAILURE);
+      }
+      deepness -= 1;
+      current_element = current_element->parent;
+    }
+    else
+    {
+      current_element = get_next_element(xml, current_element, deepness);
+      if (current_element->parent == NULL)
+      {
+        root = current_element;
+      }
+      deepness += 1;
+    }
+    xml = xml + sizeof(char) * 1;
+  }
+  return root;
+}

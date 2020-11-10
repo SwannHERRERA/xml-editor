@@ -1,3 +1,5 @@
+#ifndef _parse_dtd_h_
+#define _parse_dtd_h_
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -18,3 +20,5 @@ bool is_xml_valid_char(char c);
 char **split_string(char *dtd, int *size, char delim);
 char *get_root_name(char *buffer);
 char *get_node_name(char *buffer);
+
+#endif
