@@ -1,9 +1,9 @@
 <?xml version="1.0"?>
-<!DOCTYPE classrooms[<!ELEMENT classrooms (classroom+)><!ELEMENT classroom (#PCDATA)>]>
-<classrooms attribute1="TOTO">
+<!DOCTYPE classrooms[<!ELEMENT classrooms (classroom+)><!ELEMENT classroom (#PCDATA)><!ATTLIST classrooms name CDATA #FIXED "TOTO"><!ATTLIST classroom year CDATA #REQUIRED>]>
+<classrooms name="TOTO">
   <!-- <!DOCTYPE Stockmarket SYSTEM "exemple.dtd"> -->
-  <classroom>AL</classroom>
-  <classroom>IABD</classroom>
-  <classroom>MOC</classroom>
-  <classroom>IBC</classroom>
+  <classroom year="2018">AL</classroom>
+  <classroom year="2015">IABD</classroom>
+  <classroom year="2014">MOC</classroom>
+  <classroom year="2012">IBC</classroom>
 </classrooms>
