@@ -20,7 +20,7 @@ int main(int argc, char **argv)
   }
   char *root_name;
   char *dtd = find_doctype(file, &root_name);
-  parse_dtd(dtd, root_name);
+  /*XMLElement *parent = */parse_dtd(dtd, root_name);
 
   fseek(file, 0L, SEEK_SET);
   char *xml = file_get_content(file);
