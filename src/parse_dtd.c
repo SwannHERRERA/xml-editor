@@ -5,7 +5,7 @@ char *find_doctype(FILE *file, char **root_name)
 {
   char *buffer = file_get_content(file);
   char *start = strstr(buffer, "<!DOCTYPE ");
-  char size_of_doctype = get_size_of_doctype(start);
+  long size_of_doctype = get_size_of_doctype(start);
   char *doctype = (char *)malloc(sizeof(char) * size_of_doctype + 1);
   if (!doctype)
   {
@@ -13,7 +13,8 @@ char *find_doctype(FILE *file, char **root_name)
     exit(EXIT_FAILURE);
   }
   strncpy(doctype, start, size_of_doctype);
-  *root_name = get_root_name(doctype);
+  size_t cursor = strlen("<!DOCTYPE ");
+  *root_name = get_next_name(strstr(buffer, "<!DOCTYPE "), &cursor);
   doctype[(int)size_of_doctype] = 0;
   free(buffer);
   if (is_internal_doctype(doctype))
@@ -121,8 +122,7 @@ bool is_internal_doctype(char *doctype)
   return false;
 }
 
-/*TODO check why start is equal to nil
- * Gets every char between two tokens 
+/* Gets every char between two tokens 
  * tokens[0] is where the new string will begin
  * tokens[1] is the token where the new string will stop
  */
@@ -151,34 +151,33 @@ bool is_xml_valid_char(char c)
   return ((c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || (c >= '0' && c <= '9')) ? true : false;
 }
 
-char *get_root_name(char *buffer)
+char *get_next_name(char *ptr_str, size_t *offset)
 {
-  char *start = strstr(buffer, "<!DOCTYPE ") + strlen("<!DOCTYPE ");
-  int char_count = 0, j = 0;
   bool found = false;
-  while (is_xml_valid_char(*(start + j)) || !found)
+  char *name_start = NULL;
+  int name_length = 0;
+  while (is_xml_valid_char(*(ptr_str + (*offset))) || !found)
   {
-    if (is_xml_valid_char(*(start + j)) && !found)
+    if (is_xml_valid_char(*(ptr_str + (*offset))) && !found)
     {
       found = true;
-      start = start + j;
-      j = 0;
+      name_start = ptr_str + (*offset);
     }
-    if (is_xml_valid_char(*(start + j)))
+    if (is_xml_valid_char(*(ptr_str + (*offset))))
     {
-      char_count++;
+      name_length++;
     }
-    j++;
+    (*offset)++;
   }
-  char *root_name = (char *)malloc(sizeof(char) * char_count + 1);
-  if (root_name == NULL)
+  char *name = (char *)malloc(sizeof(char) * name_length + 1);
+  if (name == NULL)
   {
-    fprintf(stderr, "Memory allocation failed [get_root_name]");
+    fprintf(stderr, "Failed to allocate memory [name] {parse_element}\n");
     exit(EXIT_FAILURE);
   }
-  strncpy(root_name, start, char_count);
-  root_name[char_count] = 0;
-  return root_name;
+  strncpy(name, name_start, name_length);
+  name[name_length] = 0;
+  return name;
 }
 
 int char_count(char *str, char character)
@@ -223,32 +222,6 @@ char **split_string(char *dtd, int *size, char delim)
   return buffer;
 }
 
-char *get_node_name(char *buffer)
-{
-  char *ptr_str = strstr(buffer, "<!ELEMENT ");
-  int j = (ptr_str - buffer) + strlen("<!ELEMENT ");
-  bool found = false;
-  char *name_start = NULL;
-  int name_length = 0;
-  while (is_xml_valid_char(buffer[j]) || !found)
-  {
-    if (is_xml_valid_char(buffer[j]) && !found)
-    {
-      found = true;
-      name_start = buffer + j;
-    }
-    if (is_xml_valid_char(buffer[j]))
-    {
-      name_length++;
-    }
-    j++;
-  }
-  char *name = malloc(sizeof(char) * name_length);
-  strncpy(name, name_start, name_length);
-  name[name_length] = 0;
-  return name;
-}
-
 void parse_element_childs(XMLElement *parent, int elements_size, char **elements_buffer, char **buffer, int buffer_size)
 {
   for (int j = 0; j < elements_size; j += 1)
@@ -257,34 +230,10 @@ void parse_element_childs(XMLElement *parent, int elements_size, char **elements
     {
       continue;
     }
-    int k = 0;
-    int name_length = 0;
-    bool found = false;
-    char *name_start = NULL;
-    char *element_name = NULL;
-    while (is_xml_valid_char(*(elements_buffer[j] + k)) || !found)
+    size_t cursor = 0;
+    char *element_name = get_next_name(elements_buffer[j], &cursor);
+    if (element_name != NULL)
     {
-      if (is_xml_valid_char(*(elements_buffer[j] + k)) && !found)
-      {
-        found = true;
-        name_start = elements_buffer[j] + k;
-      }
-      if (is_xml_valid_char(*(elements_buffer[j] + k)))
-      {
-        name_length++;
-      }
-      k++;
-    }
-    if (name_length > 0)
-    {
-      element_name = malloc(sizeof(char) * name_length + 1);
-      if (buffer == NULL)
-      {
-        fprintf(stderr, "Failed to allocate memory [name] {parse_element}\n");
-        exit(EXIT_FAILURE);
-      }
-      strncpy(element_name, name_start, name_length);
-      element_name[name_length] = 0;
       add_element(parent, parse_element(element_name, buffer, buffer_size));
     }
   }
@@ -314,6 +263,80 @@ char *get_node_childs(char *buffer, char *name)
   return elements;
 }
 
+AttributeValue get_attribute_value(char **str)
+{
+  const char *names[] = {"", "#REQUIRED", "#IMPLIED", "#FIXED"};
+  int size = 4;
+  int value = -1;
+  for (int i = 0; i < size; i++)
+  {
+    if (!strcmp(*str, names[i]))
+    {
+      if (value == -1)
+      {
+        value = i;
+      }
+      else
+      {
+        printf("ERROR at %s\n", *str);
+      }
+      char *st = strstr(*str, names[i]);
+      if ( st != NULL && st > *str)
+      {
+        *str = strstr(*str, names[i]);
+      }
+    }
+  }
+  return value;
+}
+
+AttributeType get_attribute_type(char **str)
+{
+  const char *names[] = {"CDATA"};
+  int size = 1;
+  int type = -1;
+  for (int i = 0; i < size; i++)
+  {
+    if (!strcmp(*str, names[i]))
+    {
+      if (type == -1)
+      {
+        type = i;
+      }
+      else
+      {
+        printf("ERROR at %s\n", *str);
+      }
+      char *st = strstr(*str, names[i]);
+      if ( st != NULL && st > *str)
+      {
+        *str = strstr(*str, names[i]);
+      }
+    }
+  }
+  return type;
+}
+//TODO Translate types and values to an enum value
+void parse_attributes(XMLElement *element, char **buffer, int buffer_size)
+{
+  for (int i = 0; i < buffer_size; i++)
+  {
+    char *ptr_str = strstr(buffer[i], "<!ATTLIST ");
+    if (ptr_str != NULL)
+    {
+      size_t cursor = strlen("<!ATTLIST ");
+      char *node_name = get_next_name(ptr_str, &cursor);
+      if (!strcmp(element->name, node_name))
+      {
+        char *attribute_name = get_next_name(strstr(ptr_str, node_name), &cursor);
+        AttributeType type = get_attribute_type(&ptr_str);
+        AttributeValue value = get_attribute_value(&ptr_str);
+        add_attribute(element, attribute_name, value, type);
+      }
+    }
+  }
+}
+
 XMLElement *parse_element(char *node_name, char **buffer, int buffer_size)
 {
   XMLElement *xml_element = NULL;
@@ -322,7 +345,8 @@ XMLElement *parse_element(char *node_name, char **buffer, int buffer_size)
     char *ptr_str = strstr(buffer[i], "<!ELEMENT ");
     if (ptr_str != NULL)
     {
-      char *name = get_node_name(buffer[i]);
+      size_t cursor = strlen("<!ELEMENT ");
+      char *name = get_next_name(ptr_str, &cursor);
       if (strcmp(node_name, name) == 0)
       {
         xml_element = create_element(name);
@@ -340,12 +364,14 @@ XMLElement *parse_element(char *node_name, char **buffer, int buffer_size)
 
 XMLElement *parse_dtd(char *dtd, char *root_name)
 {
-  printf("Starting to parse dtd\n");
+  printf("######## Starting to parse DTD ########\n");
   printf("DTD : %s\nRoot name : %s\n", dtd, root_name);
   int buffer_size = 0;
   char **buffer = split_string(dtd, &buffer_size, '>');
   XMLElement *parent = parse_element(root_name, buffer, buffer_size);
+  print_tree(parent);
   printf("child = %s\n", parent->childs[0]->name);
   free(buffer);
+  printf("######## Finished parsing DTD ########\n");
   return parent;
 }

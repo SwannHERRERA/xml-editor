@@ -21,21 +21,49 @@
 #define OCCURENCE_OR 0b1000
 
 typedef struct XMLElement XMLElement;
+typedef struct XMLAttribute XMLAttribute;
+typedef enum AttributeValue AttributeValue;
+typedef enum AttributeType AttributeType;
 XMLElement *create_element(char *name);
+void print_tree(XMLElement *parent);
 void add_element(XMLElement *parent, XMLElement *child);
 void print_XMLElement(XMLElement *element);
 void free_XMLElement(XMLElement *element);
 void free_DTD(XMLElement *root);
+void add_attribute(XMLElement *element, char *name, AttributeValue value, AttributeType type);
 
 struct XMLElement
 {
   XMLElement *parent;
   XMLElement **childs;
+  XMLAttribute *attributes;
   char *name;
   int deepness;
   int childsCount;
   int childsCapacity;
   unsigned char occurenceFlag;
+};
+
+enum AttributeValue
+{
+  NONE,
+  REQUIRED,
+  IMPLIED,
+  FIXED
+};
+
+enum AttributeType
+{
+  VALUE,
+  CDATA
+};
+
+struct XMLAttribute
+{
+  XMLAttribute *next;
+  AttributeType type;
+  AttributeValue value;
+  char *name;
 };
 
 #endif
