@@ -21,6 +21,23 @@ XMLElement *create_element(char *name)
   return element;
 }
 
+void print_tree(XMLElement *parent)
+{
+  if (parent != NULL)
+  {
+    for (int i = 0; i < parent->deepness; i++)
+    {
+      printf("\t");
+    }
+    printf("\u255A\u2550\u2550");
+    printf(">%s\n", parent->name);
+    for (int i = 0; i < parent->childsCount; i++)
+    {
+      print_tree(parent->childs[i]);
+    }
+  }
+}
+
 void add_element(XMLElement *parent, XMLElement *child)
 {
   if (parent->childsCount == parent->childsCapacity)
@@ -33,6 +50,18 @@ void add_element(XMLElement *parent, XMLElement *child)
       exit(EXIT_FAILURE);
     }
   }
+  child->deepness = parent->deepness + 1;
   parent->childs[parent->childsCount] = child;
   parent->childsCount += 1;
+}
+
+void add_attribute(XMLElement *element, char *name, AttributeValue value, AttributeType type)
+{
+  XMLAttribute *first = element->attributes;
+  XMLAttribute *new = malloc(sizeof(XMLAttribute));
+  new->next = first;
+  element->attributes = new;
+  new->name = name;
+  new->type = type;
+  new->value = value;
 }
