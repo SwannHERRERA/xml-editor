@@ -1,8 +1,6 @@
 #include "parse_dtd.h"
 #include "parse_xml.h"
 
-xml_element *parse_xml(char *xml);
-
 /**
  * I use ARGV to give relative path to xml
  */
