@@ -328,7 +328,7 @@ void parse_attributes(XMLElement *element, char **buffer, int buffer_size)
       char *node_name = get_next_name(ptr_str, &cursor);
       if (!strcmp(element->name, node_name))
       {
-        char *attribute_name = get_next_name(strstr(ptr_str, node_name), &cursor);
+        char *attribute_name = get_next_name(ptr_str, &cursor);
         AttributeType type = get_attribute_type(&ptr_str);
         AttributeValue value = get_attribute_value(&ptr_str);
         add_attribute(element, attribute_name, value, type);
@@ -354,6 +354,7 @@ XMLElement *parse_element(char *node_name, char **buffer, int buffer_size)
         int elements_size = 1;
         char **elements_buffer = split_string(elements, &elements_size, ',');
         parse_element_childs(xml_element, elements_size, elements_buffer, buffer, buffer_size);
+        parse_attributes(xml_element, buffer, buffer_size);
         free(elements);
         break;
       }
@@ -370,7 +371,7 @@ XMLElement *parse_dtd(char *dtd, char *root_name)
   char **buffer = split_string(dtd, &buffer_size, '>');
   XMLElement *parent = parse_element(root_name, buffer, buffer_size);
   print_tree(parent);
-  printf("child = %s\n", parent->childs[0]->name);
+  printf("attrib : %s\n", parent->attributes->name);
   free(buffer);
   printf("######## Finished parsing DTD ########\n");
   return parent;
