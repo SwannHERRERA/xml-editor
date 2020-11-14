@@ -21,8 +21,8 @@ int main(int argc, char **argv)
     return EXIT_FAILURE;
   }
   char *root_name;
-  char *dtd = find_doctype(file, &root_name);
-  parse_dtd(dtd, root_name);
+  char *dtd_string = find_doctype(file, &root_name);
+  XMLElement *dtd = parse_dtd(dtd_string, root_name);
 
   printf("\n######## Starting PARSE XML ########\n");
 

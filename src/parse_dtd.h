@@ -1,3 +1,5 @@
+#ifndef _parse_dtd_h_
+#define _parse_dtd_h_
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -20,3 +22,5 @@ char **split_string(char *dtd, int *size, char delim);
 char *get_next_name(char *ptr_str, size_t *offset);
 AttributeType get_attribute_type(char **str);
 AttributeValue get_attribute_value(char **str);
+
+#endif

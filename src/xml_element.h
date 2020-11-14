@@ -1,3 +1,6 @@
+#ifndef _xml_element_h_
+#define _xml_element_h_
+
 #include <stdlib.h>
 #include <stdio.h>
 // Occurence flag definitions
@@ -60,3 +63,5 @@ struct XMLAttribute
   AttributeValue value;
   char *name;
 };
+
+#endif
