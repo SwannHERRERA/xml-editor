@@ -19,7 +19,7 @@ char *find_doctype(FILE *file, char **root_name)
   free(buffer);
   if (is_internal_doctype(doctype))
   {
-    char *str = get_between_tokens(doctype, "[]");
+    char *str = get_between_tokens(doctype, &cursor, "[]");
     return str;
   }
   else
@@ -126,23 +126,24 @@ bool is_internal_doctype(char *doctype)
  * tokens[0] is where the new string will begin
  * tokens[1] is the token where the new string will stop
  */
-char *get_between_tokens(char *buffer, char *tokens)
+char *get_between_tokens(char *buffer, size_t *cursor, char *tokens)
 {
   int size = 0;
   char *start = NULL;
   char *end = NULL;
   char *buff = NULL;
-  start = strchr(buffer, tokens[0]) + 1;
+  start = strchr(buffer + (*cursor), tokens[0]) + 1;
   end = strchr(buffer, tokens[1]) - 1;
-  size = end - start + 2;
+  size = end - start + 1;
   if (start == NULL || end == NULL || end - start < 1)
   {
-    fprintf(stderr, "Invalid DTD, it maybe empty %s %p %p\n", tokens, start, end);
+    fprintf(stderr, "Invalid DTD, it maybe empty %s\n", tokens);
     return NULL;
   }
-  buff = malloc(sizeof(char) * size);
+  buff = malloc(sizeof(char) * size + 1);
   strncpy(buff, start, size);
-  buff[size - 1] = 0;
+  buff[size] = 0;
+  *cursor += size + 3;
   return buff;
 }
 
@@ -222,6 +223,14 @@ char **split_string(char *dtd, int *size, char delim)
   return buffer;
 }
 
+void set_global_child_occurence(char global_occurence_char, XMLElement *parent)
+{
+  for (int i = 0; i < parent->childsCount; i++)
+  {
+    set_child_occurence(global_occurence_char, parent->childs[i]);
+  }
+}
+
 void set_child_occurence(char occurence_char, XMLElement *child)
 {
   const char c[] = {'?', '+', '*', '|'};
@@ -237,22 +246,22 @@ void set_child_occurence(char occurence_char, XMLElement *child)
   switch (pos)
   {
   case 0:
-    child->occurenceFlag = OCCURENCE_0_1;
+    child->occurenceFlag |= OCCURENCE_0_1;
     break;
   case 1:
-    child->occurenceFlag = OCCURENCE_1_N;
+    child->occurenceFlag |= OCCURENCE_1_N;
     break;
   case 2:
-    child->occurenceFlag = OCCURENCE_0_N;
+    child->occurenceFlag |= OCCURENCE_0_N;
     break;
   case 3:
-    child->occurenceFlag = OCCURENCE_OR;
+    child->occurenceFlag |= OCCURENCE_OR;
     break;
   default:
     break;
   }
 }
-// TODO Still need to parse global occurence flag e.g. : (classroom)+
+
 void parse_element_childs(XMLElement *parent, int elements_size, char **elements_buffer, char **buffer, int buffer_size)
 {
   for (int j = 0; j < elements_size; j += 1)
@@ -268,7 +277,6 @@ void parse_element_childs(XMLElement *parent, int elements_size, char **elements
       XMLElement *child = parse_sub_element(element_name, buffer, buffer_size);
       if (elements_buffer[j][cursor] != 0)
       {
-        printf("occurence char = %c\n", elements_buffer[j][cursor]);
         set_child_occurence(elements_buffer[j][cursor], child);
       }
       add_element(parent, child);
@@ -276,9 +284,10 @@ void parse_element_childs(XMLElement *parent, int elements_size, char **elements
   }
 }
 
-char *get_node_childs(char *buffer, char *name)
+char *get_node_childs(char *buffer, char *name, char *last_char)
 {
-  char *ptr_str = strstr(buffer, name) + strlen(name);
+  char *ptr_str = strstr(buffer, name);
+  size_t cursor = strlen(name);
   bool found_any = false;
   bool found_empty = false;
   char *elements = NULL;
@@ -291,7 +300,8 @@ char *get_node_childs(char *buffer, char *name)
   {
     found_empty = true;
   }
-  elements = get_between_tokens(ptr_str, "()");
+  elements = get_between_tokens(ptr_str, &cursor, "()");
+  *last_char = *(ptr_str + cursor);
   if ((found_any && found_empty) || (found_any && elements != NULL) || (found_empty && elements != NULL))
   {
     fprintf(stderr, "Error at : %s>\n", buffer);
@@ -419,10 +429,12 @@ XMLElement *complete_element(char **buffer, int buffer_size, int index, char *na
 {
   XMLElement *xml_element;
   xml_element = create_element(name);
-  char *elements = get_node_childs(buffer[index], name);
+  char global_occurence_char = 0;
+  char *elements = get_node_childs(buffer[index], name, &global_occurence_char);
   int elements_size = 1;
   char **elements_buffer = split_string(elements, &elements_size, ',');
   parse_element_childs(xml_element, elements_size, elements_buffer, buffer, buffer_size);
+  set_global_child_occurence(global_occurence_char, xml_element);
   parse_attributes(xml_element, buffer, buffer_size);
   free(elements);
   return xml_element;
