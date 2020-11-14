@@ -222,6 +222,37 @@ char **split_string(char *dtd, int *size, char delim)
   return buffer;
 }
 
+void set_child_occurence(char occurence_char, XMLElement *child)
+{
+  const char c[] = {'?', '+', '*', '|'};
+  const size_t c_size = 4;
+  int pos = -1;
+  for (size_t i = 0; i < c_size; i++)
+  {
+    if (occurence_char == c[i])
+    {
+      pos = i;
+    }
+  }
+  switch (pos)
+  {
+  case 0:
+    child->occurenceFlag = OCCURENCE_0_1;
+    break;
+  case 1:
+    child->occurenceFlag = OCCURENCE_1_N;
+    break;
+  case 2:
+    child->occurenceFlag = OCCURENCE_0_N;
+    break;
+  case 3:
+    child->occurenceFlag = OCCURENCE_OR;
+    break;
+  default:
+    break;
+  }
+}
+// TODO Still need to parse global occurence flag e.g. : (classroom)+
 void parse_element_childs(XMLElement *parent, int elements_size, char **elements_buffer, char **buffer, int buffer_size)
 {
   for (int j = 0; j < elements_size; j += 1)
@@ -234,7 +265,13 @@ void parse_element_childs(XMLElement *parent, int elements_size, char **elements
     char *element_name = get_next_name(elements_buffer[j], &cursor);
     if (element_name != NULL)
     {
-      add_element(parent, parse_sub_element(element_name, buffer, buffer_size));
+      XMLElement *child = parse_sub_element(element_name, buffer, buffer_size);
+      if (elements_buffer[j][cursor] != 0)
+      {
+        printf("occurence char = %c\n", elements_buffer[j][cursor]);
+        set_child_occurence(elements_buffer[j][cursor], child);
+      }
+      add_element(parent, child);
     }
   }
 }
@@ -316,7 +353,7 @@ AttributeType get_attribute_type(char **str)
   }
   return type;
 }
-//TODO Translate types and values to an enum value
+
 void parse_attributes(XMLElement *element, char **buffer, int buffer_size)
 {
   for (int i = 0; i < buffer_size; i++)
@@ -399,7 +436,6 @@ XMLElement *parse_dtd(char *dtd, char *root_name)
   char **buffer = split_string(dtd, &buffer_size, '>');
   XMLElement *parent = parse_element(root_name, buffer, buffer_size);
   print_tree(parent);
-  printf("attrib : %s\n", parent->attributes->name);
   free(buffer);
   printf("######## Finished parsing DTD ########\n");
   return parent;

@@ -22,6 +22,7 @@ char *get_between_tokens(char *buffer, char *tokens);
 bool is_xml_valid_char(char c);
 char **split_string(char *dtd, int *size, char delim);
 char *get_next_name(char *ptr_str, size_t *offset);
+void set_child_occurence(char occurence_char, XMLElement *child);
 AttributeType get_attribute_type(char **str);
 AttributeValue get_attribute_value(char **str);
 
