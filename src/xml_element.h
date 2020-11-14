@@ -42,6 +42,7 @@ struct XMLElement
   int childsCount;
   int childsCapacity;
   unsigned char occurenceFlag;
+  char occurenceChar;
 };
 
 enum AttributeValue

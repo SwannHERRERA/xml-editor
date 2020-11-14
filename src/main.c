@@ -2,7 +2,7 @@
 #include "parse_xml.h"
 
 bool check_xml_correspond_to_xml(XMLElement *dtd, xml_element *root);
-
+bool check_element_is_correct(XMLElement *dtd_element, xml_element *element);
 /**
  * I use ARGV to give relative path to xml
  */
@@ -51,25 +51,45 @@ int main(int argc, char **argv)
 
 bool check_xml_correspond_to_xml(XMLElement *dtd, xml_element *root)
 {
-  int i, j;
-  XMLElement *dtd_element;
-  if (strcmp(dtd->name, root->name) != 0)
+  if (strcmp(dtd->name, root->name) == 0)
   {
-    return false;
+    return check_element_is_correct(dtd, root);
   }
-  for (i = 0; i < dtd->childsCount; i += 1)
+  return false;
+}
+bool check_element_is_correct(XMLElement *dtd_element, xml_element *element)
+{
+  int i, j;
+  /**
+   * Cas a géré un élément qui ne trouve pas sa pair 
+   * Pour la dtd
+   * Faire un count nombre d'élément trouvé += pour chaque nombre d'élément trouvé diférent
+   * et verifié que ce count = childCount 
+   * 
+   * Gestion des occurences
+   * 
+   * Faire un tableau des possiblités ["classroom", "student"]
+   * si + alors je lis le flag est ce que j'ai trouvé un element de ce type
+   * si rien je delete l'élément du tableau
+   * si * je le laisse dans le tableau
+   * si ? je le retire mais si je le croise a la fin j'ignore
+   */
+  for (i = 0; i < element->childs_count; i += 1)
   {
-    dtd_element = dtd->childs[i];
-    for (j = 0; j < root->childs_count; j += 1)
+    // flag j'ai trouvé = false
+    for (j = 0; j < dtd_element->childsCount; j += 1)
     {
-      if (strcmp(dtd_element->name, root->childs[j]->name) != 0)
+      printf("name: %s occurenceChar: %c\n", dtd_element->childs[j]->name, dtd_element->childs[j]->occurenceChar);
+      if (strcmp(element->childs[i]->name, dtd_element->childs[j]->name) == 0)
       {
-        return false;
+        if (check_element_is_correct(dtd_element->childs[j], element->childs[i]) == false)
+        {
+          return false;
+        }
+        // flag j'ai trouvé = true
       }
     }
-    // Faire un system de conteur pour que les element qui sont la et qui ne devrait pas puisse être pris en compte
-    // exemple avec student
-    // check les attributes
   }
+  // check les attributes
   return true;
 }
