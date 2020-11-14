@@ -1,4 +1,4 @@
-<!ELEMENT Stockmarket (sname,(branch|contact))>
-<!ELEMENT sname (#PCDATA)>
-<!ELEMENT branch (#PCDATA)>
-<!ELEMENT contact (#PCDATA)>
+<!DOCTYPE ESGI [
+<!ELEMENT classrooms (classroom+)>
+<!ELEMENT classroom (#PCDATA)>
+]>
