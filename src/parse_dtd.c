@@ -234,7 +234,7 @@ void parse_element_childs(XMLElement *parent, int elements_size, char **elements
     char *element_name = get_next_name(elements_buffer[j], &cursor);
     if (element_name != NULL)
     {
-      add_element(parent, parse_element(element_name, buffer, buffer_size));
+      add_element(parent, parse_sub_element(element_name, buffer, buffer_size));
     }
   }
 }
@@ -281,7 +281,7 @@ AttributeValue get_attribute_value(char **str)
         printf("ERROR at %s\n", *str);
       }
       char *st = strstr(*str, names[i]);
-      if ( st != NULL && st > *str)
+      if (st != NULL && st > *str)
       {
         *str = strstr(*str, names[i]);
       }
@@ -308,7 +308,7 @@ AttributeType get_attribute_type(char **str)
         printf("ERROR at %s\n", *str);
       }
       char *st = strstr(*str, names[i]);
-      if ( st != NULL && st > *str)
+      if (st != NULL && st > *str)
       {
         *str = strstr(*str, names[i]);
       }
@@ -340,6 +340,27 @@ void parse_attributes(XMLElement *element, char **buffer, int buffer_size)
 XMLElement *parse_element(char *node_name, char **buffer, int buffer_size)
 {
   XMLElement *xml_element = NULL;
+  char *ptr_str = strstr(buffer[0], "<!ELEMENT ");
+  if (ptr_str != NULL)
+  {
+    size_t cursor = strlen("<!ELEMENT ");
+    char *name = get_next_name(ptr_str, &cursor);
+    if (strcmp(node_name, name) == 0)
+    {
+      xml_element = complete_element(buffer, buffer_size, 0, name);
+    }
+    else
+    {
+      fprintf(stderr, "Error root Name is not equal to %s\n", node_name);
+      exit(EXIT_FAILURE);
+    }
+  }
+  return xml_element;
+}
+
+XMLElement *parse_sub_element(char *node_name, char **buffer, int buffer_size)
+{
+  XMLElement *xml_element = NULL;
   for (int i = 0; i < buffer_size; i++)
   {
     char *ptr_str = strstr(buffer[i], "<!ELEMENT ");
@@ -349,17 +370,24 @@ XMLElement *parse_element(char *node_name, char **buffer, int buffer_size)
       char *name = get_next_name(ptr_str, &cursor);
       if (strcmp(node_name, name) == 0)
       {
-        xml_element = create_element(name);
-        char *elements = get_node_childs(buffer[i], name);
-        int elements_size = 1;
-        char **elements_buffer = split_string(elements, &elements_size, ',');
-        parse_element_childs(xml_element, elements_size, elements_buffer, buffer, buffer_size);
-        parse_attributes(xml_element, buffer, buffer_size);
-        free(elements);
+        xml_element = complete_element(buffer, buffer_size, i, name);
         break;
       }
     }
   }
+  return xml_element;
+}
+
+XMLElement *complete_element(char **buffer, int buffer_size, int index, char *name)
+{
+  XMLElement *xml_element;
+  xml_element = create_element(name);
+  char *elements = get_node_childs(buffer[index], name);
+  int elements_size = 1;
+  char **elements_buffer = split_string(elements, &elements_size, ',');
+  parse_element_childs(xml_element, elements_size, elements_buffer, buffer, buffer_size);
+  parse_attributes(xml_element, buffer, buffer_size);
+  free(elements);
   return xml_element;
 }
 
