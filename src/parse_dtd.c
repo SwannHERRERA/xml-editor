@@ -45,6 +45,7 @@ char *get_content_of_external_DTD(char *doctype)
   }
 
   res = file_get_content(external_DTD_file);
+  fprintf(stderr, "file content %s\n", res);
   free(external_DTD_filename);
   free(doctype);
   fclose(external_DTD_file);
@@ -382,6 +383,7 @@ void parse_attributes(XMLElement *element, char **buffer, int buffer_size)
         AttributeValue value = get_attribute_value(&ptr_str);
         add_attribute(element, attribute_name, value, type);
       }
+      free(node_name);
     }
   }
 }
@@ -438,6 +440,7 @@ XMLElement *complete_element(char **buffer, int buffer_size, int index, char *na
   parse_element_childs(xml_element, elements_size, elements_buffer, buffer, buffer_size);
   set_global_child_occurence(global_occurence_char, xml_element);
   parse_attributes(xml_element, buffer, buffer_size);
+  free(elements_buffer);
   free(elements);
   return xml_element;
 }
@@ -449,6 +452,7 @@ XMLElement *parse_dtd(char *dtd, char *root_name)
   int buffer_size = 0;
   char **buffer = split_string(dtd, &buffer_size, '>');
   XMLElement *parent = parse_element(root_name, buffer, buffer_size);
+  if(parent->attributes!=NULL)  printf("attrib %s\n", parent->attributes->name);
   print_tree(parent);
   free(buffer);
   printf("######## Finished parsing DTD ########\n");

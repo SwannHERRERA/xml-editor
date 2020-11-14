@@ -13,6 +13,7 @@ XMLElement *create_element(char *name)
   element->childsCount = 0;
   element->childsCapacity = 20;
   element->childs = malloc(sizeof(XMLElement) * element->childsCapacity);
+  element->attributes = NULL;
   if (!element->childs)
   {
     fprintf(stderr, "Failed to allocate memory for {element->childs} [create_element]\n");
@@ -71,12 +72,26 @@ void free_DTD(XMLElement *root)
   free_XMLElement(root);
 }
 
+void free_XMLAttributes(XMLAttribute *attribute)
+{
+  XMLAttribute *swap;
+  XMLAttribute *first = attribute;
+  while(first != NULL){
+    swap = first->next;
+    free(first->name);
+    free(first);
+    first = swap;
+  }
+}
+
 void free_XMLElement(XMLElement *element)
 {
   for (int i = 0; i < element->childsCount; i += 1)
   {
     free_XMLElement(element->childs[i]);
   }
+  free_XMLAttributes(element->attributes);
+  free(element->childs);
   free(element->name);
   free(element);
 }
