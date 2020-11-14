@@ -65,3 +65,18 @@ void add_attribute(XMLElement *element, char *name, AttributeValue value, Attrib
   new->type = type;
   new->value = value;
 }
+
+void free_DTD(XMLElement *root)
+{
+  free_XMLElement(root);
+}
+
+void free_XMLElement(XMLElement *element)
+{
+  for (int i = 0; i < element->childsCount; i += 1)
+  {
+    free_XMLElement(element->childs[i]);
+  }
+  free(element->name);
+  free(element);
+}

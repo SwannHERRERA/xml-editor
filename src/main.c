@@ -44,7 +44,7 @@ int main(int argc, char **argv)
   free_DTD(dtd);
   free(xml);
   fclose(file);
-  free(dtd);
+  free(dtd_string);
   free(root_name);
   return EXIT_SUCCESS;
 }

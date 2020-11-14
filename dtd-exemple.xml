@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<!DOCTYPE classroomss[<!ELEMENT classrooms (classroom+)><!ELEMENT classroom (#PCDATA)><!ATTLIST classrooms name CDATA #FIXED "TOTO"><!ATTLIST classroom year CDATA #REQUIRED>]>
+<!DOCTYPE classrooms[<!ELEMENT classrooms (classroom+)><!ELEMENT classroom (#PCDATA)><!ATTLIST classrooms name CDATA #FIXED "TOTO"><!ATTLIST classroom year CDATA #REQUIRED>]>
 <classrooms name="TOTO">
   <!-- <!DOCTYPE Stockmarket SYSTEM "exemple.dtd"> -->
   <classroom year="2018">AL</classroom>
