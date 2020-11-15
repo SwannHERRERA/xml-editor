@@ -19,7 +19,7 @@ char *find_doctype(FILE *file, char **root_name)
   free(buffer);
   if (is_internal_doctype(doctype))
   {
-    char *str = get_between_tokens(doctype, "[]");
+    char *str = get_between_tokens(doctype, &cursor, "[]");
     return str;
   }
   else
@@ -126,23 +126,24 @@ bool is_internal_doctype(char *doctype)
  * tokens[0] is where the new string will begin
  * tokens[1] is the token where the new string will stop
  */
-char *get_between_tokens(char *buffer, char *tokens)
+char *get_between_tokens(char *buffer, size_t *cursor, char *tokens)
 {
   int size = 0;
   char *start = NULL;
   char *end = NULL;
   char *buff = NULL;
-  start = strchr(buffer, tokens[0]) + 1;
+  start = strchr(buffer + (*cursor), tokens[0]) + 1;
   end = strchr(buffer, tokens[1]) - 1;
-  size = end - start + 2;
+  size = end - start + 1;
   if (start == NULL || end == NULL || end - start < 1)
   {
-    fprintf(stderr, "Invalid DTD, it maybe empty %s %p %p\n", tokens, start, end);
+    fprintf(stderr, "Invalid DTD, it maybe empty %s\n", tokens);
     return NULL;
   }
-  buff = malloc(sizeof(char) * size);
+  buff = malloc(sizeof(char) * size + 1);
   strncpy(buff, start, size);
-  buff[size - 1] = 0;
+  buff[size] = 0;
+  *cursor += size + 3;
   return buff;
 }
 
@@ -222,6 +223,45 @@ char **split_string(char *dtd, int *size, char delim)
   return buffer;
 }
 
+void set_global_child_occurence(char global_occurence_char, XMLElement *parent)
+{
+  for (int i = 0; i < parent->childsCount; i++)
+  {
+    set_child_occurence(global_occurence_char, parent->childs[i]);
+  }
+}
+
+void set_child_occurence(char occurence_char, XMLElement *child)
+{
+  const char c[] = {'?', '+', '*', '|'};
+  const size_t c_size = 4;
+  int pos = -1;
+  for (size_t i = 0; i < c_size; i++)
+  {
+    if (occurence_char == c[i])
+    {
+      pos = i;
+    }
+  }
+  switch (pos)
+  {
+  case 0:
+    child->occurenceFlag |= OCCURENCE_0_1;
+    break;
+  case 1:
+    child->occurenceFlag |= OCCURENCE_1_N;
+    break;
+  case 2:
+    child->occurenceFlag |= OCCURENCE_0_N;
+    break;
+  case 3:
+    child->occurenceFlag |= OCCURENCE_OR;
+    break;
+  default:
+    break;
+  }
+}
+
 void parse_element_childs(XMLElement *parent, int elements_size, char **elements_buffer, char **buffer, int buffer_size)
 {
   for (int j = 0; j < elements_size; j += 1)
@@ -234,14 +274,22 @@ void parse_element_childs(XMLElement *parent, int elements_size, char **elements
     char *element_name = get_next_name(elements_buffer[j], &cursor);
     if (element_name != NULL)
     {
-      add_element(parent, parse_element(element_name, buffer, buffer_size));
+      XMLElement *child = parse_sub_element(element_name, buffer, buffer_size);
+      if (elements_buffer[j][cursor] != 0)
+      {
+        printf("occurence char = %c\n", elements_buffer[j][cursor]);
+        child->occurenceChar = elements_buffer[j][cursor];
+        set_child_occurence(elements_buffer[j][cursor], child);
+      }
+      add_element(parent, child);
     }
   }
 }
 
-char *get_node_childs(char *buffer, char *name)
+char *get_node_childs(char *buffer, char *name, char *last_char)
 {
-  char *ptr_str = strstr(buffer, name) + strlen(name);
+  char *ptr_str = strstr(buffer, name);
+  size_t cursor = strlen(name);
   bool found_any = false;
   bool found_empty = false;
   char *elements = NULL;
@@ -254,7 +302,8 @@ char *get_node_childs(char *buffer, char *name)
   {
     found_empty = true;
   }
-  elements = get_between_tokens(ptr_str, "()");
+  elements = get_between_tokens(ptr_str, &cursor, "()");
+  *last_char = *(ptr_str + cursor);
   if ((found_any && found_empty) || (found_any && elements != NULL) || (found_empty && elements != NULL))
   {
     fprintf(stderr, "Error at : %s>\n", buffer);
@@ -281,7 +330,7 @@ AttributeValue get_attribute_value(char **str)
         printf("ERROR at %s\n", *str);
       }
       char *st = strstr(*str, names[i]);
-      if ( st != NULL && st > *str)
+      if (st != NULL && st > *str)
       {
         *str = strstr(*str, names[i]);
       }
@@ -308,7 +357,7 @@ AttributeType get_attribute_type(char **str)
         printf("ERROR at %s\n", *str);
       }
       char *st = strstr(*str, names[i]);
-      if ( st != NULL && st > *str)
+      if (st != NULL && st > *str)
       {
         *str = strstr(*str, names[i]);
       }
@@ -316,7 +365,7 @@ AttributeType get_attribute_type(char **str)
   }
   return type;
 }
-//TODO Translate types and values to an enum value
+
 void parse_attributes(XMLElement *element, char **buffer, int buffer_size)
 {
   for (int i = 0; i < buffer_size; i++)
@@ -328,7 +377,7 @@ void parse_attributes(XMLElement *element, char **buffer, int buffer_size)
       char *node_name = get_next_name(ptr_str, &cursor);
       if (!strcmp(element->name, node_name))
       {
-        char *attribute_name = get_next_name(strstr(ptr_str, node_name), &cursor);
+        char *attribute_name = get_next_name(ptr_str, &cursor);
         AttributeType type = get_attribute_type(&ptr_str);
         AttributeValue value = get_attribute_value(&ptr_str);
         add_attribute(element, attribute_name, value, type);
@@ -340,6 +389,27 @@ void parse_attributes(XMLElement *element, char **buffer, int buffer_size)
 XMLElement *parse_element(char *node_name, char **buffer, int buffer_size)
 {
   XMLElement *xml_element = NULL;
+  char *ptr_str = strstr(buffer[0], "<!ELEMENT ");
+  if (ptr_str != NULL)
+  {
+    size_t cursor = strlen("<!ELEMENT ");
+    char *name = get_next_name(ptr_str, &cursor);
+    if (strcmp(node_name, name) == 0)
+    {
+      xml_element = complete_element(buffer, buffer_size, 0, name);
+    }
+    else
+    {
+      fprintf(stderr, "Error root Name is not equal to %s\n", node_name);
+      exit(EXIT_FAILURE);
+    }
+  }
+  return xml_element;
+}
+
+XMLElement *parse_sub_element(char *node_name, char **buffer, int buffer_size)
+{
+  XMLElement *xml_element = NULL;
   for (int i = 0; i < buffer_size; i++)
   {
     char *ptr_str = strstr(buffer[i], "<!ELEMENT ");
@@ -349,16 +419,26 @@ XMLElement *parse_element(char *node_name, char **buffer, int buffer_size)
       char *name = get_next_name(ptr_str, &cursor);
       if (strcmp(node_name, name) == 0)
       {
-        xml_element = create_element(name);
-        char *elements = get_node_childs(buffer[i], name);
-        int elements_size = 1;
-        char **elements_buffer = split_string(elements, &elements_size, ',');
-        parse_element_childs(xml_element, elements_size, elements_buffer, buffer, buffer_size);
-        free(elements);
+        xml_element = complete_element(buffer, buffer_size, i, name);
         break;
       }
     }
   }
+  return xml_element;
+}
+
+XMLElement *complete_element(char **buffer, int buffer_size, int index, char *name)
+{
+  XMLElement *xml_element;
+  xml_element = create_element(name);
+  char global_occurence_char = 0;
+  char *elements = get_node_childs(buffer[index], name, &global_occurence_char);
+  int elements_size = 1;
+  char **elements_buffer = split_string(elements, &elements_size, ',');
+  parse_element_childs(xml_element, elements_size, elements_buffer, buffer, buffer_size);
+  set_global_child_occurence(global_occurence_char, xml_element);
+  parse_attributes(xml_element, buffer, buffer_size);
+  free(elements);
   return xml_element;
 }
 
@@ -370,7 +450,6 @@ XMLElement *parse_dtd(char *dtd, char *root_name)
   char **buffer = split_string(dtd, &buffer_size, '>');
   XMLElement *parent = parse_element(root_name, buffer, buffer_size);
   print_tree(parent);
-  printf("child = %s\n", parent->childs[0]->name);
   free(buffer);
   printf("######## Finished parsing DTD ########\n");
   return parent;

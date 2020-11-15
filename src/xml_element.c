@@ -55,18 +55,6 @@ void add_element(XMLElement *parent, XMLElement *child)
   parent->childsCount += 1;
 }
 
-void print_XMLElement(XMLElement *element)
-{
-  printf("Name: %s\n", element->name);
-  if (element->parent != NULL)
-  {
-    printf("parent Name: %s\n", element->parent->name);
-  }
-  printf("profondeur: %d\n", element->deepness);
-  printf("nombre d enfant: %d capacite: %d\n", element->childsCount, element->childsCapacity);
-  printf("Caractère d'occurence: %c\n", element->occurenceFlag);
-}
-
 void add_attribute(XMLElement *element, char *name, AttributeValue value, AttributeType type)
 {
   XMLAttribute *first = element->attributes;

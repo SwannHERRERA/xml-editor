@@ -1,13 +1,9 @@
 <?xml version="1.0"?>
-<!DOCTYPE classroomss[<!ELEMENT classrooms (classroom+)><!ELEMENT classroom (#PCDATA)><!ATTLIST classrooms name CDATA #FIXED "TOTO"><!ATTLIST classroom year CDATA #REQUIRED>]>
-<classrooms name="TOTO">
-  <!-- <!DOCTYPE Stockmarket SYSTEM "exemple.dtd"> -->
-  <classroom rank="1" other_name="les bests">AL</classroom>
+<!DOCTYPE classrooms SYSTEM "exemple.dtd">
+<classrooms>
+  <!-- <!DOCTYPE classrooms[<!ELEMENT classrooms (classroom+)><!ELEMENT classroom (#PCDATA)><!ATTLIST classrooms name CDATA #FIXED "TOTO"><!ATTLIST classroom year CDATA #REQUIRED><!ELEMENT students (student)><!ELEMENT student (#PCDATA)>]> -->
+  <classroom>AL</classroom>
   <classroom>IABD</classroom>
   <classroom>MOC</classroom>
   <classroom>IBC</classroom>
-  <!-- <students>
-    <student>Pierre</student>
-    <student>Swann</student>
-  </students> -->
 </classrooms>

@@ -148,7 +148,8 @@ char *found_start(char *xml, xml_element *element)
   strcpy(tmp, "<");
   strcat(tmp, element->name);
   char *str = strstr(xml, tmp);
-  if (str == NULL) {
+  if (str == NULL)
+  {
     fprintf(stderr, "Error root Name is not equal to %s\n", element->name);
     exit(EXIT_FAILURE);
   }

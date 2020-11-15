@@ -1,5 +1,6 @@
 #ifndef _xml_element_h_
 #define _xml_element_h_
+
 #include <stdlib.h>
 #include <stdio.h>
 // Occurence flag definitions
@@ -27,10 +28,9 @@ typedef enum AttributeType AttributeType;
 XMLElement *create_element(char *name);
 void print_tree(XMLElement *parent);
 void add_element(XMLElement *parent, XMLElement *child);
-void print_XMLElement(XMLElement *element);
+void add_attribute(XMLElement *element, char *name, AttributeValue value, AttributeType type);
 void free_XMLElement(XMLElement *element);
 void free_DTD(XMLElement *root);
-void add_attribute(XMLElement *element, char *name, AttributeValue value, AttributeType type);
 
 struct XMLElement
 {
@@ -42,6 +42,7 @@ struct XMLElement
   int childsCount;
   int childsCapacity;
   unsigned char occurenceFlag;
+  char occurenceChar;
 };
 
 enum AttributeValue
