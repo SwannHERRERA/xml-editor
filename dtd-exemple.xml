@@ -10,6 +10,6 @@
     <student>Pierre</student>
     <student>Swann</student>
     <student>Noé</student>
-    <student name="Victorien" />
+    <!-- <student name="Victorien" /> -->
   </students>
 </classrooms>
