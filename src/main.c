@@ -1,5 +1,6 @@
 #include "parse_dtd.h"
 #include "parse_xml.h"
+#include "interface.h"
 
 bool check_xml_correspond_to_xml(XMLElement *dtd, xml_element *root);
 bool check_element_is_correct(XMLElement *dtd_element, xml_element *element);
@@ -8,6 +9,7 @@ bool check_element_is_correct(XMLElement *dtd_element, xml_element *element);
  */
 int main(int argc, char **argv)
 {
+
   if (argc < 2)
   {
     fprintf(stderr, "Error attending xml file in parameters\n");
@@ -42,10 +44,12 @@ int main(int argc, char **argv)
   }
 
   free_DTD(dtd);
+  free_element(root);
   free(xml);
   fclose(file);
   free(dtd_string);
   free(root_name);
+  init_interface(&argc, &argv);
   return EXIT_SUCCESS;
 }
 
