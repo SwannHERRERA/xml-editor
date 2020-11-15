@@ -60,36 +60,34 @@ bool check_xml_correspond_to_xml(XMLElement *dtd, xml_element *root)
 bool check_element_is_correct(XMLElement *dtd_element, xml_element *element)
 {
   int i, j;
-  /**
-   * Cas a géré un élément qui ne trouve pas sa pair 
-   * Pour la dtd
-   * Faire un count nombre d'élément trouvé += pour chaque nombre d'élément trouvé diférent
-   * et verifié que ce count = childCount 
-   * 
-   * Gestion des occurences
-   * 
-   * Faire un tableau des possiblités ["classroom", "student"]
-   * si + alors je lis le flag est ce que j'ai trouvé un element de ce type
-   * si rien je delete l'élément du tableau
-   * si * je le laisse dans le tableau
-   * si ? je le retire mais si je le croise a la fin j'ignore
-   */
+  int tab[dtd_element->childsCount];
+
+  for (i = 0; i < dtd_element->childsCount; i += 1)
+  {
+    tab[i] = 0;
+  }
+
   for (i = 0; i < element->childs_count; i += 1)
   {
-    // flag j'ai trouvé = false
     for (j = 0; j < dtd_element->childsCount; j += 1)
     {
-      printf("name: %s occurenceChar: %c\n", dtd_element->childs[j]->name, dtd_element->childs[j]->occurenceChar);
       if (strcmp(element->childs[i]->name, dtd_element->childs[j]->name) == 0)
       {
+        tab[j] += 1;
         if (check_element_is_correct(dtd_element->childs[j], element->childs[i]) == false)
         {
           return false;
         }
-        // flag j'ai trouvé = true
       }
     }
   }
+
   // check les attributes
+
+  // check with occurenceFlag
+  for (i = 0; i < dtd_element->childsCount; i += 1)
+  {
+    printf("%s: %d\n", dtd_element->childs[i]->name, tab[i]);
+  }
   return true;
 }

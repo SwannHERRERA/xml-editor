@@ -1,4 +1,5 @@
 #include "parse_dtd.h"
+#include "utils.c"
 
 // TODO attention http
 char *find_doctype(FILE *file, char **root_name)
@@ -398,11 +399,6 @@ XMLElement *parse_element(char *node_name, char **buffer, int buffer_size)
     {
       xml_element = complete_element(buffer, buffer_size, 0, name);
     }
-    else
-    {
-      fprintf(stderr, "Error root Name is not equal to %s\n", node_name);
-      exit(EXIT_FAILURE);
-    }
   }
   return xml_element;
 }
@@ -435,6 +431,7 @@ XMLElement *complete_element(char **buffer, int buffer_size, int index, char *na
   char *elements = get_node_childs(buffer[index], name, &global_occurence_char);
   int elements_size = 1;
   char **elements_buffer = split_string(elements, &elements_size, ',');
+  print_array(elements_buffer, elements_size);
   parse_element_childs(xml_element, elements_size, elements_buffer, buffer, buffer_size);
   set_global_child_occurence(global_occurence_char, xml_element);
   parse_attributes(xml_element, buffer, buffer_size);
@@ -448,7 +445,7 @@ XMLElement *parse_dtd(char *dtd, char *root_name)
   printf("DTD : %s\nRoot name : %s\n", dtd, root_name);
   int buffer_size = 0;
   char **buffer = split_string(dtd, &buffer_size, '>');
-  XMLElement *parent = parse_element(root_name, buffer, buffer_size);
+  XMLElement *parent = parse_sub_element(root_name, buffer, buffer_size);
   print_tree(parent);
   free(buffer);
   printf("######## Finished parsing DTD ########\n");

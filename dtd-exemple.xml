@@ -1,9 +1,15 @@
 <?xml version="1.0"?>
-<!DOCTYPE classrooms SYSTEM "exemple.dtd">
+<!DOCTYPE classrooms [<!ELEMENT classrooms (classroom+, students)><!ELEMENT classroom (#PCDATA)><!ELEMENT students (student+)>]>
 <classrooms>
-  <!-- <!DOCTYPE classrooms[<!ELEMENT classrooms (classroom+)><!ELEMENT classroom (#PCDATA)><!ATTLIST classrooms name CDATA #FIXED "TOTO"><!ATTLIST classroom year CDATA #REQUIRED><!ELEMENT students (student)><!ELEMENT student (#PCDATA)>]> -->
+  <!-- <!DOCTYPE classrooms SYSTEM "exemple.dtd"> -->
   <classroom>AL</classroom>
   <classroom>IABD</classroom>
   <classroom>MOC</classroom>
   <classroom>IBC</classroom>
+  <students>
+    <student>Pierre</student>
+    <student>Swann</student>
+    <student>Noé</student>
+    <student name="Victorien" />
+  </students>
 </classrooms>
