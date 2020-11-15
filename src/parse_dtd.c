@@ -1,5 +1,4 @@
 #include "parse_dtd.h"
-#include "utils.c"
 
 // TODO attention http
 char *find_doctype(FILE *file, char **root_name)
@@ -435,7 +434,6 @@ XMLElement *complete_element(char **buffer, int buffer_size, int index, char *na
   char *elements = get_node_childs(buffer[index], name, &global_occurence_char);
   int elements_size = 1;
   char **elements_buffer = split_string(elements, &elements_size, ',');
-  print_array(elements_buffer, elements_size);
   parse_element_childs(xml_element, elements_size, elements_buffer, buffer, buffer_size);
   set_global_child_occurence(global_occurence_char, xml_element);
   parse_attributes(xml_element, buffer, buffer_size);
