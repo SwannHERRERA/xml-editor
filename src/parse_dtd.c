@@ -402,11 +402,6 @@ XMLElement *parse_element(char *node_name, char **buffer, int buffer_size)
     {
       xml_element = complete_element(buffer, buffer_size, 0, name);
     }
-    else
-    {
-      fprintf(stderr, "Error root Name is not equal to %s\n", node_name);
-      exit(EXIT_FAILURE);
-    }
   }
   return xml_element;
 }
