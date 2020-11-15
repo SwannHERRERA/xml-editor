@@ -49,7 +49,7 @@ int main(int argc, char **argv)
   fclose(file);
   free(dtd_string);
   free(root_name);
-  //init_interface(&argc, &argv);
+  init_interface(&argc, &argv);
   return EXIT_SUCCESS;
 }
 

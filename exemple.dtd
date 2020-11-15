@@ -1,4 +1,1 @@
-<!DOCTYPE ESGI [
-<!ELEMENT classrooms (classroom+)>
-<!ELEMENT classroom (#PCDATA)>
-]>
+<!ELEMENT classrooms (classroom+)><!ELEMENT classroom (#PCDATA)>
