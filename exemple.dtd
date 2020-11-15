@@ -1,1 +1,1 @@
-<!ELEMENT classrooms (classroom+)><!ELEMENT classroom (#PCDATA)>
+<!ELEMENT classrooms (classroom+,student?)><!ELEMENT classroom (#PCDATA)>
