@@ -136,11 +136,12 @@ char *get_between_tokens(char *buffer, size_t *cursor, char *tokens)
   start = strchr(buffer + (*cursor), tokens[0]) + 1;
   end = strchr(buffer, tokens[1]) - 1;
   size = end - start + 1;
-  if (start == NULL || end == NULL || end - start < 1)
+  if (buffer == NULL || start == NULL || end == NULL || end - start < 1)
   {
     fprintf(stderr, "Invalid DTD, it maybe empty %s\n", tokens);
     return NULL;
   }
+  printf("aaaaaaa  %s %s\n", start, buffer);
   buff = malloc(sizeof(char) * size + 1);
   strncpy(buff, start, size);
   buff[size] = 0;
@@ -297,7 +298,6 @@ void parse_element_childs(XMLElement *parent, int elements_size, char **elements
 
 char *get_node_childs(char *buffer, char *name, char *last_char)
 {
-  printf("aaaaaa %s %s\n",buffer, name);
   char *ptr_str = strstr(buffer, name);
   size_t cursor = strlen(name);
   bool found_any = false;
@@ -313,6 +313,10 @@ char *get_node_childs(char *buffer, char *name, char *last_char)
     found_empty = true;
   }
   elements = get_between_tokens(ptr_str, &cursor, "()");
+  if (elements == NULL)
+  {
+    return NULL;
+  }
   *last_char = *(ptr_str + cursor);
   if ((found_any && found_empty) || (found_any && elements != NULL) || (found_empty && elements != NULL))
   {
@@ -402,15 +406,18 @@ XMLElement *parse_element(char *node_name, char **buffer, int buffer_size)
   XMLElement *xml_element = NULL;
   for (int i = 0; i < buffer_size; i++)
   {
-    char *ptr_str = strstr(buffer[i], "<!ELEMENT ");
-    if (ptr_str != NULL)
+    if (buffer[i] != NULL)
     {
-      size_t cursor = strlen("<!ELEMENT ");
-      char *name = get_next_name(ptr_str, &cursor);
-      if (strcmp(node_name, name) == 0)
+      char *ptr_str = strstr(buffer[i], "<!ELEMENT ");
+      if (ptr_str != NULL)
       {
-        xml_element = complete_element(buffer, buffer_size, i, name);
-        break;
+        size_t cursor = strlen("<!ELEMENT ");
+        char *name = get_next_name(ptr_str, &cursor);
+        if (strcmp(node_name, name) == 0)
+        {
+          xml_element = complete_element(buffer, buffer_size, i, name);
+          break;
+        }
       }
     }
   }
@@ -442,13 +449,16 @@ XMLElement *complete_element(char **buffer, int buffer_size, int index, char *na
   XMLElement *xml_element = create_element(name);
   char global_occurence_char = 0;
   char *elements = get_node_childs(buffer[index], name, &global_occurence_char);
-  int elements_size = 1;
-  char **elements_buffer = split_string(elements, &elements_size, ',');
-  parse_element_childs(xml_element, elements_size, elements_buffer, buffer, buffer_size);
-  set_global_child_occurence(global_occurence_char, xml_element);
-  parse_attributes(xml_element, buffer, buffer_size);
-  free(elements_buffer);
-  free(elements);
+  if (elements != NULL)
+  {
+    int elements_size = 1;
+    char **elements_buffer = split_string(elements, &elements_size, ',');
+    parse_element_childs(xml_element, elements_size, elements_buffer, buffer, buffer_size);
+    set_global_child_occurence(global_occurence_char, xml_element);
+    parse_attributes(xml_element, buffer, buffer_size);
+    free(elements_buffer);
+    free(elements);
+  }
   return xml_element;
 }
 
