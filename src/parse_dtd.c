@@ -158,6 +158,7 @@ char *get_next_name(char *ptr_str, size_t *offset)
   bool found = false;
   char *name_start = NULL;
   int name_length = 0;
+  char *name = NULL;
   while (is_xml_valid_char(*(ptr_str + (*offset))) || !found)
   {
     if (is_xml_valid_char(*(ptr_str + (*offset))) && !found)
@@ -171,7 +172,10 @@ char *get_next_name(char *ptr_str, size_t *offset)
     }
     (*offset)++;
   }
-  char *name = (char *)malloc(sizeof(char) * name_length + 1);
+  if (name_length > 0)
+  {
+    name = (char *)malloc(sizeof(char) * name_length + 1);
+  }
   if (name == NULL)
   {
     fprintf(stderr, "Failed to allocate memory [name] {parse_element}\n");
@@ -198,12 +202,12 @@ int char_count(char *str, char character)
 char **split_string(char *dtd, int *size, char delim)
 {
   bool no_delim = (strchr(dtd, delim) == NULL ? true : false);
-
+  char **buffer = NULL;
   if (no_delim)
   {
     *size = 1;
   }
-  char **buffer = malloc(sizeof(char *) * (*size) + 1);
+  buffer = malloc(sizeof(char *) * (*size) + 1);
   if (buffer == NULL)
   {
     fprintf(stderr, "Failed to allocate memory [parse_dtd]\n");
@@ -219,6 +223,7 @@ char **split_string(char *dtd, int *size, char delim)
   while (buffer[*size] != NULL)
   {
     *size += 1;
+    buffer = realloc(buffer, sizeof(char *) * (*size) + 1);
     buffer[*size] = strtok(NULL, &delim);
   }
   return buffer;
@@ -291,6 +296,7 @@ void parse_element_childs(XMLElement *parent, int elements_size, char **elements
 
 char *get_node_childs(char *buffer, char *name, char *last_char)
 {
+  printf("aaaaaa %s %s\n",buffer, name);
   char *ptr_str = strstr(buffer, name);
   size_t cursor = strlen(name);
   bool found_any = false;
@@ -393,14 +399,18 @@ void parse_attributes(XMLElement *element, char **buffer, int buffer_size)
 XMLElement *parse_element(char *node_name, char **buffer, int buffer_size)
 {
   XMLElement *xml_element = NULL;
-  char *ptr_str = strstr(buffer[0], "<!ELEMENT ");
-  if (ptr_str != NULL)
+  for (int i = 0; i < buffer_size; i++)
   {
-    size_t cursor = strlen("<!ELEMENT ");
-    char *name = get_next_name(ptr_str, &cursor);
-    if (strcmp(node_name, name) == 0)
+    char *ptr_str = strstr(buffer[i], "<!ELEMENT ");
+    if (ptr_str != NULL)
     {
-      xml_element = complete_element(buffer, buffer_size, 0, name);
+      size_t cursor = strlen("<!ELEMENT ");
+      char *name = get_next_name(ptr_str, &cursor);
+      if (strcmp(node_name, name) == 0)
+      {
+        xml_element = complete_element(buffer, buffer_size, i, name);
+        break;
+      }
     }
   }
   return xml_element;
@@ -428,8 +438,7 @@ XMLElement *parse_sub_element(char *node_name, char **buffer, int buffer_size)
 
 XMLElement *complete_element(char **buffer, int buffer_size, int index, char *name)
 {
-  XMLElement *xml_element;
-  xml_element = create_element(name);
+  XMLElement *xml_element = create_element(name);
   char global_occurence_char = 0;
   char *elements = get_node_childs(buffer[index], name, &global_occurence_char);
   int elements_size = 1;
@@ -445,14 +454,19 @@ XMLElement *complete_element(char **buffer, int buffer_size, int index, char *na
 XMLElement *parse_dtd(char *dtd, char *root_name)
 {
   printf("######## Starting to parse DTD ########\n");
-  printf("DTD : %s\nRoot name : %s\n", dtd, root_name);
-  int buffer_size = 0;
-  char **buffer = split_string(dtd, &buffer_size, '>');
-  XMLElement *parent = parse_element(root_name, buffer, buffer_size);
-  if (parent->attributes != NULL)
-    printf("attrib %s\n", parent->attributes->name);
-  print_tree(parent);
-  free(buffer);
-  printf("######## Finished parsing DTD ########\n");
+  XMLElement *parent = NULL;
+  if (dtd != NULL && strlen(dtd) > 0)
+  {
+    printf("DTD : %s\nRoot name : %s\n", dtd, root_name);
+    int buffer_size = 0;
+    char **buffer = split_string(dtd, &buffer_size, '>');
+    parent = parse_element(root_name, buffer, buffer_size);
+    set_deepness(parent);
+    if (parent->attributes != NULL)
+      printf("attrib %s\n", parent->attributes->name);
+    print_tree(parent);
+    free(buffer);
+    printf("######## Finished parsing DTD ########\n");
+  }
   return parent;
 }

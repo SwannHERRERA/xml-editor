@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<!DOCTYPE classrooms [<!ELEMENT classrooms (classroom+)><!ELEMENT classroom (#PCDATA)>]>
+<!DOCTYPE classrooms [<!ELEMENT classrooms (classroom+)><!ELEMENT classroom (#PCDATA)><!ELEMENT student (#PCDATA)>]>
 <classrooms>
   <!-- <!DOCTYPE classrooms SYSTEM "exemple.dtd"> -->
   <classroom>AL</classroom>
