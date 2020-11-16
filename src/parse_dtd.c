@@ -287,6 +287,7 @@ void parse_element_childs(XMLElement *parent, int elements_size, char **elements
         {
           printf("occurence char = %c \n", elements_buffer[i][cursor]);
           child->occurenceChar = elements_buffer[i][cursor];
+          set_child_occurence(elements_buffer[i][cursor], child);
         }
         add_element(parent, child);
       }
