@@ -449,15 +449,19 @@ XMLElement *complete_element(char **buffer, int buffer_size, int index, char *na
 XMLElement *parse_dtd(char *dtd, char *root_name)
 {
   printf("######## Starting to parse DTD ########\n");
-  printf("DTD : %s\nRoot name : %s\n", dtd, root_name);
-  int buffer_size = 0;
-  char **buffer = split_string(dtd, &buffer_size, '>');
-  XMLElement *parent = parse_element(root_name, buffer, buffer_size);
-  set_deepness(parent);
-  if (parent->attributes != NULL)
-    printf("attrib %s\n", parent->attributes->name);
-  print_tree(parent);
-  free(buffer);
-  printf("######## Finished parsing DTD ########\n");
+  XMLElement *parent = NULL;
+  if (dtd != NULL && strlen(dtd) > 0)
+  {
+    printf("DTD : %s\nRoot name : %s\n", dtd, root_name);
+    int buffer_size = 0;
+    char **buffer = split_string(dtd, &buffer_size, '>');
+    parent = parse_element(root_name, buffer, buffer_size);
+    set_deepness(parent);
+    if (parent->attributes != NULL)
+      printf("attrib %s\n", parent->attributes->name);
+    print_tree(parent);
+    free(buffer);
+    printf("######## Finished parsing DTD ########\n");
+  }
   return parent;
 }
