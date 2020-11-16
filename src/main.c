@@ -64,8 +64,11 @@ bool check_xml_correspond_to_xml(XMLElement *dtd, xml_element *root)
 
 bool check_element_is_correct(XMLElement *dtd_element, xml_element *element)
 {
+
+  // J'ai un problème quand je trouve une balise que je n'attends pas + balise autofermante
   int i, j;
   int tab[dtd_element->childsCount];
+  bool error = false;
 
   for (i = 0; i < dtd_element->childsCount; i += 1)
   {
@@ -97,6 +100,7 @@ bool check_element_is_correct(XMLElement *dtd_element, xml_element *element)
     {
     case OCCURENCE_1_N:
       if (tab[i] < 1) {
+        error = true;
         fprintf(stderr, "erreur la balise %s doit avoir des elements %s\n", dtd_element->name, dtd_element->childs[i]->name);
       }
       break;
@@ -105,11 +109,13 @@ bool check_element_is_correct(XMLElement *dtd_element, xml_element *element)
       break;
     case OCCURENCE_0_1:
       if (tab[i] > 1) {
+        error = true;
         fprintf(stderr, "erreur la balise %s doit avoir entre 0 et 1 element %s\n", dtd_element->name, dtd_element->childs[i]->name);
       }
       break;
     case OCCURENCE_1_1:
       if (tab[i] != 1) {
+        error = true;
         fprintf(stderr, "erreur la balise %s doit avoir 1 element %s\n", dtd_element->name, dtd_element->childs[i]->name);
       }
       break;
@@ -118,5 +124,5 @@ bool check_element_is_correct(XMLElement *dtd_element, xml_element *element)
       break;
     }
   }
-  return true;
+  return !error;
 }
