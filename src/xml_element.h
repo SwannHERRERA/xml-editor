@@ -4,6 +4,11 @@
 #include <stdlib.h>
 #include <stdio.h>
 // Occurence flag definitions
+
+/*
+ * Just 1
+ */
+#define OCCURENCE_1_1 0b0
 /*
  * At least one to many corresponds to +
  */
