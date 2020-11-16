@@ -296,6 +296,7 @@ void parse_element_childs(XMLElement *parent, int elements_size, char **elements
 
 char *get_node_childs(char *buffer, char *name, char *last_char)
 {
+  printf("aaaaaa %s %s\n",buffer, name);
   char *ptr_str = strstr(buffer, name);
   size_t cursor = strlen(name);
   bool found_any = false;
@@ -398,14 +399,18 @@ void parse_attributes(XMLElement *element, char **buffer, int buffer_size)
 XMLElement *parse_element(char *node_name, char **buffer, int buffer_size)
 {
   XMLElement *xml_element = NULL;
-  char *ptr_str = strstr(buffer[0], "<!ELEMENT ");
-  if (ptr_str != NULL)
+  for (int i = 0; i < buffer_size; i++)
   {
-    size_t cursor = strlen("<!ELEMENT ");
-    char *name = get_next_name(ptr_str, &cursor);
-    if (strcmp(node_name, name) == 0)
+    char *ptr_str = strstr(buffer[i], "<!ELEMENT ");
+    if (ptr_str != NULL)
     {
-      xml_element = complete_element(buffer, buffer_size, 0, name);
+      size_t cursor = strlen("<!ELEMENT ");
+      char *name = get_next_name(ptr_str, &cursor);
+      if (strcmp(node_name, name) == 0)
+      {
+        xml_element = complete_element(buffer, buffer_size, i, name);
+        break;
+      }
     }
   }
   return xml_element;
