@@ -158,6 +158,7 @@ char *get_next_name(char *ptr_str, size_t *offset)
   bool found = false;
   char *name_start = NULL;
   int name_length = 0;
+  char *name = NULL;
   while (is_xml_valid_char(*(ptr_str + (*offset))) || !found)
   {
     if (is_xml_valid_char(*(ptr_str + (*offset))) && !found)
@@ -171,7 +172,11 @@ char *get_next_name(char *ptr_str, size_t *offset)
     }
     (*offset)++;
   }
-  char *name = (char *)malloc(sizeof(char) * name_length + 1);
+  if (name_length > 0)
+  {
+    printf("%d\n", name_length);
+    name = (char *)malloc(sizeof(char) * name_length + 1);
+  }
   if (name == NULL)
   {
     fprintf(stderr, "Failed to allocate memory [name] {parse_element}\n");
@@ -198,12 +203,12 @@ int char_count(char *str, char character)
 char **split_string(char *dtd, int *size, char delim)
 {
   bool no_delim = (strchr(dtd, delim) == NULL ? true : false);
-
+  char **buffer = NULL;
   if (no_delim)
   {
     *size = 1;
   }
-  char **buffer = malloc(sizeof(char *) * (*size) + 1);
+  buffer = malloc(sizeof(char *) * (*size) + 1);
   if (buffer == NULL)
   {
     fprintf(stderr, "Failed to allocate memory [parse_dtd]\n");
@@ -219,7 +224,11 @@ char **split_string(char *dtd, int *size, char delim)
   while (buffer[*size] != NULL)
   {
     *size += 1;
+    buffer = realloc(buffer, sizeof(char *) * (*size) + 1);
     buffer[*size] = strtok(NULL, &delim);
+  }
+  for(int i =0;i<*size;i++){
+    printf("%d %s\n",i, buffer[i]);
   }
   return buffer;
 }
