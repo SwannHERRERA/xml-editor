@@ -49,7 +49,7 @@ int main(int argc, char **argv)
   fclose(file);
   free(dtd_string);
   free(root_name);
-  init_interface(&argc, &argv);
+  // init_interface(&argc, &argv);
   return EXIT_SUCCESS;
 }
 
@@ -61,6 +61,7 @@ bool check_xml_correspond_to_xml(XMLElement *dtd, xml_element *root)
   }
   return false;
 }
+
 bool check_element_is_correct(XMLElement *dtd_element, xml_element *element)
 {
   int i, j;
@@ -91,7 +92,7 @@ bool check_element_is_correct(XMLElement *dtd_element, xml_element *element)
   // check with occurenceFlag
   for (i = 0; i < dtd_element->childsCount; i += 1)
   {
-    printf("%s %d tab[%d]: %d\n", dtd_element->childs[i]->name ,dtd_element->childs[i]->occurenceFlag, i, tab[i]);
+    printf("%s %d(%c) tab[%d]: %d\n", dtd_element->childs[i]->name, dtd_element->childs[i]->occurenceFlag, dtd_element->childs[i]->occurenceChar, i, tab[i]);
     switch (dtd_element->childs[i]->occurenceFlag)
     {
     case OCCURENCE_1_N:
