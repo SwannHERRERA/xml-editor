@@ -174,7 +174,6 @@ char *get_next_name(char *ptr_str, size_t *offset)
   }
   if (name_length > 0)
   {
-    printf("%d\n", name_length);
     name = (char *)malloc(sizeof(char) * name_length + 1);
   }
   if (name == NULL)
@@ -226,9 +225,6 @@ char **split_string(char *dtd, int *size, char delim)
     *size += 1;
     buffer = realloc(buffer, sizeof(char *) * (*size) + 1);
     buffer[*size] = strtok(NULL, &delim);
-  }
-  for(int i =0;i<*size;i++){
-    printf("%d %s\n",i, buffer[i]);
   }
   return buffer;
 }
@@ -437,8 +433,7 @@ XMLElement *parse_sub_element(char *node_name, char **buffer, int buffer_size)
 
 XMLElement *complete_element(char **buffer, int buffer_size, int index, char *name)
 {
-  XMLElement *xml_element;
-  xml_element = create_element(name);
+  XMLElement *xml_element = create_element(name);
   char global_occurence_char = 0;
   char *elements = get_node_childs(buffer[index], name, &global_occurence_char);
   int elements_size = 1;
@@ -458,6 +453,7 @@ XMLElement *parse_dtd(char *dtd, char *root_name)
   int buffer_size = 0;
   char **buffer = split_string(dtd, &buffer_size, '>');
   XMLElement *parent = parse_element(root_name, buffer, buffer_size);
+  set_deepness(parent);
   if (parent->attributes != NULL)
     printf("attrib %s\n", parent->attributes->name);
   print_tree(parent);
