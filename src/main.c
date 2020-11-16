@@ -91,7 +91,31 @@ bool check_element_is_correct(XMLElement *dtd_element, xml_element *element)
   // check with occurenceFlag
   for (i = 0; i < dtd_element->childsCount; i += 1)
   {
-    printf("%s: %d\n", dtd_element->childs[i]->name, tab[i]);
+    printf("%s %d tab[%d]: %d\n", dtd_element->childs[i]->name ,dtd_element->childs[i]->occurenceFlag, i, tab[i]);
+    switch (dtd_element->childs[i]->occurenceFlag)
+    {
+    case OCCURENCE_1_N:
+      if (tab[i] < 1) {
+        fprintf(stderr, "erreur la balise %s doit avoir des elements %s\n", dtd_element->name, dtd_element->childs[i]->name);
+      }
+      break;
+    case OCCURENCE_0_N:
+      // DO nothing
+      break;
+    case OCCURENCE_0_1:
+      if (tab[i] > 1) {
+        fprintf(stderr, "erreur la balise %s doit avoir entre 0 et 1 element %s\n", dtd_element->name, dtd_element->childs[i]->name);
+      }
+      break;
+    case OCCURENCE_1_1:
+      if (tab[i] != 1) {
+        fprintf(stderr, "erreur la balise %s doit avoir 1 element %s\n", dtd_element->name, dtd_element->childs[i]->name);
+      }
+      break;
+
+    default:
+      break;
+    }
   }
   return true;
 }
