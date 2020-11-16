@@ -2,7 +2,7 @@
 #include "parse_xml.h"
 #include "interface.h"
 
-bool check_xml_correspond_to_xml(XMLElement *dtd, xml_element *root);
+bool check_dtd_correspond_to_xml(XMLElement *dtd, xml_element *root);
 bool check_element_is_correct(XMLElement *dtd_element, xml_element *element);
 /**
  * I use ARGV to give relative path to xml
@@ -34,7 +34,7 @@ int main(int argc, char **argv)
   print_element(root);
   printf("\n######## Finished PARSE XML ########\n");
 
-  if (check_xml_correspond_to_xml(dtd, root))
+  if (check_dtd_correspond_to_xml(dtd, root))
   {
     printf("XML is corresponding to DTD\n");
   }
@@ -53,7 +53,7 @@ int main(int argc, char **argv)
   return EXIT_SUCCESS;
 }
 
-bool check_xml_correspond_to_xml(XMLElement *dtd, xml_element *root)
+bool check_dtd_correspond_to_xml(XMLElement *dtd, xml_element *root)
 {
   if (strcmp(dtd->name, root->name) == 0)
   {
