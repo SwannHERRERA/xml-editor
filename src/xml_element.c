@@ -13,6 +13,7 @@ XMLElement *create_element(char *name)
   element->childsCount = 0;
   element->childsCapacity = 20;
   element->childs = malloc(sizeof(XMLElement) * element->childsCapacity);
+  element->attributes = NULL;
   if (!element->childs)
   {
     fprintf(stderr, "Failed to allocate memory for {element->childs} [create_element]\n");
@@ -21,19 +22,32 @@ XMLElement *create_element(char *name)
   return element;
 }
 
-void print_tree(XMLElement *parent)
+void set_deepness(XMLElement *element)
 {
-  if (parent != NULL)
+  if (element == NULL)
   {
-    for (int i = 0; i < parent->deepness; i++)
+    return;
+  }
+  for (int i = 0; i < element->childsCount; i++)
+  {
+    element->childs[i]->deepness = element->deepness + 1;
+    set_deepness(element->childs[i]);
+  }
+}
+
+void print_tree(XMLElement *element)
+{
+  if (element != NULL)
+  {
+    for (int i = 0; i < element->deepness; i++)
     {
       printf("\t");
     }
     printf("\u255A\u2550\u2550");
-    printf(">%s\n", parent->name);
-    for (int i = 0; i < parent->childsCount; i++)
+    printf(">%s\n", element->name);
+    for (int i = 0; i < element->childsCount; i++)
     {
-      print_tree(parent->childs[i]);
+      print_tree(element->childs[i]);
     }
   }
 }
@@ -50,9 +64,9 @@ void add_element(XMLElement *parent, XMLElement *child)
       exit(EXIT_FAILURE);
     }
   }
-  child->deepness = parent->deepness + 1;
   parent->childs[parent->childsCount] = child;
   parent->childsCount += 1;
+  child->parent = parent;
 }
 
 void add_attribute(XMLElement *element, char *name, AttributeValue value, AttributeType type)
@@ -71,12 +85,27 @@ void free_DTD(XMLElement *root)
   free_XMLElement(root);
 }
 
+void free_XMLAttributes(XMLAttribute *attribute)
+{
+  XMLAttribute *swap;
+  XMLAttribute *first = attribute;
+  while (first != NULL)
+  {
+    swap = first->next;
+    free(first->name);
+    free(first);
+    first = swap;
+  }
+}
+
 void free_XMLElement(XMLElement *element)
 {
   for (int i = 0; i < element->childsCount; i += 1)
   {
     free_XMLElement(element->childs[i]);
   }
+  free_XMLAttributes(element->attributes);
+  free(element->childs);
   free(element->name);
   free(element);
 }

@@ -1,13 +1,15 @@
 #include "parse_dtd.h"
 #include "parse_xml.h"
+#include "interface.h"
 
-bool check_xml_correspond_to_xml(XMLElement *dtd, xml_element *root);
+bool check_dtd_correspond_to_xml(XMLElement *dtd, xml_element *root);
 bool check_element_is_correct(XMLElement *dtd_element, xml_element *element);
 /**
  * I use ARGV to give relative path to xml
  */
 int main(int argc, char **argv)
 {
+
   if (argc < 2)
   {
     fprintf(stderr, "Error attending xml file in parameters\n");
@@ -32,7 +34,7 @@ int main(int argc, char **argv)
   print_element(root);
   printf("\n######## Finished PARSE XML ########\n");
 
-  if (check_xml_correspond_to_xml(dtd, root))
+  if (check_dtd_correspond_to_xml(dtd, root))
   {
     printf("XML is corresponding to DTD\n");
   }
@@ -42,14 +44,16 @@ int main(int argc, char **argv)
   }
 
   free_DTD(dtd);
+  free_element(root);
   free(xml);
   fclose(file);
   free(dtd_string);
   free(root_name);
+  // init_interface(&argc, &argv);
   return EXIT_SUCCESS;
 }
 
-bool check_xml_correspond_to_xml(XMLElement *dtd, xml_element *root)
+bool check_dtd_correspond_to_xml(XMLElement *dtd, xml_element *root)
 {
   if (strcmp(dtd->name, root->name) == 0)
   {
@@ -57,39 +61,68 @@ bool check_xml_correspond_to_xml(XMLElement *dtd, xml_element *root)
   }
   return false;
 }
+
 bool check_element_is_correct(XMLElement *dtd_element, xml_element *element)
 {
+
+  // J'ai un problème quand je trouve une balise que je n'attends pas + balise autofermante
   int i, j;
-  /**
-   * Cas a géré un élément qui ne trouve pas sa pair 
-   * Pour la dtd
-   * Faire un count nombre d'élément trouvé += pour chaque nombre d'élément trouvé diférent
-   * et verifié que ce count = childCount 
-   * 
-   * Gestion des occurences
-   * 
-   * Faire un tableau des possiblités ["classroom", "student"]
-   * si + alors je lis le flag est ce que j'ai trouvé un element de ce type
-   * si rien je delete l'élément du tableau
-   * si * je le laisse dans le tableau
-   * si ? je le retire mais si je le croise a la fin j'ignore
-   */
+  int tab[dtd_element->childsCount];
+  bool error = false;
+
+  for (i = 0; i < dtd_element->childsCount; i += 1)
+  {
+    tab[i] = 0;
+  }
+
   for (i = 0; i < element->childs_count; i += 1)
   {
-    // flag j'ai trouvé = false
     for (j = 0; j < dtd_element->childsCount; j += 1)
     {
-      printf("name: %s occurenceChar: %c\n", dtd_element->childs[j]->name, dtd_element->childs[j]->occurenceChar);
       if (strcmp(element->childs[i]->name, dtd_element->childs[j]->name) == 0)
       {
+        tab[j] += 1;
         if (check_element_is_correct(dtd_element->childs[j], element->childs[i]) == false)
         {
           return false;
         }
-        // flag j'ai trouvé = true
       }
     }
   }
+
   // check les attributes
-  return true;
+
+  // check with occurenceFlag
+  for (i = 0; i < dtd_element->childsCount; i += 1)
+  {
+    printf("%s %d(%c) tab[%d]: %d\n", dtd_element->childs[i]->name, dtd_element->childs[i]->occurenceFlag, dtd_element->childs[i]->occurenceChar, i, tab[i]);
+    switch (dtd_element->childs[i]->occurenceFlag)
+    {
+    case OCCURENCE_1_N:
+      if (tab[i] < 1) {
+        error = true;
+        fprintf(stderr, "erreur la balise %s doit avoir des elements %s\n", dtd_element->name, dtd_element->childs[i]->name);
+      }
+      break;
+    case OCCURENCE_0_N:
+      // DO nothing
+      break;
+    case OCCURENCE_0_1:
+      if (tab[i] > 1) {
+        error = true;
+        fprintf(stderr, "erreur la balise %s doit avoir entre 0 et 1 element %s\n", dtd_element->name, dtd_element->childs[i]->name);
+      }
+      break;
+    case OCCURENCE_1_1:
+      if (tab[i] != 1) {
+        error = true;
+        fprintf(stderr, "erreur la balise %s doit avoir 1 element %s\n", dtd_element->name, dtd_element->childs[i]->name);
+      }
+      break;
+
+    default:
+      break;
+    }
+  }
+  return !error;
 }

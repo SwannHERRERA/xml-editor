@@ -45,6 +45,7 @@ char *get_content_of_external_DTD(char *doctype)
   }
 
   res = file_get_content(external_DTD_file);
+  fprintf(stderr, "file content %s\n", res);
   free(external_DTD_filename);
   free(doctype);
   fclose(external_DTD_file);
@@ -157,6 +158,7 @@ char *get_next_name(char *ptr_str, size_t *offset)
   bool found = false;
   char *name_start = NULL;
   int name_length = 0;
+  char *name = NULL;
   while (is_xml_valid_char(*(ptr_str + (*offset))) || !found)
   {
     if (is_xml_valid_char(*(ptr_str + (*offset))) && !found)
@@ -170,7 +172,10 @@ char *get_next_name(char *ptr_str, size_t *offset)
     }
     (*offset)++;
   }
-  char *name = (char *)malloc(sizeof(char) * name_length + 1);
+  if (name_length > 0)
+  {
+    name = (char *)malloc(sizeof(char) * name_length + 1);
+  }
   if (name == NULL)
   {
     fprintf(stderr, "Failed to allocate memory [name] {parse_element}\n");
@@ -197,12 +202,12 @@ int char_count(char *str, char character)
 char **split_string(char *dtd, int *size, char delim)
 {
   bool no_delim = (strchr(dtd, delim) == NULL ? true : false);
-  *size = char_count(dtd, delim);
+  char **buffer = NULL;
   if (no_delim)
   {
     *size = 1;
   }
-  char **buffer = malloc(sizeof(char *) * (*size) + 1);
+  buffer = malloc(sizeof(char *) * (*size) + 1);
   if (buffer == NULL)
   {
     fprintf(stderr, "Failed to allocate memory [parse_dtd]\n");
@@ -213,12 +218,13 @@ char **split_string(char *dtd, int *size, char delim)
     buffer[0] = dtd;
     return buffer;
   }
-  int i = 0;
-  buffer[i] = strtok(dtd, &delim);
-  while (buffer[i] != NULL)
+  *size = 0;
+  buffer[*size] = strtok(dtd, &delim);
+  while (buffer[*size] != NULL)
   {
-    i += 1;
-    buffer[i] = strtok(NULL, &delim);
+    *size += 1;
+    buffer = realloc(buffer, sizeof(char *) * (*size) + 1);
+    buffer[*size] = strtok(NULL, &delim);
   }
   return buffer;
 }
@@ -264,30 +270,34 @@ void set_child_occurence(char occurence_char, XMLElement *child)
 
 void parse_element_childs(XMLElement *parent, int elements_size, char **elements_buffer, char **buffer, int buffer_size)
 {
-  for (int j = 0; j < elements_size; j += 1)
+  for (int i = 0; i < elements_size; i += 1)
   {
-    if (strstr(elements_buffer[j], "#PCDATA") != NULL)
+    if (strstr(elements_buffer[i], "#PCDATA") != NULL)
     {
       continue;
     }
     size_t cursor = 0;
-    char *element_name = get_next_name(elements_buffer[j], &cursor);
+    char *element_name = get_next_name(elements_buffer[i], &cursor);
     if (element_name != NULL)
     {
       XMLElement *child = parse_sub_element(element_name, buffer, buffer_size);
-      if (elements_buffer[j][cursor] != 0)
+      if (child != NULL)
       {
-        printf("occurence char = %c\n", elements_buffer[j][cursor]);
-        child->occurenceChar = elements_buffer[j][cursor];
-        set_child_occurence(elements_buffer[j][cursor], child);
+        if (elements_buffer[i][cursor] != 0)
+        {
+          printf("occurence char = %c \n", elements_buffer[i][cursor]);
+          child->occurenceChar = elements_buffer[i][cursor];
+          set_child_occurence(elements_buffer[i][cursor], child);
+        }
+        add_element(parent, child);
       }
-      add_element(parent, child);
     }
   }
 }
 
 char *get_node_childs(char *buffer, char *name, char *last_char)
 {
+  printf("aaaaaa %s %s\n",buffer, name);
   char *ptr_str = strstr(buffer, name);
   size_t cursor = strlen(name);
   bool found_any = false;
@@ -382,6 +392,7 @@ void parse_attributes(XMLElement *element, char **buffer, int buffer_size)
         AttributeValue value = get_attribute_value(&ptr_str);
         add_attribute(element, attribute_name, value, type);
       }
+      free(node_name);
     }
   }
 }
@@ -389,19 +400,18 @@ void parse_attributes(XMLElement *element, char **buffer, int buffer_size)
 XMLElement *parse_element(char *node_name, char **buffer, int buffer_size)
 {
   XMLElement *xml_element = NULL;
-  char *ptr_str = strstr(buffer[0], "<!ELEMENT ");
-  if (ptr_str != NULL)
+  for (int i = 0; i < buffer_size; i++)
   {
-    size_t cursor = strlen("<!ELEMENT ");
-    char *name = get_next_name(ptr_str, &cursor);
-    if (strcmp(node_name, name) == 0)
+    char *ptr_str = strstr(buffer[i], "<!ELEMENT ");
+    if (ptr_str != NULL)
     {
-      xml_element = complete_element(buffer, buffer_size, 0, name);
-    }
-    else
-    {
-      fprintf(stderr, "Error root Name is not equal to %s\n", node_name);
-      exit(EXIT_FAILURE);
+      size_t cursor = strlen("<!ELEMENT ");
+      char *name = get_next_name(ptr_str, &cursor);
+      if (strcmp(node_name, name) == 0)
+      {
+        xml_element = complete_element(buffer, buffer_size, i, name);
+        break;
+      }
     }
   }
   return xml_element;
@@ -429,8 +439,7 @@ XMLElement *parse_sub_element(char *node_name, char **buffer, int buffer_size)
 
 XMLElement *complete_element(char **buffer, int buffer_size, int index, char *name)
 {
-  XMLElement *xml_element;
-  xml_element = create_element(name);
+  XMLElement *xml_element = create_element(name);
   char global_occurence_char = 0;
   char *elements = get_node_childs(buffer[index], name, &global_occurence_char);
   int elements_size = 1;
@@ -438,6 +447,7 @@ XMLElement *complete_element(char **buffer, int buffer_size, int index, char *na
   parse_element_childs(xml_element, elements_size, elements_buffer, buffer, buffer_size);
   set_global_child_occurence(global_occurence_char, xml_element);
   parse_attributes(xml_element, buffer, buffer_size);
+  free(elements_buffer);
   free(elements);
   return xml_element;
 }
@@ -445,12 +455,19 @@ XMLElement *complete_element(char **buffer, int buffer_size, int index, char *na
 XMLElement *parse_dtd(char *dtd, char *root_name)
 {
   printf("######## Starting to parse DTD ########\n");
-  printf("DTD : %s\nRoot name : %s\n", dtd, root_name);
-  int buffer_size = 0;
-  char **buffer = split_string(dtd, &buffer_size, '>');
-  XMLElement *parent = parse_element(root_name, buffer, buffer_size);
-  print_tree(parent);
-  free(buffer);
-  printf("######## Finished parsing DTD ########\n");
+  XMLElement *parent = NULL;
+  if (dtd != NULL && strlen(dtd) > 0)
+  {
+    printf("DTD : %s\nRoot name : %s\n", dtd, root_name);
+    int buffer_size = 0;
+    char **buffer = split_string(dtd, &buffer_size, '>');
+    parent = parse_element(root_name, buffer, buffer_size);
+    set_deepness(parent);
+    if (parent->attributes != NULL)
+      printf("attrib %s\n", parent->attributes->name);
+    print_tree(parent);
+    free(buffer);
+    printf("######## Finished parsing DTD ########\n");
+  }
   return parent;
 }

@@ -86,7 +86,7 @@ void get_content(char *subject, xml_element *element)
 {
   char *content = (char *)malloc(sizeof(char) * strlen(subject));
   strcpy(content, subject);
-  // TODO make this generic
+  // TODO Autoclosing tag
   char *closing_tag = malloc((strlen(element->name) + 3) * sizeof(char));
   strcpy(closing_tag, "</");
   strcat(closing_tag, element->name);
