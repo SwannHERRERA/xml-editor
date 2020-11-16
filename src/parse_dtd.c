@@ -297,7 +297,6 @@ void parse_element_childs(XMLElement *parent, int elements_size, char **elements
 
 char *get_node_childs(char *buffer, char *name, char *last_char)
 {
-  printf("aaaaaa %s %s\n",buffer, name);
   char *ptr_str = strstr(buffer, name);
   size_t cursor = strlen(name);
   bool found_any = false;

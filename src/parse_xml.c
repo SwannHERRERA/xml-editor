@@ -196,7 +196,7 @@ xml_element *get_next_element(char *xml, xml_element *parent, int deepness)
   int start, end;
   char *name;
   long max_size = strlen(xml);
-  while (!isspace(xml[i]) && xml[i] != '>' && i < max_size)
+  while (!isspace(xml[i]) && xml[i] != '>' && xml[i] != '/' && i < max_size)
   {
     i += 1;
   }
@@ -283,6 +283,15 @@ bool is_closing_tag(char *s)
   return false;
 }
 
+bool is_autoclosing_tag(xml_element *element)
+{
+  if (element->content[strlen(element->content) - sizeof(char) * 2] == '/')
+  {
+    return true;
+  }
+  return false;
+}
+
 xml_element *parse_xml(char *xml)
 {
   xml_element *root;
@@ -313,7 +322,10 @@ xml_element *parse_xml(char *xml)
       {
         root = current_element;
       }
-      deepness += 1;
+      if (!is_autoclosing_tag(current_element))
+      {
+        deepness += 1;
+      }
     }
     xml = xml + sizeof(char) * 1;
   }

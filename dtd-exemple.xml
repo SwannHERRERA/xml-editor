@@ -7,8 +7,7 @@
   <classroom>MOC</classroom>
   <classroom>IBC</classroom>
   <student>Pierre</student>
-  <student>Pierre</student>
+  <!-- <student>Pierre</student> -->
   <coffee>sfef</coffee>
-  <!-- <student name="swann" />
- -->
+  <student name="swann" />
 </classrooms>

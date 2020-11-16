@@ -48,6 +48,7 @@ bool check_is_balise(char **xml);
 bool check_is_doctype(char *s);
 bool check_is_version(char *s);
 bool check_is_comment(char *s);
+bool is_autoclosing_tag(xml_element *element);
 xml_element *get_next_element(char *xml, xml_element *parent, int deepness);
 void realloc_childs(xml_element *element);
 char *found_start(char *xml, xml_element *element);
