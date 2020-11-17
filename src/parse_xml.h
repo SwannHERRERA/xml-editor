@@ -32,6 +32,7 @@ typedef struct xml_element
   int childs_count;
   int childs_capacity;
   int deepness;
+  bool autoclosing;
 } xml_element;
 
 void create_empty_xml_attribute_linkedlist(xml_element *element);

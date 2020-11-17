@@ -57,6 +57,14 @@ int make_attributes(char *tag, char *subject, xml_element *element)
     }
     i += 1;
   }
+  if (tmp[i - 1] == '/')
+  {
+    element->autoclosing = true;
+  }
+  else
+  {
+    element->autoclosing = false;
+  }
   element->attributes = head;
   i += 1; // skip >
   return i;
@@ -117,7 +125,10 @@ void print_element(xml_element *element)
   {
     print_element(element->childs[i]);
   }
-  printf("%s\n", element->content);
+  if (element->autoclosing == false)
+  {
+    printf("%s\n", element->content);
+  }
   printf("\n");
 }
 
@@ -172,7 +183,10 @@ xml_element *get_element(char *xml, char *tag_name)
   xml = found_start(xml, element);
   index_of_opening_tag = make_attributes(tag_name, xml, element);
   char *start = xml + sizeof(char) * index_of_opening_tag;
-  get_content(start, element);
+  if (element->autoclosing == false)
+  {
+    get_content(start, element);
+  }
   // print_element(element);
   // free_element(element);
   return element;
@@ -202,6 +216,7 @@ xml_element *get_next_element(char *xml, xml_element *parent, int deepness)
   }
   start = 1;
   end = i;
+
   name = malloc(sizeof(char) * (end - start));
   strncpy(name, xml + start, end - start);
   xml_element *element = get_element(xml, name);
@@ -210,6 +225,7 @@ xml_element *get_next_element(char *xml, xml_element *parent, int deepness)
   element->childs_capacity = 5;
   element->parent = parent;
   element->deepness = deepness;
+
   if (parent != NULL)
   {
     if (parent->childs_count == parent->childs_capacity)
@@ -283,15 +299,6 @@ bool is_closing_tag(char *s)
   return false;
 }
 
-bool is_autoclosing_tag(xml_element *element)
-{
-  if (element->content[strlen(element->content) - sizeof(char) * 2] == '/')
-  {
-    return true;
-  }
-  return false;
-}
-
 xml_element *parse_xml(char *xml)
 {
   xml_element *root;
@@ -322,7 +329,7 @@ xml_element *parse_xml(char *xml)
       {
         root = current_element;
       }
-      if (!is_autoclosing_tag(current_element))
+      if (current_element->autoclosing == false)
       {
         deepness += 1;
       }
