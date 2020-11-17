@@ -152,12 +152,17 @@ void free_element(xml_element *element)
   free(element);
 }
 
-char *found_start(char *xml, xml_element *element)
+char *find_start(char *xml, xml_element *element)
 {
+  printf("%s: length: %ld\n", element->name, strlen(element->name));
   int length_of_opening_tag = strlen(element->name) + (2 * sizeof(char));
   char tmp[length_of_opening_tag];
+  for (int i = 0; i < length_of_opening_tag; i += 1)
+  {
+    tmp[i] = '\0';
+  }
   strcpy(tmp, "<");
-  strcat(tmp, element->name);
+  strcat(tmp, element->name); // Y a un espace a la fin
   char *str = strstr(xml, tmp);
   if (str == NULL)
   {
@@ -180,7 +185,7 @@ xml_element *get_element(char *xml, char *tag_name)
   strcpy(element->name, tag_name);
   element->number_of_attribute = 0;
   create_empty_xml_attribute_linkedlist(element);
-  xml = found_start(xml, element);
+  xml = find_start(xml, element);
   index_of_opening_tag = make_attributes(tag_name, xml, element);
   char *start = xml + sizeof(char) * index_of_opening_tag;
   if (element->autoclosing == false)
