@@ -157,10 +157,7 @@ char *find_start(char *xml, xml_element *element)
   printf("%s: length: %ld\n", element->name, strlen(element->name));
   int length_of_opening_tag = strlen(element->name) + (2 * sizeof(char));
   char tmp[length_of_opening_tag];
-  for (int i = 0; i < length_of_opening_tag; i += 1)
-  {
-    tmp[i] = '\0';
-  }
+  printf("length_of_opening_tag: %d\n", length_of_opening_tag);
   strcpy(tmp, "<");
   strcat(tmp, element->name); // Y a un espace a la fin
   char *str = strstr(xml, tmp);
