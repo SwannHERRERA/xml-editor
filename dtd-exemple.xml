@@ -9,6 +9,7 @@
   <coffee>sfef</coffee>
   <student name="swann" />
   <carte>
-    <code>2020</code>
+    <!-- NOK <code>2020</code> -->
+    <!-- OK <codee>2020</codee> -->
   </carte>
 </classrooms>
