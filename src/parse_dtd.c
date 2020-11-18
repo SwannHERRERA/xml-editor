@@ -202,30 +202,40 @@ int char_count(char *str, char character)
 
 char **split_string(char *dtd, int *size, char delim)
 {
-  bool no_delim = (strchr(dtd, delim) == NULL ? true : false);
   char **buffer = NULL;
+  bool no_delim = (strchr(dtd, delim) == NULL ? true : false);
   if (no_delim)
   {
-    *size = 1;
-  }
-  buffer = malloc(sizeof(char *) * (*size) + 1);
-  if (buffer == NULL)
-  {
-    fprintf(stderr, "Failed to allocate memory [parse_dtd]\n");
-    exit(EXIT_FAILURE);
-  }
-  if (no_delim)
-  {
-    buffer[0] = dtd;
-    return buffer;
+    *size = 0;
+    buffer = malloc(sizeof(char *) * (*size) + 1);
+    if (buffer == NULL)
+    {
+      fprintf(stderr, "Failed to allocate memory [parse_dtd]\n");
+      exit(EXIT_FAILURE);
+    }
+    strcpy(buffer[0], dtd);
+    return buffer; 
   }
   *size = 0;
-  buffer[*size] = strtok(dtd, &delim);
+  buffer = malloc(sizeof(char *) * (*size) + 1);
+  char *str_new = strtok(dtd, &delim);
+  if (str_new != NULL)
+  {
+    buffer[*size] = malloc(sizeof(char) * strlen(str_new) + 1);
+    strcpy(buffer[*size], str_new);
+    buffer[*size][strlen(str_new)] = 0;
+  }
   while (buffer[*size] != NULL)
   {
     *size += 1;
     buffer = realloc(buffer, sizeof(char *) * (*size) + 1);
-    buffer[*size] = strtok(NULL, &delim);
+    char *str = strtok(NULL, &delim);
+    if (str != NULL)
+    {
+      buffer[*size] = malloc(sizeof(char) * strlen(str) + 1);
+      strcpy(buffer[*size], str);
+      buffer[*size][strlen(str)] = 0;
+    }
   }
   return buffer;
 }
@@ -473,8 +483,6 @@ XMLElement *parse_dtd(char *dtd, char *root_name)
     char **buffer = split_string(dtd, &buffer_size, '>');
     parent = parse_element(root_name, buffer, buffer_size);
     set_deepness(parent);
-    if (parent->attributes != NULL)
-      printf("attrib %s\n", parent->attributes->name);
     print_tree(parent);
     free(buffer);
     printf("######## Finished parsing DTD ########\n");
