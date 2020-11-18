@@ -484,6 +484,9 @@ XMLElement *parse_dtd(char *dtd, char *root_name)
     parent = parse_element(root_name, buffer, buffer_size);
     set_deepness(parent);
     print_tree(parent);
+    for(int i = 0 ;i < buffer_size; i++){
+      free(buffer[i]);
+    }
     free(buffer);
     printf("######## Finished parsing DTD ########\n");
   }
