@@ -55,15 +55,17 @@ void menu_button_open_file(GtkWidget *widget, gpointer data)
     FILE *file = fopen(gui_data->file_name, "r");
     if (file == NULL)
     {
-      fclose(file);
       fprintf(stderr, "Error opening file %s\n", gui_data->file_name);
-      exit(EXIT_FAILURE);
     }
     GtkTextBuffer *buffer = NULL;
     char *str = file_get_content(file);
     buffer = gtk_text_view_get_buffer(gui_data->widgets->main_text_view);
     gtk_text_buffer_set_text(buffer, str, -1);
-    free(str);
+    if (str != NULL)
+    {
+      free(str);
+    }
+    fclose(file);
   }
   gtk_widget_destroy(dialog);
 }
@@ -79,7 +81,10 @@ void menu_button_save_file(GtkWidget *widget, gpointer data)
     gtk_text_buffer_get_bounds(buffer, &start, &end);
     char *str = gtk_text_buffer_get_text(buffer, &start, &end, FALSE);
     save_to_file(gui_data->file_name, str);
-    free(str);
+    if (str != NULL)
+    {
+      free(str);
+    }
   }
 }
 
