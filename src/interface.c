@@ -74,8 +74,12 @@ void menu_button_save_file(GtkWidget *widget, gpointer data)
   GuiData *gui_data = (GuiData *)data;
   if (gui_data->file_name != NULL)
   {
-
-    save_to_file(gui_data->file_name, "test");
+    GtkTextIter start, end;
+    GtkTextBuffer *buffer = gtk_text_view_get_buffer(gui_data->widgets->main_text_view);
+    gtk_text_buffer_get_bounds(buffer, &start, &end);
+    char *str = gtk_text_buffer_get_text(buffer, &start, &end, FALSE);
+    save_to_file(gui_data->file_name, str);
+    free(str);
   }
 }
 
