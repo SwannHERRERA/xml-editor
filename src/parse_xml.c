@@ -178,7 +178,6 @@ xml_element *get_element(char *xml, char *tag_name)
   element->parent = NULL;
   element->name = malloc(sizeof(char) * strlen(tag_name));
   strcpy(element->name, tag_name);
-  printf("length of element->name %ld\n", strlen(tag_name));
   element->number_of_attribute = 0;
   create_empty_xml_attribute_linkedlist(element);
   xml = find_start(xml, element);
