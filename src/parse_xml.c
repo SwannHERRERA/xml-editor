@@ -335,6 +335,10 @@ xml_element *parse_xml(char *xml)
       {
         deepness += 1;
       }
+      else
+      {
+        current_element = current_element->parent;
+      }
     }
     xml = xml + sizeof(char) * 1;
   }
