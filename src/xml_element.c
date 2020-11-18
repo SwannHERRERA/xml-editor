@@ -45,10 +45,24 @@ void print_tree(XMLElement *element)
     }
     printf("\u255A\u2550\u2550");
     printf(">%s\n", element->name);
+    print_attributes(element);
     for (int i = 0; i < element->childsCount; i++)
     {
       print_tree(element->childs[i]);
     }
+  }
+}
+
+void print_attributes(XMLElement *element)
+{
+  XMLAttribute *attrib = element->attributes;
+  while(attrib != NULL){
+    for (int i = 0; i < element->deepness; i++)
+    {
+      printf("\t");
+    }
+    printf("%s\n", attrib->name);
+    attrib = attrib->next;
   }
 }
 

@@ -231,21 +231,24 @@ char **split_string(char *dtd, int *size, char delim)
   while (buffer[*size] != NULL)
   {
     char *str = strtok(NULL, &delim);
-    if (str == NULL)
-    {
-      break;
-    }
     *size += 1;
     char **new_buffer = malloc(sizeof(char *) * (*size) + 1);
     for (int i = 0; i < *size; i++)
     {
       new_buffer[i] = buffer[i];
     }
-    new_buffer[*size] = malloc(sizeof(char) * strlen(str) + 1);
-    strcpy(new_buffer[*size], str);
-    new_buffer[*size][strlen(str)] = 0;
+    if (str != NULL)
+    {
+      new_buffer[*size] = malloc(sizeof(char) * strlen(str) + 1);
+      strcpy(new_buffer[*size], str);
+      new_buffer[*size][strlen(str)] = 0;
+    }
     free(buffer);
     buffer = new_buffer;
+  }
+  for (int i = 0; i < *size; i++)
+  {
+    printf("aaaaaaaaaaaaaaaa %s\n", buffer[i]);
   }
   return buffer;
 }

@@ -26,6 +26,7 @@ typedef struct XMLAttribute XMLAttribute;
 typedef enum AttributeValue AttributeValue;
 typedef enum AttributeType AttributeType;
 XMLElement *create_element(char *name);
+void print_attributes(XMLElement *element);
 void set_deepness(XMLElement *parent);
 void print_tree(XMLElement *parent);
 void add_element(XMLElement *parent, XMLElement *child);
