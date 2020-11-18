@@ -17,10 +17,11 @@ void save_to_file(char *file_name, char *buffer)
 char *file_get_content(FILE *file)
 {
   long size = get_size_of_file(file);
-  char *buffer = (char *)malloc(sizeof(char) * size);
+  char *buffer = (char *)malloc(sizeof(char) * size+1);
   if (buffer)
   {
     fread(buffer, sizeof(char), size, file);
+    buffer[size] = 0;
   }
   else
   {
