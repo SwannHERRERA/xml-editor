@@ -1,12 +1,7 @@
 #ifndef _interface_h_
 #define _interface_h_
 #include <gtk/gtk.h>
-
-typedef struct FileHandlerData FileHandlerData;
-struct FileHandlerData
-{
-  char *file_name;
-};
+#include "file_helper.h"
 
 typedef struct
 {
@@ -20,10 +15,17 @@ typedef struct
 typedef struct
 {
   GtkWindow *window;
+  GtkTextView *main_text_view;
   MenuItems *items;
-} Widgets;
+} GuiWidgets;
 
-void connect_widgets(GtkBuilder *builder, FileHandlerData **data);
+typedef struct
+{
+  char *file_name;
+  GuiWidgets *widgets;
+} GuiData;
+
+void connect_widgets(GtkBuilder *builder, GuiData *data);
 void init_interface(int *argc, char ***argv);
 void raise_error(char *buffer);
 

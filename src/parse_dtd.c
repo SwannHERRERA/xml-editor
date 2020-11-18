@@ -204,19 +204,22 @@ char **split_string(char *dtd, int *size, char delim)
 {
   char **buffer = NULL;
   bool no_delim = (strchr(dtd, delim) == NULL ? true : false);
+  *size = 0;
   if (no_delim)
   {
-    *size = 0;
     buffer = malloc(sizeof(char *) * (*size) + 1);
+
+    buffer[0] = malloc(sizeof(char) * strlen(dtd) + 1);
     if (buffer == NULL)
     {
       fprintf(stderr, "Failed to allocate memory [parse_dtd]\n");
       exit(EXIT_FAILURE);
     }
     strcpy(buffer[0], dtd);
-    return buffer; 
+    buffer[0][strlen(dtd)] = 0;
+    *size = 1;
+    return buffer;
   }
-  *size = 0;
   buffer = malloc(sizeof(char *) * (*size) + 1);
   char *str_new = strtok(dtd, &delim);
   if (str_new != NULL)
@@ -484,7 +487,8 @@ XMLElement *parse_dtd(char *dtd, char *root_name)
     parent = parse_element(root_name, buffer, buffer_size);
     set_deepness(parent);
     print_tree(parent);
-    for(int i = 0 ;i < buffer_size; i++){
+    for (int i = 0; i < buffer_size; i++)
+    {
       free(buffer[i]);
     }
     free(buffer);
