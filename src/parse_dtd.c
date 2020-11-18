@@ -228,13 +228,14 @@ char **split_string(char *dtd, int *size, char delim)
     strcpy(buffer[*size], str_new);
     buffer[*size][strlen(str_new)] = 0;
   }
-      printf("splitting %p,  %s\n", buffer[0],buffer[0]);
+  printf("splitting %p,  %s\n", buffer[0], buffer[0]);
   while (buffer[*size] != NULL)
   {
     *size += 1;
     char **new_buffer = malloc(sizeof(char *) * (*size) + 1);
-    for(int i = 0; i< *size; i++){
-      new_buffer[i]=buffer[i];
+    for (int i = 0; i < *size; i++)
+    {
+      new_buffer[i] = buffer[i];
     }
     char *str = strtok(NULL, &delim);
     if (str != NULL)
@@ -243,8 +244,9 @@ char **split_string(char *dtd, int *size, char delim)
       strcpy(new_buffer[*size], str);
       new_buffer[*size][strlen(str)] = 0;
     }
-    for(int i = 0; i< *size-1; i++){
-      printf("\nsplitting %p, %d, %s\n", buffer[i],i,buffer[i]);
+    for (int i = 0; i < *size - 1; i++)
+    {
+      printf("\nsplitting %p, %d, %s\n", buffer[i], i, buffer[i]);
     }
   }
   return buffer;
