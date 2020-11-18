@@ -154,10 +154,13 @@ void free_element(xml_element *element)
 
 char *find_start(char *xml, xml_element *element)
 {
-  printf("%s: length: %ld\n", element->name, strlen(element->name));
   int length_of_opening_tag = strlen(element->name) + (2 * sizeof(char));
   char tmp[length_of_opening_tag];
-  printf("length_of_opening_tag: %d\n", length_of_opening_tag);
+  for (size_t i = 0; i < strlen(element->name); i += 1)
+  {
+    printf("%c|", element->name[i]);
+  }
+  printf(" %ld\n", strlen(element->name));
   strcpy(tmp, "<");
   strcat(tmp, element->name); // Y a un espace a la fin
   char *str = strstr(xml, tmp);
@@ -180,6 +183,7 @@ xml_element *get_element(char *xml, char *tag_name)
   element->parent = NULL;
   element->name = malloc(sizeof(char) * strlen(tag_name));
   strcpy(element->name, tag_name);
+  printf("length of element->name %ld\n", strlen(tag_name));
   element->number_of_attribute = 0;
   create_empty_xml_attribute_linkedlist(element);
   xml = find_start(xml, element);
@@ -217,10 +221,20 @@ xml_element *get_next_element(char *xml, xml_element *parent, int deepness)
     i += 1;
   }
   start = 1;
-  end = i;
+  end = i - start;
 
-  name = malloc(sizeof(char) * (end - start));
-  strncpy(name, xml + start, end - start);
+  printf("end: %d", end);
+
+  name = malloc(sizeof(char) * end);
+  strncpy(name, xml + start, end);
+  name[end + 1] = '\0';
+  size_t j;
+  for (j = 0; j < strlen(name); j++)
+  {
+    printf("%c ", name[j]);
+  }
+  printf("j: %ld\n", j);
+
   xml_element *element = get_element(xml, name);
   element->childs = malloc(sizeof(xml_element *) * 5);
   element->childs_count = 0;
