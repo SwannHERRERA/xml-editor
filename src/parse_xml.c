@@ -156,13 +156,8 @@ char *find_start(char *xml, xml_element *element)
 {
   int length_of_opening_tag = strlen(element->name) + (2 * sizeof(char));
   char tmp[length_of_opening_tag];
-  for (size_t i = 0; i < strlen(element->name); i += 1)
-  {
-    printf("%c|", element->name[i]);
-  }
-  printf(" %ld\n", strlen(element->name));
   strcpy(tmp, "<");
-  strcat(tmp, element->name); // Y a un espace a la fin
+  strcat(tmp, element->name);
   char *str = strstr(xml, tmp);
   if (str == NULL)
   {
@@ -223,17 +218,9 @@ xml_element *get_next_element(char *xml, xml_element *parent, int deepness)
   start = 1;
   end = i - start;
 
-  printf("end: %d", end);
-
   name = malloc(sizeof(char) * end);
   strncpy(name, xml + start, end);
-  name[end + 1] = '\0';
-  size_t j;
-  for (j = 0; j < strlen(name); j++)
-  {
-    printf("%c ", name[j]);
-  }
-  printf("j: %ld\n", j);
+  name[end] = '\0';
 
   xml_element *element = get_element(xml, name);
   element->childs = malloc(sizeof(xml_element *) * 5);
