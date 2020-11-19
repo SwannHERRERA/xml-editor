@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<!DOCTYPE classrooms SYSTEM "exemple.dtd">
+<!DOCTYPE classrooms SYSTEM "./xml-test/exemple.dtd">
 <classrooms>
   <classroom>AL</classroom>
   <classroom>IABD</classroom>
