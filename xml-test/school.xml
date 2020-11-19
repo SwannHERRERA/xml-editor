@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+<!DOCTYPE schools [
+<!ELEMENT schools (school+)>
+<!ELEMENT school (classrooms)>
+<!ELEMENT classrooms (classroom+)>
+<!ATTLIST classroom students CDATA>
+<!ATTLIST school name CDATA>
+]>
+
+<schools>
+    <school name="esgi">
+        <classrooms>
+            <classroom students="30">AL</classroom>
+            <classroom students="40">IBD</classroom>
+            <classroom students="25">MOC</classroom>
+            <classroom students="20">IBC</classroom>
+        </classrooms>
+    </school>
+</schools> 
