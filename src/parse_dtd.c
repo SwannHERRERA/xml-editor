@@ -313,6 +313,7 @@ void parse_element_childs(XMLElement *parent, int elements_size, char **elements
         continue;
       }
     }
+    free(element_name);
   }
 }
 
