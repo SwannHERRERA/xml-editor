@@ -57,6 +57,14 @@ int make_attributes(char *tag, char *subject, xml_element *element)
     }
     i += 1;
   }
+  if (tmp[i - 1] == '/')
+  {
+    element->autoclosing = true;
+  }
+  else
+  {
+    element->autoclosing = false;
+  }
   element->attributes = head;
   i += 1; // skip >
   return i;
@@ -117,7 +125,10 @@ void print_element(xml_element *element)
   {
     print_element(element->childs[i]);
   }
-  printf("%s\n", element->content);
+  if (element->autoclosing == false)
+  {
+    printf("%s\n", element->content);
+  }
   printf("\n");
 }
 
@@ -145,7 +156,7 @@ void free_element(xml_element *element)
   free(element);
 }
 
-char *found_start(char *xml, xml_element *element)
+char *find_start(char *xml, xml_element *element)
 {
   int length_of_opening_tag = strlen(element->name) + (2 * sizeof(char));
   char tmp[length_of_opening_tag];
@@ -173,10 +184,13 @@ xml_element *get_element(char *xml, char *tag_name)
   strcpy(element->name, tag_name);
   element->number_of_attribute = 0;
   create_empty_xml_attribute_linkedlist(element);
-  xml = found_start(xml, element);
+  xml = find_start(xml, element);
   index_of_opening_tag = make_attributes(tag_name, xml, element);
   char *start = xml + sizeof(char) * index_of_opening_tag;
-  get_content(start, element);
+  if (element->autoclosing == false)
+  {
+    get_content(start, element);
+  }
   // print_element(element);
   // free_element(element);
   return element;
@@ -200,20 +214,24 @@ xml_element *get_next_element(char *xml, xml_element *parent, int deepness)
   int start, end;
   char *name;
   long max_size = strlen(xml);
-  while (!isspace(xml[i]) && xml[i] != '>' && i < max_size)
+  while (!isspace(xml[i]) && xml[i] != '>' && xml[i] != '/' && i < max_size)
   {
     i += 1;
   }
   start = 1;
-  end = i;
-  name = malloc(sizeof(char) * (end - start));
-  strncpy(name, xml + start, end - start);
+  end = i - start;
+
+  name = malloc(sizeof(char) * end);
+  strncpy(name, xml + start, end);
+  name[end] = '\0';
+
   xml_element *element = get_element(xml, name);
   element->childs = malloc(sizeof(xml_element *) * 5);
   element->childs_count = 0;
   element->childs_capacity = 5;
   element->parent = parent;
   element->deepness = deepness;
+
   if (parent != NULL)
   {
     if (parent->childs_count == parent->childs_capacity)
@@ -317,7 +335,14 @@ xml_element *parse_xml(char *xml)
       {
         root = current_element;
       }
-      deepness += 1;
+      if (current_element->autoclosing == false)
+      {
+        deepness += 1;
+      }
+      else
+      {
+        current_element = current_element->parent;
+      }
     }
     xml = xml + sizeof(char) * 1;
   }

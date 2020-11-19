@@ -1,5 +1,4 @@
-#include "parse_dtd.h"
-#include "parse_xml.h"
+#include "check_xml_corresponding.h"
 #include "interface.h"
 
 /**
@@ -32,12 +31,21 @@ int main(int argc, char **argv)
   print_element(root);
   printf("\n######## Finished PARSE XML ########\n");
 
+  if (check_dtd_correspond_to_xml(dtd, root))
+  {
+    printf("XML is corresponding to DTD\n");
+  }
+  else
+  {
+    printf("XML is NOT corresponding to DTD\n");
+  }
+
   free_DTD(dtd);
   free_element(root);
   free(xml);
   fclose(file);
   free(dtd_string);
   free(root_name);
-  //init_interface(&argc, &argv);
+  // init_interface(&argc, &argv);
   return EXIT_SUCCESS;
 }
