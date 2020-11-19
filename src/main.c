@@ -1,8 +1,6 @@
 #include "check_xml_corresponding.h"
 #include "interface.h"
 
-bool check_dtd_correspond_to_xml(XMLElement *dtd, xml_element *root);
-bool check_element_is_correct(XMLElement *dtd_element, xml_element *element);
 /**
  * I use ARGV to give relative path to xml
  */
