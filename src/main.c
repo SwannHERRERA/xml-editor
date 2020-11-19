@@ -40,12 +40,15 @@ int main(int argc, char **argv)
     printf("XML is NOT corresponding to DTD\n");
   }
 
-  free_DTD(dtd);
+  if (dtd != NULL)
+  {
+    free_DTD(dtd);
+  }
   free_element(root);
   free(xml);
   fclose(file);
   free(dtd_string);
   free(root_name);
-  // init_interface(&argc, &argv);
+  init_interface(&argc, &argv);
   return EXIT_SUCCESS;
 }

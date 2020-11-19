@@ -30,9 +30,11 @@ void connect_widgets(GtkBuilder *builder, GuiData *data)
   data->widgets->items->quit_button = GTK_MENU_ITEM(gtk_builder_get_object(builder, "exit_app"));
   data->widgets->items->save_file = GTK_MENU_ITEM(gtk_builder_get_object(builder, "save_file"));
   data->widgets->items->open_file = GTK_MENU_ITEM(gtk_builder_get_object(builder, "open_file"));
+  data->widgets->items->save_file_as = GTK_MENU_ITEM(gtk_builder_get_object(builder, "save_file_as"));
   g_signal_connect(data->widgets->window, "destroy", (GCallback)gtk_main_quit, NULL);
   g_signal_connect(data->widgets->items->open_file, "activate", (GCallback)menu_button_open_file, (gpointer)data);
   g_signal_connect(data->widgets->items->save_file, "activate", (GCallback)menu_button_save_file, (gpointer)data);
+  g_signal_connect(data->widgets->items->save_file_as, "activate", (GCallback)menu_button_save_file_as, (gpointer)data);
 }
 
 void raise_error(char *buffer)
@@ -74,6 +76,10 @@ void menu_button_save_file(GtkWidget *widget, gpointer data)
 {
   printf("Saving file\n");
   GuiData *gui_data = (GuiData *)data;
+  if (gui_data->file_name == NULL)
+  {
+    menu_button_save_file_as(widget, data);
+  }
   if (gui_data->file_name != NULL)
   {
     GtkTextIter start, end;
@@ -86,6 +92,29 @@ void menu_button_save_file(GtkWidget *widget, gpointer data)
       free(str);
     }
   }
+}
+
+void menu_button_save_file_as(GtkWidget *widget, gpointer data)
+{
+  printf("Saving file as\n");
+  GuiData *gui_data = (GuiData *)data;
+  GtkWidget *dialog = gtk_file_chooser_dialog_new("Save File", gui_data->widgets->window, GTK_FILE_CHOOSER_ACTION_SAVE, "Cancel", GTK_RESPONSE_CANCEL, "Save", GTK_RESPONSE_ACCEPT, NULL);
+  gtk_file_chooser_set_do_overwrite_confirmation(GTK_FILE_CHOOSER(dialog), TRUE);
+  gint res = gtk_dialog_run(GTK_DIALOG(dialog));
+  if (res == GTK_RESPONSE_ACCEPT)
+  {
+    gui_data->file_name = gtk_file_chooser_get_filename(GTK_FILE_CHOOSER(dialog));
+    GtkTextIter start, end;
+    GtkTextBuffer *buffer = gtk_text_view_get_buffer(gui_data->widgets->main_text_view);
+    gtk_text_buffer_get_bounds(buffer, &start, &end);
+    char *str = gtk_text_buffer_get_text(buffer, &start, &end, FALSE);
+    save_to_file(gui_data->file_name, str);
+    if (str != NULL)
+    {
+      free(str);
+    }
+  }
+  gtk_widget_destroy(dialog);
 }
 
 void menu_button_quit()
