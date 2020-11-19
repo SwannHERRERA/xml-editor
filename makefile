@@ -1,6 +1,6 @@
 BUILD_DIR = build/
 CC = gcc
-EXTRAFLAG = -std=c18 -Wall -Wextra -Werror -g
+EXTRAFLAG = -std=c18 -Wall -Wextra  -ggdb
 RMDIR = rm -rf
 SRC = src/
 LIB= `pkg-config gtk+-3.0 --libs --cflags`

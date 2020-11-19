@@ -52,3 +52,5 @@ Mkfile.old
 dkms.conf
 .vscode
 ./ui/main_window.glade~
+ui/main_window.glade~
+ui/#main_window.glade#

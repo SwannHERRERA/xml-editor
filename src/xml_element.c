@@ -14,6 +14,8 @@ XMLElement *create_element(char *name)
   element->childsCapacity = 20;
   element->childs = malloc(sizeof(XMLElement) * element->childsCapacity);
   element->attributes = NULL;
+  element->occurenceFlag = 0;
+  element->occurenceChar = 0;
   if (!element->childs)
   {
     fprintf(stderr, "Failed to allocate memory for {element->childs} [create_element]\n");
@@ -44,11 +46,25 @@ void print_tree(XMLElement *element)
       printf("\t");
     }
     printf("\u255A\u2550\u2550");
-    printf(">%s\n", element->name);
+    printf(">%s %d\n", element->name, element->occurenceFlag);
+    print_attributes(element);
     for (int i = 0; i < element->childsCount; i++)
     {
       print_tree(element->childs[i]);
     }
+  }
+}
+
+void print_attributes(XMLElement *element)
+{
+  XMLAttribute *attrib = element->attributes;
+  while(attrib != NULL){
+    for (int i = 0; i < element->deepness; i++)
+    {
+      printf("\t");
+    }
+    printf("%s\n", attrib->name);
+    attrib = attrib->next;
   }
 }
 

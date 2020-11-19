@@ -136,7 +136,11 @@ void free_element(xml_element *element)
 {
   xml_attribute_linkedlist *tmp = NULL;
   int i;
-
+  for (int i = 0; i < element->childs_count; i++)
+  {
+    free_element(element->childs[i]);
+  }
+  free(element->childs);
   for (i = 0; i < element->number_of_attribute; i += 1)
   {
     free(element->attributes->value->name);
