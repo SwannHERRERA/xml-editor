@@ -20,6 +20,7 @@ char *find_doctype(FILE *file, char **root_name)
   if (is_internal_doctype(doctype))
   {
     char *str = get_between_tokens(doctype, &cursor, "[]");
+    free(doctype);
     return str;
   }
   else
@@ -141,7 +142,6 @@ char *get_between_tokens(char *buffer, size_t *cursor, char *tokens)
     fprintf(stderr, "Invalid DTD, it maybe empty %s\n", tokens);
     return NULL;
   }
-  printf("aaaaaaa  %s %s\n", start, buffer);
   buff = malloc(sizeof(char) * size + 1);
   strncpy(buff, start, size);
   buff[size] = 0;
@@ -203,9 +203,8 @@ int char_count(char *str, char character)
 char **split_string(char *dtd, int *size, char delim)
 {
   char **buffer = NULL;
-  bool no_delim = (strchr(dtd, delim) == NULL ? true : false);
   *size = 0;
-  if (no_delim)
+  if (strchr(dtd, delim) == NULL)
   {
     buffer = malloc(sizeof(char *) * (*size) + 1);
 
@@ -245,10 +244,6 @@ char **split_string(char *dtd, int *size, char delim)
     }
     free(buffer);
     buffer = new_buffer;
-  }
-  for (int i = 0; i < *size; i++)
-  {
-    printf("aaaaaaaaaaaaaaaa %s\n", buffer[i]);
   }
   return buffer;
 }
@@ -314,6 +309,8 @@ void parse_element_childs(XMLElement *parent, int elements_size, char **elements
           set_child_occurence(elements_buffer[i][cursor], child);
         }
         add_element(parent, child);
+        free(element_name);
+        continue;
       }
     }
   }
@@ -462,6 +459,7 @@ XMLElement *parse_sub_element(char *node_name, char **buffer, int buffer_size)
         xml_element = complete_element(buffer, buffer_size, i, name);
         break;
       }
+      free(name);
     }
   }
   return xml_element;
@@ -474,11 +472,15 @@ XMLElement *complete_element(char **buffer, int buffer_size, int index, char *na
   char *elements = get_node_childs(buffer[index], name, &global_occurence_char);
   if (elements != NULL)
   {
-    int elements_size = 1;
+    int elements_size = 0;
     char **elements_buffer = split_string(elements, &elements_size, ',');
     parse_element_childs(xml_element, elements_size, elements_buffer, buffer, buffer_size);
     set_global_child_occurence(global_occurence_char, xml_element);
     parse_attributes(xml_element, buffer, buffer_size);
+    for (int i = 0; i < elements_size; i++)
+    {
+      free(elements_buffer[i]);
+    }
     free(elements_buffer);
     free(elements);
   }
