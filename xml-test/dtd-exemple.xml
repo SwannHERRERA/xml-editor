@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+<!DOCTYPE classrooms SYSTEM "exemple.dtd">
+<classrooms>
+  <classroom>AL</classroom>
+  <classroom>IABD</classroom>
+  <classroom>MOC</classroom>
+  <classroom>IBC</classroom>
+  <classroom>IBC</classroom>
+  <student name="swann" />
+  <carte>
+    <code>
+      <prefix>
+        <valeur>
+          <valeur-interne>12</valeur-iterne>
+        </valeur>
+      </prefix>
+      <suffix>
+        <valeur>
+          <valeur-interne>13</valeur-iterne>
+        </valeur>
+      </suffix>
+    </code>
+  </carte>
+</classrooms>
