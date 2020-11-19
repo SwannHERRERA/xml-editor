@@ -58,7 +58,8 @@ void print_tree(XMLElement *element)
 void print_attributes(XMLElement *element)
 {
   XMLAttribute *attrib = element->attributes;
-  while(attrib != NULL){
+  while (attrib != NULL)
+  {
     for (int i = 0; i < element->deepness; i++)
     {
       printf("\t");

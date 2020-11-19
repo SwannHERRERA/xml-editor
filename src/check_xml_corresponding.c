@@ -32,7 +32,7 @@ bool check_element_is_correct(XMLElement *dtd_element, xml_element *element)
             {
                 is_not_in_dtd = false;
                 tab[j] += 1;
-                if (check_element_is_correct(dtd_element->childs[j], element->childs[i]) == false)
+                if (!check_element_is_correct(dtd_element->childs[j], element->childs[i]) || !check_attributes(dtd_element->childs[j], element->childs[i]))
                 {
                     return false;
                 }
@@ -45,8 +45,6 @@ bool check_element_is_correct(XMLElement *dtd_element, xml_element *element)
             return false;
         }
     }
-
-    // check les attributes
 
     for (i = 0; i < dtd_element->childsCount; i += 1)
     {
@@ -83,4 +81,24 @@ bool check_element_is_correct(XMLElement *dtd_element, xml_element *element)
         }
     }
     return !error;
+}
+
+bool check_attributes(XMLElement *dtd_element, xml_element *element)
+{
+    // TODO
+    /**
+    * Gestion des attributs et de leur ordre,
+    * Gestion de la valeur des attributs
+    */
+    printf("check_attributes\n");
+    XMLAttribute *head_dtd = dtd_element->attributes;
+    xml_attribute_linkedlist *head = element->attributes;
+
+    while (head != NULL && head_dtd != NULL)
+    {
+        printf("dtd: %s element: %s\n", head_dtd->name, head->value->name);
+        head_dtd = head_dtd->next;
+        head = head->next;
+    }
+    return true;
 }

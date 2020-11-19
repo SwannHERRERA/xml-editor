@@ -6,5 +6,6 @@
 
 bool check_dtd_correspond_to_xml(XMLElement *dtd, xml_element *root);
 bool check_element_is_correct(XMLElement *dtd_element, xml_element *element);
+bool check_attributes(XMLElement *dtd_element, xml_element *element);
 
 #endif
