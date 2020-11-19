@@ -1,12 +1,27 @@
 #include "file_helper.h"
 
+void save_to_file(char *file_name, char *buffer)
+{
+  FILE *file = fopen(file_name, "w");
+  if (file == NULL)
+  {
+    fprintf(stderr, "Unable to open file %s to save\n", file_name);
+  }
+  else
+  {
+    fwrite(buffer, sizeof(char), strlen(buffer), file);
+  }
+  fclose(file);
+}
+
 char *file_get_content(FILE *file)
 {
   long size = get_size_of_file(file);
-  char *buffer = (char *)malloc(sizeof(char) * size);
+  char *buffer = (char *)malloc(sizeof(char) * size+1);
   if (buffer)
   {
     fread(buffer, sizeof(char), size, file);
+    buffer[size] = 0;
   }
   else
   {
