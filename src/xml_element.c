@@ -99,6 +99,19 @@ void add_attribute(XMLElement *element, char *name, AttributeValue value, Attrib
   element->numberOfAttribute += 1;
 }
 
+XMLAttribute **attributes_dtd_to_array(XMLElement *element)
+{
+  XMLAttribute **res = malloc(sizeof(XMLAttribute *) * element->numberOfAttribute);
+  XMLAttribute *head = element->attributes;
+
+  for (unsigned int i = 0; i < element->numberOfAttribute; i += 1)
+  {
+    res[i] = head;
+    head = head->next;
+  }
+  return res;
+}
+
 void free_DTD(XMLElement *root)
 {
   free_XMLElement(root);

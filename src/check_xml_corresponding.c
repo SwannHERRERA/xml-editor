@@ -32,7 +32,7 @@ bool check_element_is_correct(XMLElement *dtd_element, xml_element *element)
             {
                 is_not_in_dtd = false;
                 tab[j] += 1;
-                if (!check_element_is_correct(dtd_element->childs[j], element->childs[i]) || !check_attributes(dtd_element->childs[j], element->childs[i]))
+                if (!check_element_is_correct(dtd_element->childs[j], element->childs[i]) || check_error_attributes(dtd_element->childs[j], element->childs[i]))
                 {
                     return false;
                 }
@@ -83,15 +83,53 @@ bool check_element_is_correct(XMLElement *dtd_element, xml_element *element)
     return !error;
 }
 
-bool check_attributes(XMLElement *dtd_element, xml_element *element)
+bool check_error_attributes(XMLElement *dtd_element, xml_element *element)
 {
     // TODO
     /**
-    * Gestion des attributs et de leur ordre,
     * Gestion de la valeur des attributs
     */
-    printf("count attribute%d\n", element->number_of_attribute);
-    printf("count dtd_attribute%d\n", dtd_element->numberOfAttribute);
+    unsigned int i, j;
+    bool attribute_exist;
+    bool error = false;
+    xml_attribute **attributes = attributes_to_array(element);
+    XMLAttribute **dtd_attributes = attributes_dtd_to_array(dtd_element);
+    int tab[element->number_of_attribute];
+    for (i = 0; i < dtd_element->numberOfAttribute; i += 1)
+    {
+        tab[i] = 0;
+    }
+    for (j = 0; j < element->number_of_attribute; j += 1)
+    {
+        attribute_exist = false;
+        for (i = 0; i < dtd_element->numberOfAttribute; i += 1)
+        {
+            printf("attrbute:%s len:%ld dtd:%s len:%ld\n",
+                   attributes[j]->name,
+                   strlen(attributes[j]->name),
+                   dtd_attributes[i]->name,
+                   strlen(dtd_attributes[i]->name));
+            if (strcmp(dtd_attributes[i]->name, attributes[j]->name) == 0)
+            {
+                tab[j] = 1;
+                attribute_exist = true;
+            }
+        }
+        if (!attribute_exist)
+        {
+            error = true;
+            fprintf(stderr, "%s is not in dtd\n", attributes[j]->name);
+        }
+    }
+    for (i = 0; i < dtd_element->numberOfAttribute; i += 1)
+    {
+        if (tab[i] != 1)
+        {
+            error = true;
+            fprintf(stderr, "error %s\n", dtd_attributes[i]->name);
+        }
+    }
+    printf("\n");
 
-    return true;
+    return error;
 }

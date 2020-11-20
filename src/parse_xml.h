@@ -53,5 +53,6 @@ bool is_autoclosing_tag(xml_element *element);
 xml_element *get_next_element(char *xml, xml_element *parent, int deepness);
 void realloc_childs(xml_element *element);
 char *find_start(char *xml, xml_element *element);
+xml_attribute **attributes_to_array(xml_element *element);
 
 #endif
