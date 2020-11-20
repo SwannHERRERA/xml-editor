@@ -36,6 +36,7 @@ typedef struct xml_element
 } xml_element;
 
 void create_empty_xml_attribute_linkedlist(xml_element *element);
+size_t count_attribute(xml_element *element);
 void print_attribute(xml_element *element);
 void print_element(xml_element *element);
 void get_content(char *subject, xml_element *element);

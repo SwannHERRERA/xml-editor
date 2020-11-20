@@ -38,6 +38,7 @@ void add_element(XMLElement *parent, XMLElement *child);
 void add_attribute(XMLElement *element, char *name, AttributeValue value, AttributeType type);
 void free_XMLElement(XMLElement *element);
 void free_DTD(XMLElement *root);
+size_t count_dtd_attribute(XMLElement *element);
 
 struct XMLElement
 {

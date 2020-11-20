@@ -126,3 +126,15 @@ void free_XMLElement(XMLElement *element)
   free(element->name);
   free(element);
 }
+
+size_t count_attribute(XMLElement *element)
+{
+  size_t count = 0;
+  XMLAttribute *first = element->attributes;
+  while (first != NULL)
+  {
+    count += 1;
+    first = first->next;
+  }
+  return count;
+}
