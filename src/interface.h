@@ -2,6 +2,8 @@
 #define _interface_h_
 #include <gtk/gtk.h>
 #include "file_helper.h"
+#include "parse_dtd.h"
+#include "parse_xml.h"
 
 typedef struct
 {

@@ -133,4 +133,41 @@ void text_view_populate_popup_menu(GtkWidget *widget, GtkWidget *popup, gpointer
 void start_xml_validation(GtkWidget *widget, gpointer data)
 {
   printf("Validating XML\n");
+  GuiData *gui_data = (GuiData *)data;
+  if (gui_data->file_name == NULL)
+  {
+    fprintf(stderr, "Error opening file try saving it first\n");
+    return;
+  }
+  GtkTextIter start, end;
+  GtkTextBuffer *buffer = gtk_text_view_get_buffer(gui_data->widgets->main_text_view);
+  gtk_text_buffer_get_bounds(buffer, &start, &end);
+  char *str = gtk_text_buffer_get_text(buffer, &start, &end, FALSE);
+  char *root_name;
+  char *dtd_string = find_doctype(str, &root_name);
+  XMLElement *dtd = parse_dtd(dtd_string, root_name);
+
+  printf("\n######## Starting PARSE XML ########\n");
+
+  xml_element *root = parse_xml(str);
+  print_element(root);
+  printf("\n######## Finished PARSE XML ########\n");
+
+  if (check_dtd_correspond_to_xml(dtd, root))
+  {
+    printf("XML is corresponding to DTD\n");
+  }
+  else
+  {
+    printf("XML is NOT corresponding to DTD\n");
+  }
+
+  if (dtd != NULL)
+  {
+    free_DTD(dtd);
+  }
+  free_element(root);
+  free(str);
+  free(dtd_string);
+  free(root_name);
 }

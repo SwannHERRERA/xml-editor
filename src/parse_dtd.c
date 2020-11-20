@@ -1,9 +1,8 @@
 #include "parse_dtd.h"
 
 // TODO attention http
-char *find_doctype(FILE *file, char **root_name)
+char *find_doctype(char *buffer, char **root_name)
 {
-  char *buffer = file_get_content(file);
   char *start = strstr(buffer, "<!DOCTYPE ");
   long size_of_doctype = get_size_of_doctype(start);
   char *doctype = (char *)malloc(sizeof(char) * size_of_doctype + 1);
@@ -16,7 +15,6 @@ char *find_doctype(FILE *file, char **root_name)
   size_t cursor = strlen("<!DOCTYPE ");
   *root_name = get_next_name(strstr(buffer, "<!DOCTYPE "), &cursor);
   doctype[(int)size_of_doctype] = 0;
-  free(buffer);
   if (is_internal_doctype(doctype))
   {
     char *str = get_between_tokens(doctype, &cursor, "[]");
@@ -220,16 +218,16 @@ char **split_string(char *dtd, int *size, char delim)
     return buffer;
   }
   buffer = malloc(sizeof(char *) * (*size) + 1);
-  char *str_new = strtok(dtd, &delim);
-  if (str_new != NULL)
+  char *str = strtok(dtd, &delim);
+  if (str != NULL)
   {
-    buffer[*size] = malloc(sizeof(char) * strlen(str_new) + 1);
-    strcpy(buffer[*size], str_new);
-    buffer[*size][strlen(str_new)] = 0;
+    buffer[*size] = malloc(sizeof(char) * strlen(str) + 1);
+    strcpy(buffer[*size], str);
+    buffer[*size][strlen(str)] = 0;
   }
-  while (buffer[*size] != NULL)
+  while (str != NULL)
   {
-    char *str = strtok(NULL, &delim);
+    str = strtok(NULL, &delim);
     *size += 1;
     char **new_buffer = malloc(sizeof(char *) * (*size) + 1);
     for (int i = 0; i < *size; i++)
@@ -241,9 +239,12 @@ char **split_string(char *dtd, int *size, char delim)
       new_buffer[*size] = malloc(sizeof(char) * strlen(str) + 1);
       strcpy(new_buffer[*size], str);
       new_buffer[*size][strlen(str)] = 0;
+      free(buffer);
+      buffer = new_buffer;
     }
-    free(buffer);
-    buffer = new_buffer;
+  }
+  for(int i = 0; i< *size;i++){
+    printf("aaaaaaaaaaaaaaaaaaaaaaaaa %s\n",buffer[i]);
   }
   return buffer;
 }
