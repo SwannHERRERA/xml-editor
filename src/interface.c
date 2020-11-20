@@ -31,10 +31,14 @@ void connect_widgets(GtkBuilder *builder, GuiData *data)
   data->widgets->items->save_file = GTK_MENU_ITEM(gtk_builder_get_object(builder, "save_file"));
   data->widgets->items->open_file = GTK_MENU_ITEM(gtk_builder_get_object(builder, "open_file"));
   data->widgets->items->save_file_as = GTK_MENU_ITEM(gtk_builder_get_object(builder, "save_file_as"));
+  data->widgets->items->validate_xml = GTK_MENU_ITEM(gtk_builder_get_object(builder, "validate_xml"));
   g_signal_connect(data->widgets->window, "destroy", (GCallback)gtk_main_quit, NULL);
+  g_signal_connect(data->widgets->main_text_view, "populate-popup", (GCallback)text_view_populate_popup_menu, (gpointer)data);
+  g_signal_connect(data->widgets->items->quit_button, "activate", (GCallback)gtk_main_quit, NULL);
   g_signal_connect(data->widgets->items->open_file, "activate", (GCallback)menu_button_open_file, (gpointer)data);
   g_signal_connect(data->widgets->items->save_file, "activate", (GCallback)menu_button_save_file, (gpointer)data);
   g_signal_connect(data->widgets->items->save_file_as, "activate", (GCallback)menu_button_save_file_as, (gpointer)data);
+  g_signal_connect(data->widgets->items->validate_xml, "activate", (GCallback)start_xml_validation, (gpointer)data);
 }
 
 void raise_error(char *buffer)
@@ -98,7 +102,7 @@ void menu_button_save_file_as(GtkWidget *widget, gpointer data)
 {
   printf("Saving file as\n");
   GuiData *gui_data = (GuiData *)data;
-  GtkWidget *dialog = gtk_file_chooser_dialog_new("Save File", gui_data->widgets->window, GTK_FILE_CHOOSER_ACTION_SAVE, "Cancel", GTK_RESPONSE_CANCEL, "Save", GTK_RESPONSE_ACCEPT, NULL);
+  GtkWidget *dialog = gtk_file_chooser_dialog_new("Save file as", gui_data->widgets->window, GTK_FILE_CHOOSER_ACTION_SAVE, "Cancel", GTK_RESPONSE_CANCEL, "Save", GTK_RESPONSE_ACCEPT, NULL);
   gtk_file_chooser_set_do_overwrite_confirmation(GTK_FILE_CHOOSER(dialog), TRUE);
   gint res = gtk_dialog_run(GTK_DIALOG(dialog));
   if (res == GTK_RESPONSE_ACCEPT)
@@ -117,8 +121,16 @@ void menu_button_save_file_as(GtkWidget *widget, gpointer data)
   gtk_widget_destroy(dialog);
 }
 
-void menu_button_quit()
+void text_view_populate_popup_menu(GtkWidget *widget, GtkWidget *popup, gpointer data)
 {
-  printf("Exiting program\n");
-  exit(0);
+  GuiData *gui_data = (GuiData *)data;
+  GtkWidget *item = gtk_menu_item_new_with_label("Validate");
+  gtk_menu_attach(GTK_MENU(popup), item, 0, 1, 7, 8);
+  g_signal_connect(item, "activate", (GCallback)start_xml_validation, (gpointer)data);
+  gtk_widget_show_all(popup);
+}
+
+void start_xml_validation(GtkWidget *widget, gpointer data)
+{
+  printf("Validating XML\n");
 }
