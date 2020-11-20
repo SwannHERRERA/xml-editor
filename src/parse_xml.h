@@ -24,7 +24,7 @@ struct xml_attribute_linkedlist
 typedef struct xml_element
 {
   char *name;
-  int number_of_attribute;
+  unsigned int number_of_attribute;
   xml_attribute_linkedlist *attributes;
   char *content;
   struct xml_element *parent;
@@ -36,7 +36,6 @@ typedef struct xml_element
 } xml_element;
 
 void create_empty_xml_attribute_linkedlist(xml_element *element);
-size_t count_attribute(xml_element *element);
 void print_attribute(xml_element *element);
 void print_element(xml_element *element);
 void get_content(char *subject, xml_element *element);

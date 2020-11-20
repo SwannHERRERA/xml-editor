@@ -90,15 +90,8 @@ bool check_attributes(XMLElement *dtd_element, xml_element *element)
     * Gestion des attributs et de leur ordre,
     * Gestion de la valeur des attributs
     */
-    printf("check_attributes\n");
-    XMLAttribute *head_dtd = dtd_element->attributes;
-    xml_attribute_linkedlist *head = element->attributes;
+    printf("count attribute%d\n", element->number_of_attribute);
+    printf("count dtd_attribute%d\n", dtd_element->numberOfAttribute);
 
-    while (head != NULL && head_dtd != NULL)
-    {
-        printf("dtd: %s element: %s\n", head_dtd->name, head->value->name);
-        head_dtd = head_dtd->next;
-        head = head->next;
-    }
     return true;
 }

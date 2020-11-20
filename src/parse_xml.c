@@ -78,18 +78,6 @@ void create_empty_xml_attribute_linkedlist(xml_element *element)
   element->attributes->next = NULL;
 }
 
-size_t count_attribute(xml_element *element)
-{
-  size_t count = 0;
-  xml_attribute_linkedlist *first = element->attributes;
-  while (first != NULL)
-  {
-    count += 1;
-    first = first->next;
-  }
-  return count;
-}
-
 void print_attribute(xml_element *element)
 {
   int i = 0;

@@ -95,6 +95,8 @@ void add_attribute(XMLElement *element, char *name, AttributeValue value, Attrib
   new->name = name;
   new->type = type;
   new->value = value;
+
+  element->numberOfAttribute += 1;
 }
 
 void free_DTD(XMLElement *root)
@@ -125,16 +127,4 @@ void free_XMLElement(XMLElement *element)
   free(element->childs);
   free(element->name);
   free(element);
-}
-
-size_t count_attribute(XMLElement *element)
-{
-  size_t count = 0;
-  XMLAttribute *first = element->attributes;
-  while (first != NULL)
-  {
-    count += 1;
-    first = first->next;
-  }
-  return count;
 }
