@@ -20,7 +20,6 @@ int make_attributes(char *tag, char *subject, xml_element *element)
 
   xml_attribute_linkedlist *head = element->attributes;
 
-  // Care about <b attr=">">
   while (tmp[i] != '>')
   {
     if (tmp[i] == '=')
@@ -36,6 +35,7 @@ int make_attributes(char *tag, char *subject, xml_element *element)
       }
       attr->name = calloc(counter, sizeof(char));
       strncpy(attr->name, tmp + i - counter, counter);
+      attr->name[counter] = '\0';
 
       i += 2; // skip ="
       j = i;
@@ -45,6 +45,7 @@ int make_attributes(char *tag, char *subject, xml_element *element)
       }
       attr->value = calloc(j - i, sizeof(char));
       strncpy(attr->value, tmp + i, j - i);
+      attr->name[j] = '\0';
 
       element->attributes->value = attr;
       element->attributes = create_next_element(element->attributes);
