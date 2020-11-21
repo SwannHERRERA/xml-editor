@@ -1,5 +1,4 @@
 #include "check_xml_corresponding.h"
-#include "interface.h"
 
 /**
  * I use ARGV to give relative path to xml
@@ -45,6 +44,5 @@ int main(int argc, char **argv)
   fclose(file);
   free(dtd_string);
   free(root_name);
-  // init_interface(&argc, &argv);
   return EXIT_SUCCESS;
 }
