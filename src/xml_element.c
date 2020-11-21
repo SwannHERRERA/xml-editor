@@ -58,7 +58,8 @@ void print_tree(XMLElement *element)
 void print_attributes(XMLElement *element)
 {
   XMLAttribute *attrib = element->attributes;
-  while(attrib != NULL){
+  while (attrib != NULL)
+  {
     for (int i = 0; i < element->deepness; i++)
     {
       printf("\t");
@@ -94,6 +95,21 @@ void add_attribute(XMLElement *element, char *name, AttributeValue value, Attrib
   new->name = name;
   new->type = type;
   new->value = value;
+
+  element->numberOfAttribute += 1;
+}
+
+XMLAttribute **attributes_dtd_to_array(XMLElement *element)
+{
+  XMLAttribute **res = malloc(sizeof(XMLAttribute *) * element->numberOfAttribute);
+  XMLAttribute *head = element->attributes;
+
+  for (unsigned int i = 0; i < element->numberOfAttribute; i += 1)
+  {
+    res[i] = head;
+    head = head->next;
+  }
+  return res;
 }
 
 void free_DTD(XMLElement *root)

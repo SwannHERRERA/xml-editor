@@ -24,7 +24,7 @@ struct xml_attribute_linkedlist
 typedef struct xml_element
 {
   char *name;
-  int number_of_attribute;
+  unsigned int number_of_attribute;
   xml_attribute_linkedlist *attributes;
   char *content;
   struct xml_element *parent;
@@ -53,5 +53,6 @@ bool is_autoclosing_tag(xml_element *element);
 xml_element *get_next_element(char *xml, xml_element *parent, int deepness);
 void realloc_childs(xml_element *element);
 char *find_start(char *xml, xml_element *element);
+xml_attribute **attributes_to_array(xml_element *element);
 
 #endif

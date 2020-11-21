@@ -20,7 +20,6 @@ int make_attributes(char *tag, char *subject, xml_element *element)
 
   xml_attribute_linkedlist *head = element->attributes;
 
-  // Care about <b attr=">">
   while (tmp[i] != '>')
   {
     if (tmp[i] == '=')
@@ -34,8 +33,10 @@ int make_attributes(char *tag, char *subject, xml_element *element)
         j -= 1;
         counter += 1;
       }
+      counter -= 1;
       attr->name = calloc(counter, sizeof(char));
       strncpy(attr->name, tmp + i - counter, counter);
+      attr->name[counter] = '\0';
 
       i += 2; // skip ="
       j = i;
@@ -45,6 +46,7 @@ int make_attributes(char *tag, char *subject, xml_element *element)
       }
       attr->value = calloc(j - i, sizeof(char));
       strncpy(attr->value, tmp + i, j - i);
+      attr->name[j] = '\0';
 
       element->attributes->value = attr;
       element->attributes = create_next_element(element->attributes);
@@ -77,9 +79,22 @@ void create_empty_xml_attribute_linkedlist(xml_element *element)
   element->attributes->next = NULL;
 }
 
+xml_attribute **attributes_to_array(xml_element *element)
+{
+  xml_attribute **res = malloc(sizeof(xml_attribute_linkedlist *) * element->number_of_attribute);
+  xml_attribute_linkedlist *head = element->attributes;
+
+  for (unsigned int i = 0; i < element->number_of_attribute; i += 1)
+  {
+    res[i] = head->value;
+    head = head->next;
+  }
+  return res;
+}
+
 void print_attribute(xml_element *element)
 {
-  int i = 0;
+  unsigned int i = 0;
   xml_attribute_linkedlist *head = element->attributes;
   printf("number of attributes: %d\n", element->number_of_attribute);
   for (i = 0; i < element->number_of_attribute; i += 1)
@@ -135,10 +150,10 @@ void print_element(xml_element *element)
 void free_element(xml_element *element)
 {
   xml_attribute_linkedlist *tmp = NULL;
-  int i;
-  for (int i = 0; i < element->childs_count; i++)
+  unsigned int i;
+  for (int j = 0; j < element->childs_count; j += 1)
   {
-    free_element(element->childs[i]);
+    free_element(element->childs[j]);
   }
   free(element->childs);
   for (i = 0; i < element->number_of_attribute; i += 1)
