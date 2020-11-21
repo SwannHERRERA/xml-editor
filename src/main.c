@@ -15,7 +15,6 @@ int main(int argc, char **argv)
   FILE *file = fopen(argv[1], "r");
   if (file == NULL)
   {
-    fclose(file);
     fprintf(stderr, "Error opening file %s\n", argv[1]);
     return EXIT_FAILURE;
   }
@@ -28,7 +27,7 @@ int main(int argc, char **argv)
   fseek(file, 0L, SEEK_SET);
   char *xml = file_get_content(file);
   xml_element *root = parse_xml(xml);
-  print_element(root);
+  // print_element(root);
   printf("\n######## Finished PARSE XML ########\n");
 
   if (check_dtd_correspond_to_xml(dtd, root))

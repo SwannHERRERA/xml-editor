@@ -38,6 +38,7 @@ void add_element(XMLElement *parent, XMLElement *child);
 void add_attribute(XMLElement *element, char *name, AttributeValue value, AttributeType type);
 void free_XMLElement(XMLElement *element);
 void free_DTD(XMLElement *root);
+XMLAttribute **attributes_dtd_to_array(XMLElement *element);
 
 struct XMLElement
 {
@@ -48,6 +49,7 @@ struct XMLElement
   int deepness;
   int childsCount;
   int childsCapacity;
+  unsigned int numberOfAttribute;
   unsigned char occurenceFlag;
   char occurenceChar;
 };
