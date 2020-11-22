@@ -17,8 +17,8 @@ int make_attributes(char *tag, char *subject, xml_element *element)
   strcpy(tmp, "<");
   start = strstr(subject, strcat(tmp, tag));
   tmp = start;
-
-  xml_attribute_linkedlist *head = element->attributes;
+  bool is_first = true;
+  xml_attribute_linkedlist *head = NULL;
 
   while (tmp[i] != '>')
   {
@@ -28,6 +28,12 @@ int make_attributes(char *tag, char *subject, xml_element *element)
       xml_attribute *attr = malloc(sizeof(xml_attribute));
       j = i;
       counter = 0;
+      if (is_first)
+      {
+        is_first = false;
+        create_empty_xml_attribute_linkedlist(element);
+        head = element->attributes;
+      }
       while (tmp[j] != ' ')
       {
         j -= 1;
@@ -203,7 +209,6 @@ xml_element *get_element(char *xml, char *tag_name)
   element->name = malloc(sizeof(char) * strlen(tag_name));
   strcpy(element->name, tag_name);
   element->number_of_attribute = 0;
-  create_empty_xml_attribute_linkedlist(element);
   xml = find_start(xml, element);
   index_of_opening_tag = make_attributes(tag_name, xml, element);
   char *start = xml + sizeof(char) * index_of_opening_tag;
