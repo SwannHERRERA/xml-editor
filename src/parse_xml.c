@@ -13,39 +13,38 @@ int make_attributes(char *tag, char *subject, xml_element *element)
 {
   char *start;
   size_t i = 0, j = 0, counter;
-  char *tmp = (char *)calloc(strlen(tag) + 1, sizeof(char));
+  char *tmp = malloc(sizeof(char) * (strlen(tag) + 1));
   strcpy(tmp, "<");
   start = strstr(subject, strcat(tmp, tag));
-  tmp = start;
 
   xml_attribute_linkedlist *head = element->attributes;
 
-  while (tmp[i] != '>')
+  while (start[i] != '>')
   {
-    if (tmp[i] == '=')
+    if (start[i] == '=')
     {
       element->number_of_attribute += 1;
       xml_attribute *attr = malloc(sizeof(xml_attribute));
       j = i;
       counter = 0;
-      while (tmp[j] != ' ')
+      while (start[j] != ' ')
       {
         j -= 1;
         counter += 1;
       }
       counter -= 1;
       attr->name = calloc(counter, sizeof(char));
-      strncpy(attr->name, tmp + i - counter, counter);
+      strncpy(attr->name, start + i - counter, counter);
       attr->name[counter] = '\0';
 
       i += 2; // skip ="
       j = i;
-      while (tmp[j] != '"' && tmp[j] != '\'' && j < strlen(tmp))
+      while (start[j] != '"' && start[j] != '\'' && j < strlen(start))
       {
         j += 1;
       }
       attr->value = calloc(j - i, sizeof(char));
-      strncpy(attr->value, tmp + i, j - i);
+      strncpy(attr->value, start + i, j - i);
       attr->name[j] = '\0';
 
       element->attributes->value = attr;
@@ -59,7 +58,7 @@ int make_attributes(char *tag, char *subject, xml_element *element)
     }
     i += 1;
   }
-  if (tmp[i - 1] == '/')
+  if (start[i - 1] == '/')
   {
     element->autoclosing = true;
   }
@@ -67,6 +66,7 @@ int make_attributes(char *tag, char *subject, xml_element *element)
   {
     element->autoclosing = false;
   }
+  free(start);
   element->attributes = head;
   i += 1; // skip >
   return i;
@@ -115,6 +115,11 @@ void get_content(char *subject, xml_element *element)
   strcat(closing_tag, element->name);
   strcat(closing_tag, ">");
   char *end = strstr(content, closing_tag);
+  if (end == NULL)
+  {
+    fprintf(stderr, "%s n'a pas de balise fermante\n", element->name);
+    exit(EXIT_FAILURE);
+  }
   end[0] = '\0';
   element->content = content;
 }
