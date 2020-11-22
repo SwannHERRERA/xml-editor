@@ -56,6 +56,10 @@ void menu_button_open_file(GtkWidget *widget, gpointer data)
   gint res = gtk_dialog_run(GTK_DIALOG(dialog));
   if (res == GTK_RESPONSE_ACCEPT)
   {
+    if (gui_data->file_name != NULL)
+    {
+      free(gui_data->file_name);
+    }
     gui_data->file_name = gtk_file_chooser_get_filename(GTK_FILE_CHOOSER(dialog));
     printf("File selected : %s \n", gui_data->file_name);
     FILE *file = fopen(gui_data->file_name, "r");
@@ -107,6 +111,10 @@ void menu_button_save_file_as(GtkWidget *widget, gpointer data)
   gint res = gtk_dialog_run(GTK_DIALOG(dialog));
   if (res == GTK_RESPONSE_ACCEPT)
   {
+    if (gui_data->file_name != NULL)
+    {
+      free(gui_data->file_name);
+    }
     gui_data->file_name = gtk_file_chooser_get_filename(GTK_FILE_CHOOSER(dialog));
     GtkTextIter start, end;
     GtkTextBuffer *buffer = gtk_text_view_get_buffer(gui_data->widgets->main_text_view);
@@ -123,7 +131,6 @@ void menu_button_save_file_as(GtkWidget *widget, gpointer data)
 
 void text_view_populate_popup_menu(GtkWidget *widget, GtkWidget *popup, gpointer data)
 {
-  GuiData *gui_data = (GuiData *)data;
   GtkWidget *item = gtk_menu_item_new_with_label("Validate");
   gtk_menu_attach(GTK_MENU(popup), item, 0, 1, 7, 8);
   g_signal_connect(item, "activate", (GCallback)start_xml_validation, (gpointer)data);

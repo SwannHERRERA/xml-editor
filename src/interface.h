@@ -4,6 +4,7 @@
 #include "file_helper.h"
 #include "parse_dtd.h"
 #include "parse_xml.h"
+#include "check_xml_corresponding.h"
 
 typedef struct
 {
