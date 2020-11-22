@@ -112,6 +112,11 @@ void get_content(char *subject, xml_element *element)
   strcat(closing_tag, element->name);
   strcat(closing_tag, ">");
   char *end = strstr(content, closing_tag);
+  if (end == NULL)
+  {
+    fprintf(stderr, "%s n'a pas de balise fermante\n", element->name);
+    exit(EXIT_FAILURE);
+  }
   end[0] = '\0';
   element->content = content;
   free(closing_tag);
