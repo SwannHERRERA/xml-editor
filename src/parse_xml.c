@@ -1,11 +1,12 @@
 #include "parse_xml.h"
 
-xml_attribute_linkedlist *create_next_element(xml_attribute_linkedlist *head)
+xml_attribute_linkedlist *create_next_element(xml_element *element)
 {
   xml_attribute_linkedlist *new_attribute = malloc(sizeof(xml_attribute_linkedlist));
-  new_attribute->next = NULL;
+  new_attribute->next = element->attributes;
+  element->attributes = new_attribute;
+  element->number_of_attribute += 1;
   new_attribute->value = NULL;
-  head->next = new_attribute;
   return new_attribute;
 }
 
@@ -16,40 +17,37 @@ int make_attributes(char *tag, char *subject, xml_element *element)
   char *tmp = (char *)calloc(strlen(tag) + 1, sizeof(char));
   strcpy(tmp, "<");
   start = strstr(subject, strcat(tmp, tag));
-  tmp = start;
+  free(tmp);
 
-  xml_attribute_linkedlist *head = element->attributes;
-
-  while (tmp[i] != '>')
+  while (start[i] != '>')
   {
-    if (tmp[i] == '=')
+    if (start[i] == '=')
     {
-      element->number_of_attribute += 1;
       xml_attribute *attr = malloc(sizeof(xml_attribute));
       j = i;
       counter = 0;
-      while (tmp[j] != ' ')
+      while (start[j] != ' ')
       {
         j -= 1;
         counter += 1;
       }
       counter -= 1;
       attr->name = calloc(counter, sizeof(char));
-      strncpy(attr->name, tmp + i - counter, counter);
+      strncpy(attr->name, start + i - counter, counter);
       attr->name[counter] = '\0';
 
       i += 2; // skip ="
       j = i;
-      while (tmp[j] != '"' && tmp[j] != '\'' && j < strlen(tmp))
+      while (start[j] != '"' && start[j] != '\'' && j < strlen(start))
       {
         j += 1;
       }
       attr->value = calloc(j - i, sizeof(char));
-      strncpy(attr->value, tmp + i, j - i);
+      strncpy(attr->value, start + i, j - i);
       attr->name[j] = '\0';
 
+      element->attributes = create_next_element(element);
       element->attributes->value = attr;
-      element->attributes = create_next_element(element->attributes);
     }
 
     if (i > strlen(start))
@@ -59,7 +57,7 @@ int make_attributes(char *tag, char *subject, xml_element *element)
     }
     i += 1;
   }
-  if (tmp[i - 1] == '/')
+  if (start[i - 1] == '/')
   {
     element->autoclosing = true;
   }
@@ -67,7 +65,6 @@ int make_attributes(char *tag, char *subject, xml_element *element)
   {
     element->autoclosing = false;
   }
-  element->attributes = head;
   i += 1; // skip >
   return i;
 }
@@ -117,6 +114,7 @@ void get_content(char *subject, xml_element *element)
   char *end = strstr(content, closing_tag);
   end[0] = '\0';
   element->content = content;
+  free(closing_tag);
 }
 
 void print_element(xml_element *element)
@@ -167,7 +165,10 @@ void free_element(xml_element *element)
   }
 
   free(element->name);
-  free(element->content);
+  if (!element->autoclosing)
+  {
+    free(element->content);
+  }
   free(element);
 }
 
@@ -198,7 +199,6 @@ xml_element *get_element(char *xml, char *tag_name)
   element->name = malloc(sizeof(char) * strlen(tag_name));
   strcpy(element->name, tag_name);
   element->number_of_attribute = 0;
-  create_empty_xml_attribute_linkedlist(element);
   xml = find_start(xml, element);
   index_of_opening_tag = make_attributes(tag_name, xml, element);
   char *start = xml + sizeof(char) * index_of_opening_tag;

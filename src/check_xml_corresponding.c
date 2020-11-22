@@ -133,6 +133,7 @@ bool check_error_attributes(XMLElement *dtd_element, xml_element *element)
         }
     }
     printf("\n");
-
+    free(attributes);
+    free(dtd_attributes);
     return error;
 }

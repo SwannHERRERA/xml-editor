@@ -16,6 +16,7 @@ XMLElement *create_element(char *name)
   element->attributes = NULL;
   element->occurenceFlag = 0;
   element->occurenceChar = 0;
+  element->numberOfAttribute = 0;
   if (!element->childs)
   {
     fprintf(stderr, "Failed to allocate memory for {element->childs} [create_element]\n");
