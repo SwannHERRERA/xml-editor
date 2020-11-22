@@ -116,10 +116,10 @@ bool check_error_attributes(XMLElement *dtd_element, xml_element *element)
             {
                 tab[j] = 1;
                 attribute_exist = true;
-                // TODO check atribute value (#required ...)
             }
         }
-        if (!attribute_exist)
+        // TODO check atribute value (#required ...)
+        if (!attribute_exist /* && atribute_value */)
         {
             error = true;
             fprintf(stderr, "%s is not in dtd\n", attributes[j]->name);
