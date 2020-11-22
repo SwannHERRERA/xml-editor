@@ -7,7 +7,7 @@
 #include "xml_element.h"
 #include "file_helper.h"
 
-char *find_doctype(FILE *file, char **root_name);
+char *find_doctype(char *buffer, char **root_name);
 XMLElement *parse_dtd(char *dtd, char *root_name);
 XMLElement *parse_element(char *node_name, char **buffer, int buffer_size);
 XMLElement *parse_sub_element(char *node_name, char **buffer, int buffer_size);

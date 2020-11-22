@@ -18,16 +18,16 @@ int main(int argc, char **argv)
     fprintf(stderr, "Error opening file %s\n", argv[1]);
     return EXIT_FAILURE;
   }
-  char *root_name;
-  char *dtd_string = find_doctype(file, &root_name);
+  char *xml_file_content = file_get_content(file);
+  char *root_name = NULL;
+  char *dtd_string = find_doctype(xml_file_content, &root_name);
   XMLElement *dtd = parse_dtd(dtd_string, root_name);
 
   printf("\n######## Starting PARSE XML ########\n");
-
+  printf("aaa%s\n",xml_file_content);
   fseek(file, 0L, SEEK_SET);
-  char *xml = file_get_content(file);
-  xml_element *root = parse_xml(xml);
-  // print_element(root);
+  xml_element *root = parse_xml(xml_file_content);
+  print_element(root);
   printf("\n######## Finished PARSE XML ########\n");
 
   if (check_dtd_correspond_to_xml(dtd, root))
@@ -39,12 +39,15 @@ int main(int argc, char **argv)
     printf("XML is NOT corresponding to DTD\n");
   }
 
-  free_DTD(dtd);
+  if (dtd != NULL)
+  {
+    free_DTD(dtd);
+  }
   free_element(root);
-  free(xml);
+  free(xml_file_content);
   fclose(file);
   free(dtd_string);
   free(root_name);
-  // init_interface(&argc, &argv);
+  //init_interface(&argc, &argv);
   return EXIT_SUCCESS;
 }

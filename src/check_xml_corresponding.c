@@ -2,9 +2,12 @@
 
 bool check_dtd_correspond_to_xml(XMLElement *dtd, xml_element *root)
 {
-    if (strcmp(dtd->name, root->name) == 0)
+    if (dtd != NULL)
     {
-        return check_element_is_correct(dtd, root);
+        if (strcmp(dtd->name, root->name) == 0)
+        {
+            return check_element_is_correct(dtd, root);
+        }
     }
     return false;
 }

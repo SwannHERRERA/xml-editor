@@ -2,6 +2,8 @@
 #define _interface_h_
 #include <gtk/gtk.h>
 #include "file_helper.h"
+#include "parse_dtd.h"
+#include "parse_xml.h"
 
 typedef struct
 {
@@ -10,6 +12,7 @@ typedef struct
   GtkMenuItem *save_file;
   GtkMenuItem *save_file_as;
   GtkMenuItem *quit_button;
+  GtkMenuItem *validate_xml;
 } MenuItems;
 
 typedef struct
@@ -32,8 +35,10 @@ void raise_error(char *buffer);
 // Listeners
 void menu_button_quit();
 void menu_button_about();
-void menu_button_save_file_as();
+void menu_button_save_file_as(GtkWidget *widget, gpointer data);
 void menu_button_save_file();
 void menu_button_open_file(GtkWidget *widget, gpointer data);
 void menu_button_new_file();
+void text_view_populate_popup_menu(GtkWidget *widget, GtkWidget *popup, gpointer data);
+void start_xml_validation(GtkWidget *widget, gpointer data);
 #endif
