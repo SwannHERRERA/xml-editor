@@ -6,7 +6,7 @@
  */
 int main(int argc, char **argv)
 {
-
+/*
   if (argc < 2)
   {
     fprintf(stderr, "Error attending xml file in parameters\n");
@@ -47,7 +47,7 @@ int main(int argc, char **argv)
   free(xml_file_content);
   fclose(file);
   free(dtd_string);
-  free(root_name);
-  //init_interface(&argc, &argv);
+  free(root_name);*/
+  init_interface(&argc, &argv);
   return EXIT_SUCCESS;
 }

@@ -41,7 +41,7 @@ void print_element(xml_element *element);
 void get_content(char *subject, xml_element *element);
 void free_element(xml_element *element);
 xml_element *get_element(char *xml, char *root_name);
-xml_attribute_linkedlist *create_next_element(xml_attribute_linkedlist *head);
+xml_attribute_linkedlist *create_next_element(xml_element *element);
 int make_attributes(char *tag, char *subject, xml_element *element);
 xml_element *parse_xml(char *xml);
 bool is_closing_tag(char *s);
