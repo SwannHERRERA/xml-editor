@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<!DOCTYPE classrooms [<!ELEMENT classrooms (classroom+)><!ELEMENT classroom (#PCDATA)><!ATTLIST classroom students CDATA ><!ATTLIST classroom voiture CDATA>]>
+<!DOCTYPE classrooms [<!ELEMENT classrooms (classroom+)><!ELEMENT classroom (#PCDATA)><!ATTLIST classroom students CDATA #REQUIRED><!ATTLIST classroom voiture CDATA #IMPLIED>]>
 
 <classrooms>
     <classroom students="30" voiture="12">AL</classroom>

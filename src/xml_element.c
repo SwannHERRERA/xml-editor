@@ -65,7 +65,7 @@ void print_attributes(XMLElement *element)
     {
       printf("\t");
     }
-    printf("%s\n", attrib->name);
+    printf("%s %d\n", attrib->name, attrib->value);
     attrib = attrib->next;
   }
 }
