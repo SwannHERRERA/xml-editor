@@ -14,8 +14,6 @@ bool check_dtd_correspond_to_xml(XMLElement *dtd, xml_element *root)
 
 bool check_element_is_correct(XMLElement *dtd_element, xml_element *element)
 {
-
-    // J'ai un problème quand je trouve une balise que je n'attends pas + balise autofermante
     int i, j;
     bool is_not_in_dtd;
     int tab[dtd_element->childsCount];
@@ -51,7 +49,6 @@ bool check_element_is_correct(XMLElement *dtd_element, xml_element *element)
 
     for (i = 0; i < dtd_element->childsCount; i += 1)
     {
-        // printf("%s %d(%c) tab[%d]: %d\n", dtd_element->childs[i]->name, dtd_element->childs[i]->occurenceFlag, dtd_element->childs[i]->occurenceChar, i, tab[i]);
         switch (dtd_element->childs[i]->occurenceFlag)
         {
         case OCCURENCE_1_N:
@@ -103,11 +100,11 @@ bool check_error_attributes(XMLElement *dtd_element, xml_element *element)
         attribute_exist = false;
         for (i = 0; i < dtd_element->numberOfAttribute; i += 1)
         {
-            // printf("attrbute:%s len:%ld dtd:%s len:%ld\n",
-            //        attributes[j]->name,
-            //        strlen(attributes[j]->name),
-            //        dtd_attributes[i]->name,
-            //        strlen(dtd_attributes[i]->name));
+            printf("attrbute:%s len:%ld dtd:%s len:%ld\n",
+                   attributes[j]->name,
+                   strlen(attributes[j]->name),
+                   dtd_attributes[i]->name,
+                   strlen(dtd_attributes[i]->name));
             if (strcmp(dtd_attributes[i]->name, attributes[j]->name) == 0)
             {
                 tab[j] = 1;

@@ -3,7 +3,7 @@
 
 <classrooms>
     <classroom students="30" voiture="12">AL</classroom>
-    <classroom students="30">IBD</classroom>
+    <classroom  students="14">IBD</classroom>
     <classroom students="25">MOC</classroom>
     <classroom students="20">IBC</classroom>
 </classrooms>
