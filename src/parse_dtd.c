@@ -411,6 +411,7 @@ void parse_attributes(XMLElement *element, char **buffer, int buffer_size)
       if (!strcmp(element->name, node_name))
       {
         char *attribute_name = get_next_name(ptr_str, &cursor);
+        ptr_str += cursor;
         AttributeType type = get_attribute_type(&ptr_str);
         AttributeValue value = get_attribute_value(&ptr_str);
         add_attribute(element, attribute_name, value, type);
