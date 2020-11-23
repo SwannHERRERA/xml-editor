@@ -88,10 +88,6 @@ bool check_element_is_correct(XMLElement *dtd_element, xml_element *element)
 
 bool check_error_attributes(XMLElement *dtd_element, xml_element *element)
 {
-    // TODO
-    /**
-    * Gestion de la valeur des attributs
-    */
     unsigned int i, j;
     bool attribute_exist;
     bool error = false;
@@ -107,11 +103,11 @@ bool check_error_attributes(XMLElement *dtd_element, xml_element *element)
         attribute_exist = false;
         for (i = 0; i < dtd_element->numberOfAttribute; i += 1)
         {
-            printf("attrbute:%s len:%ld dtd:%s len:%ld\n",
-                   attributes[j]->name,
-                   strlen(attributes[j]->name),
-                   dtd_attributes[i]->name,
-                   strlen(dtd_attributes[i]->name));
+            // printf("attrbute:%s len:%ld dtd:%s len:%ld\n",
+            //        attributes[j]->name,
+            //        strlen(attributes[j]->name),
+            //        dtd_attributes[i]->name,
+            //        strlen(dtd_attributes[i]->name));
             if (strcmp(dtd_attributes[i]->name, attributes[j]->name) == 0)
             {
                 tab[j] = 1;
@@ -124,12 +120,25 @@ bool check_error_attributes(XMLElement *dtd_element, xml_element *element)
             fprintf(stderr, "%s is not in dtd\n", attributes[j]->name);
         }
     }
+
     for (i = 0; i < dtd_element->numberOfAttribute; i += 1)
     {
-        if (tab[i] != 1)
+        printf("%d\n", dtd_element->attributes->value);
+        switch (dtd_element->attributes->value)
         {
-            error = true;
-            fprintf(stderr, "error %s\n", dtd_attributes[i]->name);
+        case REQUIRED:
+            if (tab[i] < 1)
+            {
+                error = true;
+                fprintf(stderr, "error %s\n", dtd_attributes[i]->name);
+            }
+            break;
+        case IMPLIED:
+            break;
+        case FIXED:
+            break;
+        default:
+            break;
         }
     }
     printf("\n");

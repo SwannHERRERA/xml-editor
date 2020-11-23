@@ -149,7 +149,7 @@ char *get_between_tokens(char *buffer, size_t *cursor, char *tokens)
 
 bool is_xml_valid_char(char c)
 {
-  return ((c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || (c >= '0' && c <= '9') || (c == '-' || c == '.' || c == '_')) ? true : false;
+  return ((c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || (c >= '0' && c <= '9') || (c == '-' || c == '.' || c == '_'));
 }
 
 char *get_next_name(char *ptr_str, size_t *offset)
@@ -231,20 +231,17 @@ char **split_string(char *dtd, int *size, char delim)
     *size += 1;
     if (str != NULL)
     {
-    char **new_buffer = malloc(sizeof(char *) * (*size) + 1);
-    for (int i = 0; i < *size; i++)
-    {
-      new_buffer[i] = buffer[i];
-    }
+      char **new_buffer = malloc(sizeof(char *) * (*size) + 1);
+      for (int i = 0; i < *size; i++)
+      {
+        new_buffer[i] = buffer[i];
+      }
       new_buffer[*size] = malloc(sizeof(char) * strlen(str) + 1);
       strcpy(new_buffer[*size], str);
       new_buffer[*size][strlen(str)] = 0;
       free(buffer);
       buffer = new_buffer;
     }
-  }
-  for(int i = 0; i< *size;i++){
-    printf("aaaaaaaaaaaaaaaaaaaaaaaaa %s\n",buffer[i]);
   }
   return buffer;
 }

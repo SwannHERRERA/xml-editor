@@ -157,7 +157,7 @@ void start_xml_validation(GtkWidget *widget, gpointer data)
   printf("\n######## Starting PARSE XML ########\n");
 
   xml_element *root = parse_xml(str);
-  print_element(root);
+  // print_element(root);
   printf("\n######## Finished PARSE XML ########\n");
 
   if (check_dtd_correspond_to_xml(dtd, root))
