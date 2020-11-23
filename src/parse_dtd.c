@@ -352,7 +352,7 @@ AttributeValue get_attribute_value(char **str)
   int value = -1;
   for (int i = 0; i < size; i++)
   {
-    if (!strcmp(*str, names[i]))
+    if (strstr(*str, names[i]) == 0)
     {
       if (value == -1)
       {
@@ -379,7 +379,7 @@ AttributeType get_attribute_type(char **str)
   int type = -1;
   for (int i = 0; i < size; i++)
   {
-    if (!strcmp(*str, names[i]))
+    if (!strstr(*str, names[i]))
     {
       if (type == -1)
       {
