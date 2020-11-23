@@ -231,11 +231,11 @@ char **split_string(char *dtd, int *size, char delim)
     *size += 1;
     if (str != NULL)
     {
-    char **new_buffer = malloc(sizeof(char *) * (*size) + 1);
-    for (int i = 0; i < *size; i++)
-    {
-      new_buffer[i] = buffer[i];
-    }
+      char **new_buffer = malloc(sizeof(char *) * (*size) + 1);
+      for (int i = 0; i < *size; i++)
+      {
+        new_buffer[i] = buffer[i];
+      }
       new_buffer[*size] = malloc(sizeof(char) * strlen(str) + 1);
       strcpy(new_buffer[*size], str);
       new_buffer[*size][strlen(str)] = 0;
@@ -243,8 +243,9 @@ char **split_string(char *dtd, int *size, char delim)
       buffer = new_buffer;
     }
   }
-  for(int i = 0; i< *size;i++){
-    printf("aaaaaaaaaaaaaaaaaaaaaaaaa %s\n",buffer[i]);
+  for (int i = 0; i < *size; i++)
+  {
+    printf("aaaaaaaaaaaaaaaaaaaaaaaaa %s\n", buffer[i]);
   }
   return buffer;
 }
@@ -355,7 +356,7 @@ AttributeValue get_attribute_value(char **str)
   int value = -1;
   for (int i = 0; i < size; i++)
   {
-    if (!strcmp(*str, names[i]))
+    if (strstr(*str, names[i]) == 0)
     {
       if (value == -1)
       {
@@ -382,7 +383,7 @@ AttributeType get_attribute_type(char **str)
   int type = -1;
   for (int i = 0; i < size; i++)
   {
-    if (!strcmp(*str, names[i]))
+    if (!strstr(*str, names[i]))
     {
       if (type == -1)
       {
