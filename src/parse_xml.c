@@ -10,6 +10,35 @@ xml_attribute_linkedlist *create_next_element(xml_element *element)
   return new_attribute;
 }
 
+void get_attr_name(int index, char *subject, xml_attribute *attr)
+{
+  int j, counter;
+  j = index;
+  counter = 0;
+  while (subject[j] != ' ')
+  {
+    j -= 1;
+    counter += 1;
+    printf("%d: %c\n", j, subject[j]);
+  }
+  attr->name = calloc(counter + 1, sizeof(char));
+  strncpy(attr->name, subject + index - counter, counter + 1);
+  attr->name[counter] = '\0';
+}
+
+void get_attr_value(int index, char *subject, xml_attribute *attr)
+{
+  int j;
+  j = index;
+  while (subject[j] != '"' && subject[j] != '\'' && j < strlen(subject))
+  {
+    j += 1;
+  }
+  attr->value = calloc(j - index, sizeof(char));
+  strncpy(attr->value, subject + index, j - index);
+  attr->name[j] = '\0';
+}
+
 int make_attributes(char *tag, char *subject, xml_element *element)
 {
   char *start;
@@ -24,27 +53,12 @@ int make_attributes(char *tag, char *subject, xml_element *element)
     if (start[i] == '=')
     {
       xml_attribute *attr = malloc(sizeof(xml_attribute));
-      j = i;
-      counter = 0;
-      while (start[j] != ' ')
-      {
-        j -= 1;
-        counter += 1;
-      }
-      counter -= 1;
-      attr->name = calloc(counter, sizeof(char));
-      strncpy(attr->name, start + i - counter, counter);
-      attr->name[counter] = '\0';
+
+      get_attr_name(i, start, attr);
 
       i += 2; // skip ="
-      j = i;
-      while (start[j] != '"' && start[j] != '\'' && j < strlen(start))
-      {
-        j += 1;
-      }
-      attr->value = calloc(j - i, sizeof(char));
-      strncpy(attr->value, start + i, j - i);
-      attr->name[j] = '\0';
+
+      get_attr_value(i, start, attr);
 
       element->attributes = create_next_element(element);
       element->attributes->value = attr;
