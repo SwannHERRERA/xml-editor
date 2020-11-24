@@ -30,12 +30,14 @@ void connect_widgets(GtkBuilder *builder, GuiData *data)
   data->widgets->main_text_view = GTK_TEXT_VIEW(gtk_builder_get_object(builder, "main_text_view"));
   data->widgets->items->quit_button = GTK_MENU_ITEM(gtk_builder_get_object(builder, "exit_app"));
   data->widgets->items->save_file = GTK_MENU_ITEM(gtk_builder_get_object(builder, "save_file"));
+  data->widgets->items->new_file = GTK_MENU_ITEM(gtk_builder_get_object(builder, "new_file"));
   data->widgets->items->open_file = GTK_MENU_ITEM(gtk_builder_get_object(builder, "open_file"));
   data->widgets->items->save_file_as = GTK_MENU_ITEM(gtk_builder_get_object(builder, "save_file_as"));
   data->widgets->items->validate_xml = GTK_MENU_ITEM(gtk_builder_get_object(builder, "validate_xml"));
   g_signal_connect(data->widgets->window, "destroy", (GCallback)gtk_main_quit, NULL);
   g_signal_connect(data->widgets->main_text_view, "populate-popup", (GCallback)text_view_populate_popup_menu, (gpointer)data);
   g_signal_connect(data->widgets->items->quit_button, "activate", (GCallback)gtk_main_quit, NULL);
+  g_signal_connect(data->widgets->items->new_file, "activate", (GCallback)menu_button_new_file, (gpointer)data);
   g_signal_connect(data->widgets->items->open_file, "activate", (GCallback)menu_button_open_file, (gpointer)data);
   g_signal_connect(data->widgets->items->save_file, "activate", (GCallback)menu_button_save_file, (gpointer)data);
   g_signal_connect(data->widgets->items->save_file_as, "activate", (GCallback)menu_button_save_file_as, (gpointer)data);
@@ -43,6 +45,15 @@ void connect_widgets(GtkBuilder *builder, GuiData *data)
 }
 
 //Listeners
+
+void menu_button_new_file(GtkWidget *widget, gpointer data)
+{
+  GuiData *gui_data = (GuiData *)data;
+  free(gui_data->file_name);
+  GtkTextBuffer *buffer = NULL;
+  buffer = gtk_text_view_get_buffer(gui_data->widgets->main_text_view);
+  gtk_text_buffer_set_text(buffer, "", -1);
+}
 
 void menu_button_open_file(GtkWidget *widget, gpointer data)
 {
@@ -137,11 +148,6 @@ void start_xml_validation(GtkWidget *widget, gpointer data)
 {
   printf("Validating XML\n");
   GuiData *gui_data = (GuiData *)data;
-  if (gui_data->file_name == NULL)
-  {
-    fprintf(stderr, "Error opening file try saving it first\n");
-    return;
-  }
   gtk_statusbar_remove_all(gui_data->widgets->status_bar, gtk_statusbar_get_context_id(gui_data->widgets->status_bar, "error"));
   GtkTextIter start, end;
   GtkTextBuffer *buffer = gtk_text_view_get_buffer(gui_data->widgets->main_text_view);
@@ -152,7 +158,6 @@ void start_xml_validation(GtkWidget *widget, gpointer data)
   if (dtd_string != NULL)
   {
     DTD_element *dtd = parse_dtd(dtd_string, root_name);
-
     printf("\n######## Starting PARSE XML ########\n");
 
     XML_element *root = parse_xml(str);
@@ -162,12 +167,12 @@ void start_xml_validation(GtkWidget *widget, gpointer data)
     if (check_dtd_correspond_to_xml(dtd, root))
     {
       printf("XML is corresponding to DTD\n");
-      gtk_statusbar_push(gui_data->widgets->status_bar, gtk_statusbar_get_context_id(gui_data->widgets->status_bar, "error"), "\u2550>XML is corresponding to DTD");
+      gtk_statusbar_push(gui_data->widgets->status_bar, gtk_statusbar_get_context_id(gui_data->widgets->status_bar, "error"), "\u255A>XML is corresponding to DTD");
     }
     else
     {
       printf("XML is NOT corresponding to DTD\n");
-      gtk_statusbar_push(gui_data->widgets->status_bar, gtk_statusbar_get_context_id(gui_data->widgets->status_bar, "error"), "\u2550>XML is corresponding to DTD");
+      gtk_statusbar_push(gui_data->widgets->status_bar, gtk_statusbar_get_context_id(gui_data->widgets->status_bar, "error"), "\u255A>XML is NOT corresponding to DTD");
     }
 
     if (dtd != NULL)
