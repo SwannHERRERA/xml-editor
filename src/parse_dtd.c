@@ -4,6 +4,11 @@
 char *find_doctype(char *buffer, char **root_name)
 {
   char *start = strstr(buffer, "<!DOCTYPE ");
+  if (start == NULL)
+  {
+    fprintf(stderr, "XML have no DTD\n");
+    return NULL;
+  }
   long size_of_doctype = get_size_of_doctype(start);
   char *doctype = (char *)malloc(sizeof(char) * size_of_doctype + 1);
   if (!doctype)

@@ -152,29 +152,33 @@ void start_xml_validation(GtkWidget *widget, gpointer data)
   char *str = gtk_text_buffer_get_text(buffer, &start, &end, FALSE);
   char *root_name;
   char *dtd_string = find_doctype(str, &root_name);
-  DTD_Element *dtd = parse_dtd(dtd_string, root_name);
-
-  printf("\n######## Starting PARSE XML ########\n");
-
-  xml_element *root = parse_xml(str);
-  // print_element(root);
-  printf("\n######## Finished PARSE XML ########\n");
-
-  if (check_dtd_correspond_to_xml(dtd, root))
+  if (dtd_string != NULL)
   {
-    printf("XML is corresponding to DTD\n");
-  }
-  else
-  {
-    printf("XML is NOT corresponding to DTD\n");
+    DTD_Element *dtd = parse_dtd(dtd_string, root_name);
+
+    printf("\n######## Starting PARSE XML ########\n");
+
+    xml_element *root = parse_xml(str);
+    // print_element(root);
+    printf("\n######## Finished PARSE XML ########\n");
+
+    if (check_dtd_correspond_to_xml(dtd, root))
+    {
+      printf("XML is corresponding to DTD\n");
+    }
+    else
+    {
+      printf("XML is NOT corresponding to DTD\n");
+    }
+
+    if (dtd != NULL)
+    {
+      free_DTD(dtd);
+    }
+    free_element(root);
+    free(root_name);
   }
 
-  if (dtd != NULL)
-  {
-    free_DTD(dtd);
-  }
-  free_element(root);
   free(str);
   free(dtd_string);
-  free(root_name);
 }
