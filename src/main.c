@@ -6,7 +6,7 @@
  */
 int main(int argc, char **argv)
 {
-/*
+  /*
   if (argc < 2)
   {
     fprintf(stderr, "Error attending xml file in parameters\n");
@@ -21,12 +21,12 @@ int main(int argc, char **argv)
   char *xml_file_content = file_get_content(file);
   char *root_name = NULL;
   char *dtd_string = find_doctype(xml_file_content, &root_name);
-  XMLElement *dtd = parse_dtd(dtd_string, root_name);
+  DTD_element *dtd = parse_dtd(dtd_string, root_name);
 
   printf("\n######## Starting PARSE XML ########\n");
   printf("aaa%s\n",xml_file_content);
   fseek(file, 0L, SEEK_SET);
-  xml_element *root = parse_xml(xml_file_content);
+  XML_element *root = parse_xml(xml_file_content);
   print_element(root);
   printf("\n######## Finished PARSE XML ########\n");
 

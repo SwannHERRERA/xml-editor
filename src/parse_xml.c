@@ -22,7 +22,7 @@ void get_attr_name(int index, char *subject, xml_attribute *attr)
     j -= 1;
   }
   attr->name = calloc(counter + 1, sizeof(char));
-  strncpy(attr->name, subject + index - counter+1, counter-1);
+  strncpy(attr->name, subject + index - counter + 1, counter - 1);
   attr->name[counter] = '\0';
 }
 
