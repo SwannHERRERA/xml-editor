@@ -152,7 +152,7 @@ void start_xml_validation(GtkWidget *widget, gpointer data)
   char *str = gtk_text_buffer_get_text(buffer, &start, &end, FALSE);
   char *root_name;
   char *dtd_string = find_doctype(str, &root_name);
-  XMLElement *dtd = parse_dtd(dtd_string, root_name);
+  XMLDTDElement *dtd = parse_dtd(dtd_string, root_name);
 
   printf("\n######## Starting PARSE XML ########\n");
 

@@ -1,6 +1,6 @@
 #include "check_xml_corresponding.h"
 
-bool check_dtd_correspond_to_xml(XMLElement *dtd, xml_element *root)
+bool check_dtd_correspond_to_xml(XMLDTDElement *dtd, xml_element *root)
 {
     if (dtd != NULL)
     {
@@ -12,7 +12,7 @@ bool check_dtd_correspond_to_xml(XMLElement *dtd, xml_element *root)
     return false;
 }
 
-bool check_element_is_correct(XMLElement *dtd_element, xml_element *element)
+bool check_element_is_correct(XMLDTDElement *dtd_element, xml_element *element)
 {
     int i, j;
     bool is_not_in_dtd;
@@ -83,7 +83,7 @@ bool check_element_is_correct(XMLElement *dtd_element, xml_element *element)
     return !error;
 }
 
-bool check_error_attributes(XMLElement *dtd_element, xml_element *element)
+bool check_error_attributes(XMLDTDElement *dtd_element, xml_element *element)
 {
     unsigned int i, j;
     bool attribute_exist;

@@ -26,24 +26,24 @@
  */
 #define OCCURENCE_OR 0b1000
 
-typedef struct XMLElement XMLElement;
+typedef struct XMLDTDElement XMLDTDElement;
 typedef struct XMLAttribute XMLAttribute;
 typedef enum AttributeValue AttributeValue;
 typedef enum AttributeType AttributeType;
-XMLElement *create_element(char *name);
-void print_attributes(XMLElement *element);
-void set_deepness(XMLElement *parent);
-void print_tree(XMLElement *parent);
-void add_element(XMLElement *parent, XMLElement *child);
-void add_attribute(XMLElement *element, char *name, AttributeValue value, AttributeType type);
-void free_XMLElement(XMLElement *element);
-void free_DTD(XMLElement *root);
-XMLAttribute **attributes_dtd_to_array(XMLElement *element);
+XMLDTDElement *create_element(char *name);
+void print_attributes(XMLDTDElement *element);
+void set_deepness(XMLDTDElement *parent);
+void print_tree(XMLDTDElement *parent);
+void add_element(XMLDTDElement *parent, XMLDTDElement *child);
+void add_attribute(XMLDTDElement *element, char *name, AttributeValue value, AttributeType type);
+void free_XMLElement(XMLDTDElement *element);
+void free_DTD(XMLDTDElement *root);
+XMLAttribute **attributes_dtd_to_array(XMLDTDElement *element);
 
-struct XMLElement
+struct XMLDTDElement
 {
-  XMLElement *parent;
-  XMLElement **childs;
+  XMLDTDElement *parent;
+  XMLDTDElement **childs;
   XMLAttribute *attributes;
   char *name;
   int deepness;

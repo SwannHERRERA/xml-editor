@@ -246,7 +246,7 @@ char **split_string(char *dtd, int *size, char delim)
   return buffer;
 }
 
-void set_global_child_occurence(char global_occurence_char, XMLElement *parent)
+void set_global_child_occurence(char global_occurence_char, XMLDTDElement *parent)
 {
   for (int i = 0; i < parent->childsCount; i++)
   {
@@ -254,7 +254,7 @@ void set_global_child_occurence(char global_occurence_char, XMLElement *parent)
   }
 }
 
-void set_child_occurence(char occurence_char, XMLElement *child)
+void set_child_occurence(char occurence_char, XMLDTDElement *child)
 {
   const char c[] = {'?', '+', '*', '|'};
   const size_t c_size = 4;
@@ -285,7 +285,7 @@ void set_child_occurence(char occurence_char, XMLElement *child)
   }
 }
 
-void parse_element_childs(XMLElement *parent, int elements_size, char **elements_buffer, char **buffer, int buffer_size)
+void parse_element_childs(XMLDTDElement *parent, int elements_size, char **elements_buffer, char **buffer, int buffer_size)
 {
   for (int i = 0; i < elements_size; i += 1)
   {
@@ -297,7 +297,7 @@ void parse_element_childs(XMLElement *parent, int elements_size, char **elements
     char *element_name = get_next_name(elements_buffer[i], &cursor);
     if (element_name != NULL)
     {
-      XMLElement *child = parse_sub_element(element_name, buffer, buffer_size);
+      XMLDTDElement *child = parse_sub_element(element_name, buffer, buffer_size);
       if (child != NULL)
       {
         if (elements_buffer[i][cursor] != 0)
@@ -399,7 +399,7 @@ AttributeType get_attribute_type(char **str)
   return type;
 }
 
-void parse_attributes(XMLElement *element, char **buffer, int buffer_size)
+void parse_attributes(XMLDTDElement *element, char **buffer, int buffer_size)
 {
   for (int i = 0; i < buffer_size; i++)
   {
@@ -421,9 +421,9 @@ void parse_attributes(XMLElement *element, char **buffer, int buffer_size)
   }
 }
 
-XMLElement *parse_element(char *node_name, char **buffer, int buffer_size)
+XMLDTDElement *parse_element(char *node_name, char **buffer, int buffer_size)
 {
-  XMLElement *xml_element = NULL;
+  XMLDTDElement *xml_element = NULL;
   for (int i = 0; i < buffer_size; i++)
   {
     if (buffer[i] != NULL)
@@ -444,9 +444,9 @@ XMLElement *parse_element(char *node_name, char **buffer, int buffer_size)
   return xml_element;
 }
 
-XMLElement *parse_sub_element(char *node_name, char **buffer, int buffer_size)
+XMLDTDElement *parse_sub_element(char *node_name, char **buffer, int buffer_size)
 {
-  XMLElement *xml_element = NULL;
+  XMLDTDElement *xml_element = NULL;
   for (int i = 0; i < buffer_size; i++)
   {
     char *ptr_str = strstr(buffer[i], "<!ELEMENT ");
@@ -465,9 +465,9 @@ XMLElement *parse_sub_element(char *node_name, char **buffer, int buffer_size)
   return xml_element;
 }
 
-XMLElement *complete_element(char **buffer, int buffer_size, int index, char *name)
+XMLDTDElement *complete_element(char **buffer, int buffer_size, int index, char *name)
 {
-  XMLElement *xml_element = create_element(name);
+  XMLDTDElement *xml_element = create_element(name);
   char global_occurence_char = 0;
   char *elements = get_node_childs(buffer[index], name, &global_occurence_char);
   if (elements != NULL)
@@ -487,10 +487,10 @@ XMLElement *complete_element(char **buffer, int buffer_size, int index, char *na
   return xml_element;
 }
 
-XMLElement *parse_dtd(char *dtd, char *root_name)
+XMLDTDElement *parse_dtd(char *dtd, char *root_name)
 {
   printf("######## Starting to parse DTD ########\n");
-  XMLElement *parent = NULL;
+  XMLDTDElement *parent = NULL;
   if (dtd != NULL && strlen(dtd) > 0)
   {
     printf("DTD : %s\nRoot name : %s\n", dtd, root_name);
