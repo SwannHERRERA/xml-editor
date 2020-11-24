@@ -26,6 +26,7 @@ void connect_widgets(GtkBuilder *builder, GuiData *data)
   data->widgets = g_slice_new(GuiWidgets);
   data->widgets->items = g_slice_new(MenuItems);
   data->widgets->window = GTK_WINDOW(gtk_builder_get_object(builder, "main_window"));
+  data->widgets->status_bar = GTK_STATUSBAR(gtk_builder_get_object(builder, "status_bar"));
   data->widgets->main_text_view = GTK_TEXT_VIEW(gtk_builder_get_object(builder, "main_text_view"));
   data->widgets->items->quit_button = GTK_MENU_ITEM(gtk_builder_get_object(builder, "exit_app"));
   data->widgets->items->save_file = GTK_MENU_ITEM(gtk_builder_get_object(builder, "save_file"));
@@ -39,11 +40,6 @@ void connect_widgets(GtkBuilder *builder, GuiData *data)
   g_signal_connect(data->widgets->items->save_file, "activate", (GCallback)menu_button_save_file, (gpointer)data);
   g_signal_connect(data->widgets->items->save_file_as, "activate", (GCallback)menu_button_save_file_as, (gpointer)data);
   g_signal_connect(data->widgets->items->validate_xml, "activate", (GCallback)start_xml_validation, (gpointer)data);
-}
-
-void raise_error(char *buffer)
-{
-  fprintf(stderr, "%s", buffer);
 }
 
 //Listeners
@@ -146,6 +142,7 @@ void start_xml_validation(GtkWidget *widget, gpointer data)
     fprintf(stderr, "Error opening file try saving it first\n");
     return;
   }
+  gtk_statusbar_remove_all(gui_data->widgets->status_bar, gtk_statusbar_get_context_id(gui_data->widgets->status_bar, "error"));
   GtkTextIter start, end;
   GtkTextBuffer *buffer = gtk_text_view_get_buffer(gui_data->widgets->main_text_view);
   gtk_text_buffer_get_bounds(buffer, &start, &end);
@@ -165,10 +162,12 @@ void start_xml_validation(GtkWidget *widget, gpointer data)
     if (check_dtd_correspond_to_xml(dtd, root))
     {
       printf("XML is corresponding to DTD\n");
+      gtk_statusbar_push(gui_data->widgets->status_bar, gtk_statusbar_get_context_id(gui_data->widgets->status_bar, "error"), "\u2550>XML is corresponding to DTD");
     }
     else
     {
       printf("XML is NOT corresponding to DTD\n");
+      gtk_statusbar_push(gui_data->widgets->status_bar, gtk_statusbar_get_context_id(gui_data->widgets->status_bar, "error"), "\u2550>XML is corresponding to DTD");
     }
 
     if (dtd != NULL)

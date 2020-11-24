@@ -20,6 +20,7 @@ typedef struct
 {
   GtkWindow *window;
   GtkTextView *main_text_view;
+  GtkStatusbar *status_bar;
   MenuItems *items;
 } GuiWidgets;
 
