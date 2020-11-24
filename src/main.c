@@ -1,12 +1,9 @@
 #include "check_xml_corresponding.h"
 #include "interface.h"
 
-/**
- * I use ARGV to give relative path to xml
- */
 int main(int argc, char **argv)
 {
-/*
+  /*
   if (argc < 2)
   {
     fprintf(stderr, "Error attending xml file in parameters\n");
