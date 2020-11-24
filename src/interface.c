@@ -154,11 +154,11 @@ void start_xml_validation(GtkWidget *widget, gpointer data)
   char *dtd_string = find_doctype(str, &root_name);
   if (dtd_string != NULL)
   {
-    DTD_Element *dtd = parse_dtd(dtd_string, root_name);
+    DTD_element *dtd = parse_dtd(dtd_string, root_name);
 
     printf("\n######## Starting PARSE XML ########\n");
 
-    xml_element *root = parse_xml(str);
+    XML_element *root = parse_xml(str);
     // print_element(root);
     printf("\n######## Finished PARSE XML ########\n");
 

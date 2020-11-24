@@ -26,25 +26,25 @@
  */
 #define OCCURENCE_OR 0b1000
 
-typedef struct DTD_Element DTD_Element;
-typedef struct XMLAttribute XMLAttribute;
+typedef struct DTD_element DTD_element;
+typedef struct DTD_attribute DTD_attribute;
 typedef enum AttributeValue AttributeValue;
 typedef enum AttributeType AttributeType;
-DTD_Element *create_element(char *name);
-void print_attributes(DTD_Element *element);
-void set_deepness(DTD_Element *parent);
-void print_tree(DTD_Element *parent);
-void add_element(DTD_Element *parent, DTD_Element *child);
-void add_attribute(DTD_Element *element, char *name, AttributeValue value, AttributeType type);
-void free_XMLElement(DTD_Element *element);
-void free_DTD(DTD_Element *root);
-XMLAttribute **attributes_dtd_to_array(DTD_Element *element);
+DTD_element *create_element(char *name);
+void print_attributes(DTD_element *element);
+void set_deepness(DTD_element *parent);
+void print_tree(DTD_element *parent);
+void add_element(DTD_element *parent, DTD_element *child);
+void add_attribute(DTD_element *element, char *name, AttributeValue value, AttributeType type);
+void free_XMLElement(DTD_element *element);
+void free_DTD(DTD_element *root);
+DTD_attribute **attributes_dtd_to_array(DTD_element *element);
 
-struct DTD_Element
+struct DTD_element
 {
-  DTD_Element *parent;
-  DTD_Element **childs;
-  XMLAttribute *attributes;
+  DTD_element *parent;
+  DTD_element **childs;
+  DTD_attribute *attributes;
   char *name;
   int deepness;
   int childsCount;
@@ -68,9 +68,9 @@ enum AttributeType
   CDATA
 };
 
-struct XMLAttribute
+struct DTD_attribute
 {
-  XMLAttribute *next;
+  DTD_attribute *next;
   AttributeType type;
   AttributeValue value;
   char *name;
