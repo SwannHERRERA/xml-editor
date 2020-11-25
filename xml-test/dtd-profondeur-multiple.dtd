@@ -1,7 +1,7 @@
 <!ELEMENT classrooms (classroom+, student?, carte)>
 <!ELEMENT carte (code)>
 <!ELEMENT code (prefix, suffix)>
-<!ELEMENT prefix (valeur+)>
+<!ELEMENT prefix (valeur*)>
 <!ELEMENT suffix (valeur+)>
 <!ELEMENT valeur (valeur-interne)>
 <!ELEMENT valeur-interne (#PCDATA)>
