@@ -18,7 +18,6 @@ void get_attr_name(int index, char *subject, xml_attribute *attr)
   while (subject[j] != ' ')
   {
     counter += 1;
-    printf("%d: %c\n", j, subject[j]);
     j -= 1;
   }
   attr->name = calloc(counter + 1, sizeof(char));
