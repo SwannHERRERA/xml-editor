@@ -360,11 +360,9 @@ AttributeValue get_attribute_value(char **str)
     if (strstr(*str, names[i]) == 0)
     {
       value = i;
-      printf("  %s %d\n", *str, value);
       break;
     }
   }
-  printf("%s %d\n", *str, value);
   return value;
 }
 
