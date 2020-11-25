@@ -96,10 +96,10 @@ bool check_error_attributes(DTD_element *dtd_element, XML_element *element)
     } else {
         max_size = dtd_element->numberOfAttribute;
     }
-    int tab[max_size];
+    int elements_in_dtd[max_size];
     for (i = 0; i < max_size; i += 1)
     {
-        tab[i] = 0;
+        elements_in_dtd[i] = 0;
     }
     for (j = 0; j < element->number_of_attribute; j += 1)
     {
@@ -113,7 +113,7 @@ bool check_error_attributes(DTD_element *dtd_element, XML_element *element)
                    strlen(dtd_attributes[i]->name));
             if (strcmp(dtd_attributes[i]->name, attributes[j]->name) == 0)
             {
-                tab[j] = 1;
+                elements_in_dtd[i] = 1;
                 attribute_exist = true;
             }
         }
@@ -130,7 +130,7 @@ bool check_error_attributes(DTD_element *dtd_element, XML_element *element)
         switch (dtd_attributes[i]->value)
         {
         case REQUIRED:
-            if (tab[i] < 1)
+            if (elements_in_dtd[i] < 1)
             {
                 error = true;
                 fprintf(stderr, "error %s\n", dtd_attributes[i]->name);
