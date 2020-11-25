@@ -109,11 +109,6 @@ bool check_error_attributes(DTD_element *dtd_element, XML_element *element)
         attribute_exist = false;
         for (i = 0; i < dtd_element->numberOfAttribute; i += 1)
         {
-            printf("attrbute:%s len:%ld dtd:%s len:%ld\n",
-                   attributes[j]->name,
-                   strlen(attributes[j]->name),
-                   dtd_attributes[i]->name,
-                   strlen(dtd_attributes[i]->name));
             if (strcmp(dtd_attributes[i]->name, attributes[j]->name) == 0)
             {
                 elements_in_dtd[i] = 1;
