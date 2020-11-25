@@ -27,7 +27,7 @@ void get_attr_name(int index, char *subject, xml_attribute *attr)
 
 void get_attr_value(int index, char *subject, xml_attribute *attr)
 {
-  int j;
+  size_t j;
   j = index;
   while (subject[j] != '"' && subject[j] != '\'' && j < strlen(subject))
   {
@@ -224,6 +224,8 @@ XML_element *get_element(char *xml, char *tag_name)
   {
     get_content(start, element);
   }
+  // print_element(element);
+  // free_element(element);
   return element;
 }
 
