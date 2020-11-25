@@ -33,7 +33,7 @@ bool check_element_is_correct(DTD_element *dtd_element, XML_element *element)
             {
                 is_not_in_dtd = false;
                 tab[j] += 1;
-                if (!check_element_is_correct(dtd_element->childs[j], element->childs[i]) || check_error_attributes(dtd_element->childs[j], element->childs[i]))
+                if (check_error_attributes(dtd_element->childs[j], element->childs[i]))
                 {
                     return false;
                 }
@@ -91,9 +91,12 @@ bool check_error_attributes(DTD_element *dtd_element, XML_element *element)
     xml_attribute **attributes = attributes_to_array(element);
     DTD_attribute **dtd_attributes = attributes_dtd_to_array(dtd_element);
     int max_size;
-    if (element->number_of_attribute >  dtd_element->numberOfAttribute) {
+    if (element->number_of_attribute > dtd_element->numberOfAttribute)
+    {
         max_size = element->number_of_attribute;
-    } else {
+    }
+    else
+    {
         max_size = dtd_element->numberOfAttribute;
     }
     int elements_in_dtd[max_size];
@@ -126,7 +129,7 @@ bool check_error_attributes(DTD_element *dtd_element, XML_element *element)
 
     for (i = 0; i < dtd_element->numberOfAttribute; i += 1)
     {
-        printf("%s %d\n",dtd_attributes[i]->name,dtd_attributes[i]->value);
+        printf("%s %d\n", dtd_attributes[i]->name, dtd_attributes[i]->value);
         switch (dtd_attributes[i]->value)
         {
         case REQUIRED:
