@@ -349,7 +349,7 @@ char *get_node_childs(char *buffer, char *name, char *last_char)
   }
   return elements;
 }
-
+/*
 AttributeValue get_attribute_value(char **str)
 {
   const char *names[] = {"", "#IMPLIED", "#REQUIRED", "#FIXED"};
@@ -403,7 +403,7 @@ void parse_attributes(DTD_element *element, char **buffer, int buffer_size)
     }
   }
 }
-
+*/
 DTD_element *parse_element(char *node_name, char **buffer, int buffer_size)
 {
   DTD_element *xml_element = NULL;
@@ -459,7 +459,7 @@ DTD_element *complete_element(char **buffer, int buffer_size, int index, char *n
     char **elements_buffer = split_string(elements, &elements_size, ',');
     parse_element_childs(xml_element, elements_size, elements_buffer, buffer, buffer_size);
     set_global_child_occurence(global_occurence_char, xml_element);
-    parse_attributes(xml_element, buffer, buffer_size);
+    //parse_attributes(xml_element, buffer, buffer_size);
     for (int i = 0; i < elements_size; i++)
     {
       free(elements_buffer[i]);
