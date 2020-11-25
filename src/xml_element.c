@@ -1,8 +1,8 @@
 #include "xml_element.h"
 
-XMLElement *create_element(char *name)
+DTD_element *create_element(char *name)
 {
-  XMLElement *element = malloc(sizeof(XMLElement));
+  DTD_element *element = malloc(sizeof(DTD_element));
   if (element == NULL)
   {
     fprintf(stderr, "Failed to allocate memory [create_element]\n");
@@ -12,10 +12,11 @@ XMLElement *create_element(char *name)
   element->deepness = 0;
   element->childsCount = 0;
   element->childsCapacity = 20;
-  element->childs = malloc(sizeof(XMLElement) * element->childsCapacity);
+  element->childs = malloc(sizeof(DTD_element) * element->childsCapacity);
   element->attributes = NULL;
   element->occurenceFlag = 0;
   element->occurenceChar = 0;
+  element->numberOfAttribute = 0;
   if (!element->childs)
   {
     fprintf(stderr, "Failed to allocate memory for {element->childs} [create_element]\n");
@@ -24,7 +25,7 @@ XMLElement *create_element(char *name)
   return element;
 }
 
-void set_deepness(XMLElement *element)
+void set_deepness(DTD_element *element)
 {
   if (element == NULL)
   {
@@ -37,7 +38,7 @@ void set_deepness(XMLElement *element)
   }
 }
 
-void print_tree(XMLElement *element)
+void print_tree(DTD_element *element)
 {
   if (element != NULL)
   {
@@ -55,21 +56,21 @@ void print_tree(XMLElement *element)
   }
 }
 
-void print_attributes(XMLElement *element)
+void print_attributes(DTD_element *element)
 {
-  XMLAttribute *attrib = element->attributes;
+  DTD_attribute *attrib = element->attributes;
   while (attrib != NULL)
   {
     for (int i = 0; i < element->deepness; i++)
     {
       printf("\t");
     }
-    printf("%s\n", attrib->name);
+    printf("%s %d\n", attrib->name, attrib->value);
     attrib = attrib->next;
   }
 }
 
-void add_element(XMLElement *parent, XMLElement *child)
+void add_element(DTD_element *parent, DTD_element *child)
 {
   if (parent->childsCount == parent->childsCapacity)
   {
@@ -86,10 +87,10 @@ void add_element(XMLElement *parent, XMLElement *child)
   child->parent = parent;
 }
 
-void add_attribute(XMLElement *element, char *name, AttributeValue value, AttributeType type)
+void add_attribute(DTD_element *element, char *name, AttributeValue value, AttributeType type)
 {
-  XMLAttribute *first = element->attributes;
-  XMLAttribute *new = malloc(sizeof(XMLAttribute));
+  DTD_attribute *first = element->attributes;
+  DTD_attribute *new = malloc(sizeof(DTD_attribute));
   new->next = first;
   element->attributes = new;
   new->name = name;
@@ -99,10 +100,10 @@ void add_attribute(XMLElement *element, char *name, AttributeValue value, Attrib
   element->numberOfAttribute += 1;
 }
 
-XMLAttribute **attributes_dtd_to_array(XMLElement *element)
+DTD_attribute **attributes_dtd_to_array(DTD_element *element)
 {
-  XMLAttribute **res = malloc(sizeof(XMLAttribute *) * element->numberOfAttribute);
-  XMLAttribute *head = element->attributes;
+  DTD_attribute **res = malloc(sizeof(DTD_attribute *) * element->numberOfAttribute);
+  DTD_attribute *head = element->attributes;
 
   for (unsigned int i = 0; i < element->numberOfAttribute; i += 1)
   {
@@ -112,15 +113,15 @@ XMLAttribute **attributes_dtd_to_array(XMLElement *element)
   return res;
 }
 
-void free_DTD(XMLElement *root)
+void free_DTD(DTD_element *root)
 {
   free_XMLElement(root);
 }
 
-void free_XMLAttributes(XMLAttribute *attribute)
+void free_XMLAttributes(DTD_attribute *attribute)
 {
-  XMLAttribute *swap;
-  XMLAttribute *first = attribute;
+  DTD_attribute *swap;
+  DTD_attribute *first = attribute;
   while (first != NULL)
   {
     swap = first->next;
@@ -130,7 +131,7 @@ void free_XMLAttributes(XMLAttribute *attribute)
   }
 }
 
-void free_XMLElement(XMLElement *element)
+void free_XMLElement(DTD_element *element)
 {
   for (int i = 0; i < element->childsCount; i += 1)
   {
