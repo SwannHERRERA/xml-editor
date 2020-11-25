@@ -352,28 +352,19 @@ char *get_node_childs(char *buffer, char *name, char *last_char)
 
 AttributeValue get_attribute_value(char **str)
 {
-  const char *names[] = {"", "#REQUIRED", "#IMPLIED", "#FIXED"};
+  const char *names[] = {"", "#IMPLIED", "#REQUIRED", "#FIXED"};
   int size = 4;
   int value = -1;
-  for (int i = 0; i < size; i++)
+  for (int i = 1; i < size; i++)
   {
     if (strstr(*str, names[i]) == 0)
     {
-      if (value == -1)
-      {
-        value = i;
-      }
-      else
-      {
-        printf("ERROR at %s\n", *str);
-      }
-      char *st = strstr(*str, names[i]);
-      if (st != NULL && st > *str)
-      {
-        *str = strstr(*str, names[i]);
-      }
+      value = i;
+      printf("  %s %d\n", *str, value);
+      break;
     }
   }
+  printf("%s %d\n", *str, value);
   return value;
 }
 
@@ -384,21 +375,10 @@ AttributeType get_attribute_type(char **str)
   int type = -1;
   for (int i = 0; i < size; i++)
   {
-    if (!strstr(*str, names[i]))
+    if (strstr(*str, names[i]))
     {
-      if (type == -1)
-      {
-        type = i;
-      }
-      else
-      {
-        printf("ERROR at %s\n", *str);
-      }
-      char *st = strstr(*str, names[i]);
-      if (st != NULL && st > *str)
-      {
-        *str = strstr(*str, names[i]);
-      }
+      type = i;
+      break;
     }
   }
   return type;

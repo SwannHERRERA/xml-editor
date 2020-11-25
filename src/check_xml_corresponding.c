@@ -126,6 +126,7 @@ bool check_error_attributes(DTD_element *dtd_element, XML_element *element)
 
     for (i = 0; i < dtd_element->numberOfAttribute; i += 1)
     {
+        printf("%s %d\n",dtd_attributes[i]->name,dtd_attributes[i]->value);
         switch (dtd_attributes[i]->value)
         {
         case REQUIRED:
