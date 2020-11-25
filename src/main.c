@@ -21,7 +21,6 @@ int main(int argc, char **argv)
   DTD_element *dtd = parse_dtd(dtd_string, root_name);
 
   printf("\n######## Starting PARSE XML ########\n");
-  printf("aaa%s\n",xml_file_content);
   fseek(file, 0L, SEEK_SET);
   XML_element *root = parse_xml(xml_file_content);
   print_element(root);
@@ -45,6 +44,6 @@ int main(int argc, char **argv)
   fclose(file);
   free(dtd_string);
   free(root_name);
-  //init_interface(&argc, &argv);
+  init_interface(&argc, &argv);
   return EXIT_SUCCESS;
 }
