@@ -14,8 +14,8 @@ DTD_element *create_element(char *name)
   element->childsCapacity = 20;
   element->childs = malloc(sizeof(DTD_element) * element->childsCapacity);
   element->attributes = NULL;
-  element->occurenceFlag = 0;
-  element->occurenceChar = 0;
+  element->occurrenceFlag = 0;
+  element->occurrenceChar = 0;
   element->numberOfAttribute = 0;
   if (!element->childs)
   {
@@ -47,7 +47,7 @@ void print_tree(DTD_element *element)
       printf("\t");
     }
     printf("\u255A\u2550\u2550");
-    printf(">%s %d\n", element->name, element->occurenceFlag);
+    printf(">%s %d\n", element->name, element->occurrenceFlag);
     print_attributes(element);
     for (int i = 0; i < element->childsCount; i++)
     {

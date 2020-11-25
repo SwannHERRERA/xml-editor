@@ -251,22 +251,22 @@ char **split_string(char *dtd, int *size, char delim)
   return buffer;
 }
 
-void set_global_child_occurence(char global_occurence_char, DTD_element *parent)
+void set_global_child_occurrence(char global_occurrence_char, DTD_element *parent)
 {
   for (int i = 0; i < parent->childsCount; i++)
   {
-    set_child_occurence(global_occurence_char, parent->childs[i]);
+    set_child_occurrence(global_occurrence_char, parent->childs[i]);
   }
 }
 
-void set_child_occurence(char occurence_char, DTD_element *child)
+void set_child_occurrence(char occurrence_char, DTD_element *child)
 {
   const char c[] = {'?', '+', '*', '|'};
   const size_t c_size = 4;
   int pos = -1;
   for (size_t i = 0; i < c_size; i++)
   {
-    if (occurence_char == c[i])
+    if (occurrence_char == c[i])
     {
       pos = i;
     }
@@ -274,16 +274,16 @@ void set_child_occurence(char occurence_char, DTD_element *child)
   switch (pos)
   {
   case 0:
-    child->occurenceFlag |= OCCURRENCE_0_1;
+    child->occurrenceFlag |= OCCURRENCE_0_1;
     break;
   case 1:
-    child->occurenceFlag |= OCCURRENCE_1_N;
+    child->occurrenceFlag |= OCCURRENCE_1_N;
     break;
   case 2:
-    child->occurenceFlag |= OCCURRENCE_0_N;
+    child->occurrenceFlag |= OCCURRENCE_0_N;
     break;
   case 3:
-    child->occurenceFlag |= OCCURRENCE_OR;
+    child->occurrenceFlag |= OCCURRENCE_OR;
     break;
   default:
     break;
@@ -307,9 +307,9 @@ void parse_element_childs(DTD_element *parent, int elements_size, char **element
       {
         if (elements_buffer[i][cursor] != 0)
         {
-          printf("occurence char = %c \n", elements_buffer[i][cursor]);
-          child->occurenceChar = elements_buffer[i][cursor];
-          set_child_occurence(elements_buffer[i][cursor], child);
+          printf("occurrence char = %c \n", elements_buffer[i][cursor]);
+          child->occurrenceChar = elements_buffer[i][cursor];
+          set_child_occurrence(elements_buffer[i][cursor], child);
         }
         add_element(parent, child);
         free(element_name);
@@ -451,14 +451,14 @@ DTD_element *parse_sub_element(char *node_name, char **buffer, int buffer_size)
 DTD_element *complete_element(char **buffer, int buffer_size, int index, char *name)
 {
   DTD_element *xml_element = create_element(name);
-  char global_occurence_char = 0;
-  char *elements = get_node_childs(buffer[index], name, &global_occurence_char);
+  char global_occurrence_char = 0;
+  char *elements = get_node_childs(buffer[index], name, &global_occurrence_char);
   if (elements != NULL)
   {
     int elements_size = 0;
     char **elements_buffer = split_string(elements, &elements_size, ',');
     parse_element_childs(xml_element, elements_size, elements_buffer, buffer, buffer_size);
-    set_global_child_occurence(global_occurence_char, xml_element);
+    set_global_child_occurrence(global_occurrence_char, xml_element);
     //parse_attributes(xml_element, buffer, buffer_size);
     for (int i = 0; i < elements_size; i++)
     {

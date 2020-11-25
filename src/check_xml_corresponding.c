@@ -45,26 +45,26 @@ bool check_element_is_correct(DTD_element *dtd_element, XML_element *element)
 
     for (i = 0; i < dtd_element->childsCount; i += 1)
     {
-        switch (dtd_element->childs[i]->occurenceFlag)
+        switch (dtd_element->childs[i]->occurrenceFlag)
         {
-        case OCCURENCE_1_N:
+        case OCCURRENCE_1_N:
             if (tab[i] < 1)
             {
                 error = true;
                 fprintf(stderr, "erreur la balise %s doit avoir des elements %s\n", dtd_element->name, dtd_element->childs[i]->name);
             }
             break;
-        case OCCURENCE_0_N:
+        case OCCURRENCE_0_N:
             // DO nothing
             break;
-        case OCCURENCE_0_1:
+        case OCCURRENCE_0_1:
             if (tab[i] > 1)
             {
                 error = true;
                 fprintf(stderr, "erreur la balise %s doit avoir entre 0 et 1 element %s\n", dtd_element->name, dtd_element->childs[i]->name);
             }
             break;
-        case OCCURENCE_1_1:
+        case OCCURRENCE_1_1:
             if (tab[i] != 1)
             {
                 error = true;

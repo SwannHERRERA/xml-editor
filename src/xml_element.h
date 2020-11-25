@@ -8,7 +8,7 @@
 /*
  * Just 1
  */
-#define OCCURERNCE_1_1 0b0
+#define OCCURRENCE_1_1 0b0
 /*
  * At least one to many corresponds to +
  */
@@ -50,8 +50,8 @@ struct DTD_element
   int childsCount;
   int childsCapacity;
   unsigned int numberOfAttribute;
-  unsigned char occurenceFlag;
-  char occurenceChar;
+  unsigned char occurrenceFlag;
+  char occurrenceChar;
 };
 
 enum AttributeValue
