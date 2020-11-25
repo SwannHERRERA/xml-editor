@@ -13,10 +13,16 @@
         <valeur>
           <valeur-interne>12</valeur-interne>
         </valeur>
+        <valeur>
+          <valeur-interne>14</valeur-interne>
+        </valeur>
       </prefix>
       <suffix>
         <valeur>
           <valeur-interne>13</valeur-interne>
+        </valeur>
+        <valeur>
+          <valeur-interne>16</valeur-interne>
         </valeur>
       </suffix>
     </code>

@@ -91,9 +91,12 @@ bool check_error_attributes(DTD_element *dtd_element, XML_element *element)
     xml_attribute **attributes = attributes_to_array(element);
     DTD_attribute **dtd_attributes = attributes_dtd_to_array(dtd_element);
     int max_size;
-    if (element->number_of_attribute >  dtd_element->numberOfAttribute) {
+    if (element->number_of_attribute > dtd_element->numberOfAttribute)
+    {
         max_size = element->number_of_attribute;
-    } else {
+    }
+    else
+    {
         max_size = dtd_element->numberOfAttribute;
     }
     int elements_in_dtd[max_size];
@@ -106,11 +109,6 @@ bool check_error_attributes(DTD_element *dtd_element, XML_element *element)
         attribute_exist = false;
         for (i = 0; i < dtd_element->numberOfAttribute; i += 1)
         {
-            printf("attrbute:%s len:%ld dtd:%s len:%ld\n",
-                   attributes[j]->name,
-                   strlen(attributes[j]->name),
-                   dtd_attributes[i]->name,
-                   strlen(dtd_attributes[i]->name));
             if (strcmp(dtd_attributes[i]->name, attributes[j]->name) == 0)
             {
                 elements_in_dtd[i] = 1;
@@ -126,7 +124,6 @@ bool check_error_attributes(DTD_element *dtd_element, XML_element *element)
 
     for (i = 0; i < dtd_element->numberOfAttribute; i += 1)
     {
-        printf("%s %d\n",dtd_attributes[i]->name,dtd_attributes[i]->value);
         switch (dtd_attributes[i]->value)
         {
         case REQUIRED:
@@ -144,7 +141,6 @@ bool check_error_attributes(DTD_element *dtd_element, XML_element *element)
             break;
         }
     }
-    printf("\n");
     free(attributes);
     free(dtd_attributes);
     return error;
