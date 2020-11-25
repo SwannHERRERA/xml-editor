@@ -19,5 +19,3 @@ make start inputFile=./dtd-exemple.xml
 ```ZSH
 make dev inputFile=./dtd-exemple.xml
 ```
-
-`make` is a shortcut for `make dev`

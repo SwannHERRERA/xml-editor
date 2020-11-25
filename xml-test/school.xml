@@ -3,6 +3,7 @@
 <!ELEMENT schools (school+)>
 <!ELEMENT school (classrooms)>
 <!ELEMENT classrooms (classroom+)>
+<!ELEMENT classroom (#PCDATA)>
 <!ATTLIST classroom students CDATA>
 <!ATTLIST school name CDATA>
 ]>
