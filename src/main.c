@@ -1,17 +1,37 @@
 #include "check_xml_corresponding.h"
 
-int main(int argc, char **argv)
+int menu()
 {
-
-  if (argc < 2)
+  int input = 0;
+  do
   {
-    fprintf(stderr, "Error attending xml file in parameters\n");
-    return EXIT_FAILURE;
-  }
-  FILE *file = fopen(argv[1], "r");
+    printf("Quel fichier voulez vous ouvrir ?\n");
+    printf("Option 1: basic.xml\n");
+    printf("Option 2: basic-error.xml\n");
+    printf("Option 3: basic-attribute.xml\n");
+    printf("Option 4: school.xml\n");
+    printf("Option 5: profondeur-multiple.xml\n");
+    scanf("%d", &input);
+  } while (input <= 0 || input > 5);
+  return input;
+}
+
+int main(void)
+{
+  const char *files_names[] = {
+      "./xml-test/basic.xml",
+      "./xml-test/basic-error.xml",
+      "./xml-test/basic-attribute.xml",
+      "./xml-test/school.xml",
+      "./xml-test/profondeur-multiple.xml"};
+
+  int user_entry = menu();
+  user_entry -= 1;
+
+  FILE *file = fopen(files_names[user_entry], "r");
   if (file == NULL)
   {
-    fprintf(stderr, "Error opening file %s\n", argv[1]);
+    fprintf(stderr, "Error opening file %s\n", files_names[user_entry]);
     return EXIT_FAILURE;
   }
   char *xml_file_content = file_get_content(file);

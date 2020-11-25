@@ -28,7 +28,7 @@ void get_attr_name(int index, char *subject, xml_attribute *attr)
 
 void get_attr_value(int index, char *subject, xml_attribute *attr)
 {
-  int j;
+  size_t j;
   j = index;
   while (subject[j] != '"' && subject[j] != '\'' && j < strlen(subject))
   {
