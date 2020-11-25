@@ -1,61 +1,67 @@
 #include "parse_xml.h"
 
-xml_attribute_linkedlist *create_next_element(xml_attribute_linkedlist *head)
+xml_attribute_linkedlist *create_next_element(XML_element *element)
 {
   xml_attribute_linkedlist *new_attribute = malloc(sizeof(xml_attribute_linkedlist));
-  new_attribute->next = NULL;
+  new_attribute->next = element->attributes;
+  element->attributes = new_attribute;
+  element->number_of_attribute += 1;
   new_attribute->value = NULL;
-  head->next = new_attribute;
   return new_attribute;
 }
 
-int make_attributes(char *tag, char *subject, xml_element *element)
+void get_attr_name(int index, char *subject, xml_attribute *attr)
+{
+  int j, counter;
+  j = index;
+  counter = 0;
+  while (subject[j] != ' ')
+  {
+    counter += 1;
+    printf("%d: %c\n", j, subject[j]);
+    j -= 1;
+  }
+  attr->name = calloc(counter + 1, sizeof(char));
+  strncpy(attr->name, subject + index - counter + 1, counter - 1);
+  attr->name[counter] = '\0';
+}
+
+void get_attr_value(int index, char *subject, xml_attribute *attr)
+{
+  int j;
+  j = index;
+  while (subject[j] != '"' && subject[j] != '\'' && j < strlen(subject))
+  {
+    j += 1;
+  }
+  attr->value = calloc(j - index, sizeof(char));
+  strncpy(attr->value, subject + index, j - index);
+  attr->name[j] = '\0';
+}
+
+int make_attributes(char *tag, char *subject, XML_element *element)
 {
   char *start;
   size_t i = 0, j = 0, counter;
   char *tmp = (char *)calloc(strlen(tag) + 1, sizeof(char));
   strcpy(tmp, "<");
   start = strstr(subject, strcat(tmp, tag));
-  tmp = start;
-  bool is_first = true;
-  xml_attribute_linkedlist *head = NULL;
+  free(tmp);
 
-  while (tmp[i] != '>')
+  while (start[i] != '>')
   {
-    if (tmp[i] == '=')
+    if (start[i] == '=')
     {
-      element->number_of_attribute += 1;
       xml_attribute *attr = malloc(sizeof(xml_attribute));
-      j = i;
-      counter = 0;
-      if (is_first)
-      {
-        is_first = false;
-        create_empty_xml_attribute_linkedlist(element);
-        head = element->attributes;
-      }
-      while (tmp[j] != ' ')
-      {
-        j -= 1;
-        counter += 1;
-      }
-      counter -= 1;
-      attr->name = calloc(counter, sizeof(char));
-      strncpy(attr->name, tmp + i - counter, counter);
-      attr->name[counter] = '\0';
+
+      get_attr_name(i, start, attr);
 
       i += 2; // skip ="
-      j = i;
-      while (tmp[j] != '"' && tmp[j] != '\'' && j < strlen(tmp))
-      {
-        j += 1;
-      }
-      attr->value = calloc(j - i, sizeof(char));
-      strncpy(attr->value, tmp + i, j - i);
-      attr->name[j] = '\0';
 
+      get_attr_value(i, start, attr);
+
+      element->attributes = create_next_element(element);
       element->attributes->value = attr;
-      element->attributes = create_next_element(element->attributes);
     }
 
     if (i > strlen(start))
@@ -65,7 +71,7 @@ int make_attributes(char *tag, char *subject, xml_element *element)
     }
     i += 1;
   }
-  if (tmp[i - 1] == '/')
+  if (start[i - 1] == '/')
   {
     element->autoclosing = true;
   }
@@ -73,19 +79,18 @@ int make_attributes(char *tag, char *subject, xml_element *element)
   {
     element->autoclosing = false;
   }
-  element->attributes = head;
   i += 1; // skip >
   return i;
 }
 
-void create_empty_xml_attribute_linkedlist(xml_element *element)
+void create_empty_xml_attribute_linkedlist(XML_element *element)
 {
   element->attributes = malloc(sizeof(xml_attribute_linkedlist));
   element->attributes->value = NULL;
   element->attributes->next = NULL;
 }
 
-xml_attribute **attributes_to_array(xml_element *element)
+xml_attribute **attributes_to_array(XML_element *element)
 {
   xml_attribute **res = malloc(sizeof(xml_attribute_linkedlist *) * element->number_of_attribute);
   xml_attribute_linkedlist *head = element->attributes;
@@ -98,7 +103,7 @@ xml_attribute **attributes_to_array(xml_element *element)
   return res;
 }
 
-void print_attribute(xml_element *element)
+void print_attribute(XML_element *element)
 {
   unsigned int i = 0;
   xml_attribute_linkedlist *head = element->attributes;
@@ -111,7 +116,7 @@ void print_attribute(xml_element *element)
   }
 }
 
-void get_content(char *subject, xml_element *element)
+void get_content(char *subject, XML_element *element)
 {
   char *content = (char *)malloc(sizeof(char) * strlen(subject));
   strcpy(content, subject);
@@ -128,9 +133,10 @@ void get_content(char *subject, xml_element *element)
   }
   end[0] = '\0';
   element->content = content;
+  free(closing_tag);
 }
 
-void print_element(xml_element *element)
+void print_element(XML_element *element)
 {
   printf("%s\n", element->name);
   print_attribute(element);
@@ -158,7 +164,7 @@ void print_element(xml_element *element)
   printf("\n");
 }
 
-void free_element(xml_element *element)
+void free_element(XML_element *element)
 {
   xml_attribute_linkedlist *tmp = NULL;
   unsigned int i;
@@ -178,11 +184,14 @@ void free_element(xml_element *element)
   }
 
   free(element->name);
-  free(element->content);
+  if (!element->autoclosing)
+  {
+    free(element->content);
+  }
   free(element);
 }
 
-char *find_start(char *xml, xml_element *element)
+char *find_start(char *xml, XML_element *element)
 {
   int length_of_opening_tag = strlen(element->name) + (2 * sizeof(char));
   char tmp[length_of_opening_tag];
@@ -201,10 +210,10 @@ char *find_start(char *xml, xml_element *element)
   return str;
 }
 
-xml_element *get_element(char *xml, char *tag_name)
+XML_element *get_element(char *xml, char *tag_name)
 {
   int index_of_opening_tag;
-  xml_element *element = malloc(sizeof(xml_element));
+  XML_element *element = malloc(sizeof(XML_element));
   element->parent = NULL;
   element->name = malloc(sizeof(char) * strlen(tag_name));
   strcpy(element->name, tag_name);
@@ -221,9 +230,9 @@ xml_element *get_element(char *xml, char *tag_name)
   return element;
 }
 
-void realloc_childs(xml_element *element)
+void realloc_childs(XML_element *element)
 {
-  xml_element **new_array = malloc(sizeof(xml_element *) * (element->childs_capacity * 2));
+  XML_element **new_array = malloc(sizeof(XML_element *) * (element->childs_capacity * 2));
   element->childs_capacity *= 2;
   for (int i = 0; i < element->childs_count; i += 1)
   {
@@ -233,7 +242,7 @@ void realloc_childs(xml_element *element)
   element->childs = new_array;
 }
 
-xml_element *get_next_element(char *xml, xml_element *parent, int deepness)
+XML_element *get_next_element(char *xml, XML_element *parent, int deepness)
 {
   int i = 1;
   int start, end;
@@ -250,8 +259,8 @@ xml_element *get_next_element(char *xml, xml_element *parent, int deepness)
   strncpy(name, xml + start, end);
   name[end] = '\0';
 
-  xml_element *element = get_element(xml, name);
-  element->childs = malloc(sizeof(xml_element *) * 5);
+  XML_element *element = get_element(xml, name);
+  element->childs = malloc(sizeof(XML_element *) * 5);
   element->childs_count = 0;
   element->childs_capacity = 5;
   element->parent = parent;
@@ -330,10 +339,10 @@ bool is_closing_tag(char *s)
   return false;
 }
 
-xml_element *parse_xml(char *xml)
+XML_element *parse_xml(char *xml)
 {
-  xml_element *root;
-  xml_element *current_element = NULL;
+  XML_element *root;
+  XML_element *current_element = NULL;
   int deepness = 0;
 
   while ((xml = strchr(xml, '<')) != NULL)

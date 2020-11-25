@@ -4,6 +4,7 @@
 #include "file_helper.h"
 #include "parse_dtd.h"
 #include "parse_xml.h"
+#include "check_xml_corresponding.h"
 
 typedef struct
 {
@@ -19,6 +20,7 @@ typedef struct
 {
   GtkWindow *window;
   GtkTextView *main_text_view;
+  GtkStatusbar *status_bar;
   MenuItems *items;
 } GuiWidgets;
 
@@ -38,7 +40,7 @@ void menu_button_about();
 void menu_button_save_file_as(GtkWidget *widget, gpointer data);
 void menu_button_save_file();
 void menu_button_open_file(GtkWidget *widget, gpointer data);
-void menu_button_new_file();
+void menu_button_new_file(GtkWidget *widget, gpointer data);
 void text_view_populate_popup_menu(GtkWidget *widget, GtkWidget *popup, gpointer data);
 void start_xml_validation(GtkWidget *widget, gpointer data);
 #endif

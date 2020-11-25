@@ -1,6 +1,6 @@
 #include "check_xml_corresponding.h"
 
-bool check_dtd_correspond_to_xml(XMLElement *dtd, xml_element *root)
+bool check_dtd_correspond_to_xml(DTD_element *dtd, XML_element *root)
 {
     if (dtd != NULL)
     {
@@ -12,10 +12,8 @@ bool check_dtd_correspond_to_xml(XMLElement *dtd, xml_element *root)
     return false;
 }
 
-bool check_element_is_correct(XMLElement *dtd_element, xml_element *element)
+bool check_element_is_correct(DTD_element *dtd_element, XML_element *element)
 {
-
-    // J'ai un problème quand je trouve une balise que je n'attends pas + balise autofermante
     int i, j;
     bool is_not_in_dtd;
     int tab[dtd_element->childsCount];
@@ -51,7 +49,6 @@ bool check_element_is_correct(XMLElement *dtd_element, xml_element *element)
 
     for (i = 0; i < dtd_element->childsCount; i += 1)
     {
-        // printf("%s %d(%c) tab[%d]: %d\n", dtd_element->childs[i]->name, dtd_element->childs[i]->occurenceFlag, dtd_element->childs[i]->occurenceChar, i, tab[i]);
         switch (dtd_element->childs[i]->occurenceFlag)
         {
         case OCCURENCE_1_N:
@@ -86,21 +83,23 @@ bool check_element_is_correct(XMLElement *dtd_element, xml_element *element)
     return !error;
 }
 
-bool check_error_attributes(XMLElement *dtd_element, xml_element *element)
+bool check_error_attributes(DTD_element *dtd_element, XML_element *element)
 {
-    // TODO
-    /**
-    * Gestion de la valeur des attributs
-    */
     unsigned int i, j;
     bool attribute_exist;
     bool error = false;
     xml_attribute **attributes = attributes_to_array(element);
-    XMLAttribute **dtd_attributes = attributes_dtd_to_array(dtd_element);
-    int tab[element->number_of_attribute];
-    for (i = 0; i < dtd_element->numberOfAttribute; i += 1)
+    DTD_attribute **dtd_attributes = attributes_dtd_to_array(dtd_element);
+    int max_size;
+    if (element->number_of_attribute >  dtd_element->numberOfAttribute) {
+        max_size = element->number_of_attribute;
+    } else {
+        max_size = dtd_element->numberOfAttribute;
+    }
+    int elements_in_dtd[max_size];
+    for (i = 0; i < max_size; i += 1)
     {
-        tab[i] = 0;
+        elements_in_dtd[i] = 0;
     }
     for (j = 0; j < element->number_of_attribute; j += 1)
     {
@@ -114,7 +113,7 @@ bool check_error_attributes(XMLElement *dtd_element, xml_element *element)
                    strlen(dtd_attributes[i]->name));
             if (strcmp(dtd_attributes[i]->name, attributes[j]->name) == 0)
             {
-                tab[j] = 1;
+                elements_in_dtd[i] = 1;
                 attribute_exist = true;
             }
         }
@@ -124,15 +123,29 @@ bool check_error_attributes(XMLElement *dtd_element, xml_element *element)
             fprintf(stderr, "%s is not in dtd\n", attributes[j]->name);
         }
     }
+
     for (i = 0; i < dtd_element->numberOfAttribute; i += 1)
     {
-        if (tab[i] != 1)
+        printf("%s %d\n",dtd_attributes[i]->name,dtd_attributes[i]->value);
+        switch (dtd_attributes[i]->value)
         {
-            error = true;
-            fprintf(stderr, "error %s\n", dtd_attributes[i]->name);
+        case REQUIRED:
+            if (elements_in_dtd[i] < 1)
+            {
+                error = true;
+                fprintf(stderr, "error %s\n", dtd_attributes[i]->name);
+            }
+            break;
+        case IMPLIED:
+            break;
+        case FIXED:
+            break;
+        default:
+            break;
         }
     }
     printf("\n");
-
+    free(attributes);
+    free(dtd_attributes);
     return error;
 }
