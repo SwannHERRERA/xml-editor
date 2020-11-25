@@ -274,16 +274,16 @@ void set_child_occurence(char occurence_char, DTD_element *child)
   switch (pos)
   {
   case 0:
-    child->occurenceFlag |= OCCURENCE_0_1;
+    child->occurenceFlag |= OCCURRENCE_0_1;
     break;
   case 1:
-    child->occurenceFlag |= OCCURENCE_1_N;
+    child->occurenceFlag |= OCCURRENCE_1_N;
     break;
   case 2:
-    child->occurenceFlag |= OCCURENCE_0_N;
+    child->occurenceFlag |= OCCURRENCE_0_N;
     break;
   case 3:
-    child->occurenceFlag |= OCCURENCE_OR;
+    child->occurenceFlag |= OCCURRENCE_OR;
     break;
   default:
     break;

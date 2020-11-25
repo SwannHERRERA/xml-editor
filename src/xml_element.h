@@ -8,23 +8,23 @@
 /*
  * Just 1
  */
-#define OCCURENCE_1_1 0b0
+#define OCCURERNCE_1_1 0b0
 /*
  * At least one to many corresponds to +
  */
-#define OCCURENCE_1_N 0b10
+#define OCCURRENCE_1_N 0b10
 /*
  * 0 to N corresponds to *
  */
-#define OCCURENCE_0_N 0b11
+#define OCCURRENCE_0_N 0b11
 /*
  * 0 or 1 corresponds to ?
  */
-#define OCCURENCE_0_1 0b1
+#define OCCURRENCE_0_1 0b1
 /*
  * OR with the next element corresponds to |
  */
-#define OCCURENCE_OR 0b1000
+#define OCCURRENCE_OR 0b1000
 
 typedef struct DTD_element DTD_element;
 typedef struct DTD_attribute DTD_attribute;
